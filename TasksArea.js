@@ -5,6 +5,7 @@ import {
   Text,
   TouchableHighlight,
   View,
+  Alert,
 } from "react-native";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import styles from "./styles";
@@ -33,7 +34,12 @@ function TasksArea(props) {
                 </Text>
                 <TouchableHighlight
                   style={styles.deleteButton}
-                  onPress={() => props.delete(index)}
+                  onPress={() =>
+                    Alert.alert("Delete task", "Are you sure?", [
+                      { text: "Cancel", onPress: () => null },
+                      { text: "OK", onPress: () => props.delete(index) },
+                    ])
+                  }
                 >
                   <AntDesign name="delete" size={24} color="white" />
                 </TouchableHighlight>
