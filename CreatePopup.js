@@ -7,6 +7,7 @@ import {
   Alert,
   BackHandler,
 } from "react-native";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import styles from "./styles";
 
 function CreatePopup(props) {
@@ -16,7 +17,7 @@ function CreatePopup(props) {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       () => {
-        Alert.alert("Dischard task", "Are you sure?", [
+        Alert.alert("Discard task", "Are you sure?", [
           { text: "Cancel", onPress: () => null },
           { text: "OK", onPress: () => props.closeCreatePopup() },
         ]);
@@ -63,13 +64,23 @@ function CreatePopup(props) {
           <TouchableHighlight
             style={[styles.commonButton, { backgroundColor: "#470c0c" }]}
             onPress={() =>
-              Alert.alert("Dischard task", "Are you sure?", [
+              Alert.alert("Discard task", "Are you sure?", [
                 { text: "Cancel", onPress: () => null },
                 { text: "OK", onPress: () => props.closeCreatePopup() },
               ])
             }
           >
-            <Text style={styles.text}>Cancel</Text>
+            <View
+              style={{
+                width: "100%",
+                flexDirection: "row",
+                justifyContent: "space-evenly",
+                alignItems: "center",
+              }}
+            >
+              <AntDesign name="back" size={20} color="#fff" />
+              <Text style={styles.text}>Cancel</Text>
+            </View>
           </TouchableHighlight>
           <TouchableHighlight
             style={[styles.commonButton, { backgroundColor: "#0d4f6b" }]}
@@ -77,7 +88,17 @@ function CreatePopup(props) {
               checkTextAndSave();
             }}
           >
-            <Text style={styles.text}>Add</Text>
+            <View
+              style={{
+                width: "100%",
+                flexDirection: "row",
+                justifyContent: "space-evenly",
+                alignItems: "center",
+              }}
+            >
+              <Ionicons name="save-outline" size={20} color="#fff" />
+              <Text style={styles.text}>Add</Text>
+            </View>
           </TouchableHighlight>
         </View>
       </View>

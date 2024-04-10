@@ -30,6 +30,9 @@ export default function App() {
   const didFetch = useRef(false);
   const [openMenu, setOpenMenu] = useState(false);
   const [menuAnimation, setMenuAnimation] = useState(new Animated.Value(0));
+  const [menuLeftAnimation, setMenuLeftAnimation] = useState(
+    new Animated.Value(0)
+  );
   const [viewPopup, setViewPopup] = useState(false);
   const [viewPopupAnimation, setViewPopupAnimation] = useState(
     new Animated.Value(0)
@@ -81,6 +84,15 @@ export default function App() {
     }).start();
   }
 
+  function animateMenuLeftOpening(property) {
+    Animated.timing(property, {
+      toValue: 1,
+      duration: 400,
+      easing: Easing.ease,
+      useNativeDriver: true,
+    }).start();
+  }
+
   function animateClosing(property, callbackFunction) {
     Animated.timing(property, {
       toValue: 0,
@@ -92,6 +104,15 @@ export default function App() {
     });
   }
 
+  function animateMenuLeftClosing(property) {
+    Animated.timing(property, {
+      toValue: 0,
+      duration: 400,
+      easing: Easing.ease,
+      useNativeDriver: true,
+    }).start();
+  }
+
   return (
     <View style={styles.container}>
       {openMenu && (
@@ -99,8 +120,10 @@ export default function App() {
           style={[styles.fullscreenArea, { opacity: menuAnimation }]}
         >
           <Menu
+            animation={menuLeftAnimation}
             closeMenu={() => {
               animateClosing(menuAnimation, () => setOpenMenu(false));
+              animateMenuLeftClosing(menuLeftAnimation);
             }}
           />
         </Animated.View>
@@ -138,6 +161,7 @@ export default function App() {
         openMenu={() => {
           setOpenMenu(true);
           animateOpening(menuAnimation);
+          animateMenuLeftOpening(menuLeftAnimation);
         }}
       />
       <TasksArea

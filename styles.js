@@ -29,7 +29,6 @@ const styles = StyleSheet.create({
   menuRight: {
     minWidth: "40%",
     minHeight: "100%",
-    backgroundColor: "rgba(0,0,0,0.5)",
   },
   topBar: {
     width: screenWidth,
@@ -72,7 +71,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     margin: 0,
     backgroundColor: "#590d08",
-    borderRadius: 20,
+    borderRadius: 12,
   },
   addTask: {
     width: 150,
