@@ -4,7 +4,6 @@ import {
   View,
   TextInput,
   TouchableHighlight,
-  Alert,
   BackHandler,
 } from "react-native";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
@@ -12,29 +11,35 @@ import styles from "./styles";
 
 function ViewPoup(props) {
   const [text, onChangeText] = useState("");
+  const [didTextChange, setTextChange] = useState(false);
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       () => {
-        Alert.alert("Discard changes", "Are you sure?", [
-          { text: "Cancel", onPress: () => null },
-          { text: "OK", onPress: () => props.closeViewPopup() },
-        ]);
+        typeof text === "string" &&
+        text.replace(/\s/g, "").length != 0 &&
+        text != props.taskToChange
+          ? props.openDiscardPopup()
+          : props.closeViewPopup();
         return true;
       }
     );
     return () => backHandler.remove();
+  }, [text]);
+
+  useEffect(() => {
+    onChangeText(props.taskToChange);
   }, []);
 
   function checkTextAndSave() {
-    if (text != "") {
+    if (typeof text === "string" && text.trim().length != 0) {
       props.tasks[props.index] = text;
       props.setTasks(props.tasks);
       props.save();
       props.closeViewPopup();
     } else {
-      alert("Please, insert any text!");
+      props.openNoTextPopup();
     }
   }
 
@@ -64,12 +69,13 @@ function ViewPoup(props) {
         <View style={styles.popupButtonRow}>
           <TouchableHighlight
             style={[styles.commonButton, { backgroundColor: "#470c0c" }]}
-            onPress={() =>
-              Alert.alert("Discard changes", "Are you sure?", [
-                { text: "Cancel", onPress: () => null },
-                { text: "OK", onPress: () => props.closeViewPopup() },
-              ])
-            }
+            onPress={() => {
+              typeof text === "string" &&
+              text.replace(/\s/g, "").length != 0 &&
+              text != props.taskToChange
+                ? props.openDiscardPopup()
+                : props.closeViewPopup();
+            }}
           >
             <View
               style={{

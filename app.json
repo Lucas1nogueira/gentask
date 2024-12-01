@@ -1,15 +1,16 @@
 {
   "expo": {
     "name": "MyTasks",
-    "slug": "my-app",
+    "slug": "MyTasks",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#000"
+      "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true
@@ -17,17 +18,14 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#000"
-      },
-      "package": "com.lucas_nogueira.mytasks"
+        "backgroundColor": "#ffffff"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "extra": {
-      "eas": {
-        "projectId": "8c271a34-3856-40fa-b9c3-585a8315cdaa"
-      }
-    }
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }

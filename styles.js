@@ -41,7 +41,8 @@ const styles = StyleSheet.create({
   },
   tasksArea: {
     width: screenWidth - 50,
-    height: screenHeight - 70,
+    height: screenHeight - 110,
+    marginTop: 10,
     alignSelf: "center",
     flexDirection: "column",
     justifyContent: "space-between",
@@ -74,7 +75,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   addTask: {
-    width: 150,
+    width: 155,
     height: 60,
     flexDirection: "row",
     alignSelf: "flex-end",
@@ -86,10 +87,10 @@ const styles = StyleSheet.create({
   },
   taskPopup: {
     width: 400,
-    height: 555,
+    height: 560,
     alignItems: "center",
     borderRadius: 25,
-    backgroundColor: "#22353a",
+    backgroundColor: "#222",
     padding: 25,
   },
   taskInput: {
@@ -116,6 +117,30 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: "#4c4c4c",
     backgroundColor: "#1e1e1e",
+  },
+  messagePopup: {
+    width: 400,
+    height: 200,
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    borderRadius: 25,
+    backgroundColor: "#222",
+    padding: 25,
+  },
+  minimalPopup: {
+    position: "absolute",
+    top: 70,
+    right: 40,
+    width: 230,
+    height: 50,
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#777",
+    borderRadius: 20,
+    backgroundColor: "#333",
+    zIndex: 1,
   },
 });
 

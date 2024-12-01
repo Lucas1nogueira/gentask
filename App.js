@@ -8,6 +8,8 @@ import TopBar from "./TopBar";
 import TasksArea from "./TasksArea";
 import ViewPoup from "./ViewPopup";
 import CreatePopup from "./CreatePopup";
+import MessagePopup from "./MessagePopup";
+import MinimalPopup from "./MinimalPopup";
 
 async function save(key, value) {
   const jsonValue = JSON.stringify(value);
@@ -17,40 +19,72 @@ async function save(key, value) {
 async function getValueFor(key) {
   try {
     let result = await SecureStore.getItemAsync(key);
-    if (result) {
+    if (result && result != "[]") {
       return JSON.parse(result);
+    } else {
+      return null;
     }
   } catch (error) {
-    alert("Erro ao obter dados!");
+    Alert.alert("Erro ao obter dados!");
   }
 }
 
 export default function App() {
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState(null);
   const didFetch = useRef(false);
+
   const [openMenu, setOpenMenu] = useState(false);
   const [menuAnimation, setMenuAnimation] = useState(new Animated.Value(0));
   const [menuLeftAnimation, setMenuLeftAnimation] = useState(
     new Animated.Value(0)
   );
+
   const [viewPopup, setViewPopup] = useState(false);
   const [viewPopupAnimation, setViewPopupAnimation] = useState(
     new Animated.Value(0)
   );
+
   const [createPopup, setCreatePopup] = useState(false);
   const [createPopupAnimation, setCreatePopupAnimation] = useState(
     new Animated.Value(0)
   );
+
+  const [exitPopup, setExitPopup] = useState(false);
+  const [exitPopupAnimation, setExitPopupAnimation] = useState(
+    new Animated.Value(0)
+  );
+
+  const [deletePopup, setDeletePopup] = useState(false);
+  const [deletePopupAnimation, setDeletePopupAnimation] = useState(
+    new Animated.Value(0)
+  );
+
+  const [discardPopup, setDiscardPopup] = useState(false);
+  const [discardPopupAnimation, setDiscardPopupAnimation] = useState(
+    new Animated.Value(0)
+  );
+
+  const [noTextPopup, setNoTextPopup] = useState(false);
+  const [noTextPopupAnimation, setNoTextPopupAnimation] = useState(
+    new Animated.Value(0)
+  );
+  const [noTextPopupRightAnimation, setNoTextPopupRightAnimation] = useState(
+    new Animated.Value(0)
+  );
+
+  const [errorPopup, setErrorPopup] = useState(false);
+  const [errorPopupAnimation, setErrorPopupAnimation] = useState(
+    new Animated.Value(0)
+  );
+
   const [selectedTaskIndex, setSelectedTaskIndex] = useState(0);
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       () => {
-        Alert.alert("Exit app", "Are you sure?", [
-          { text: "Cancel", onPress: () => null },
-          { text: "Exit", onPress: () => BackHandler.exitApp() },
-        ]);
+        setExitPopup(true);
+        animateOpening(exitPopupAnimation);
         return true;
       }
     );
@@ -84,15 +118,6 @@ export default function App() {
     }).start();
   }
 
-  function animateMenuLeftOpening(property) {
-    Animated.timing(property, {
-      toValue: 1,
-      duration: 400,
-      easing: Easing.ease,
-      useNativeDriver: true,
-    }).start();
-  }
-
   function animateClosing(property, callbackFunction) {
     Animated.timing(property, {
       toValue: 0,
@@ -104,7 +129,16 @@ export default function App() {
     });
   }
 
-  function animateMenuLeftClosing(property) {
+  function animateSlideIn(property) {
+    Animated.timing(property, {
+      toValue: 1,
+      duration: 400,
+      easing: Easing.ease,
+      useNativeDriver: true,
+    }).start();
+  }
+
+  function animateSlideOut(property) {
     Animated.timing(property, {
       toValue: 0,
       duration: 400,
@@ -123,7 +157,7 @@ export default function App() {
             animation={menuLeftAnimation}
             closeMenu={() => {
               animateClosing(menuAnimation, () => setOpenMenu(false));
-              animateMenuLeftClosing(menuLeftAnimation);
+              animateSlideOut(menuLeftAnimation);
             }}
           />
         </Animated.View>
@@ -135,6 +169,15 @@ export default function App() {
           <ViewPoup
             closeViewPopup={() => {
               animateClosing(viewPopupAnimation, () => setViewPopup(false));
+            }}
+            openDiscardPopup={() => {
+              setDiscardPopup(true);
+              animateOpening(discardPopupAnimation);
+            }}
+            openNoTextPopup={() => {
+              setNoTextPopup(true);
+              animateOpening(noTextPopupAnimation);
+              animateSlideIn(noTextPopupRightAnimation);
             }}
             taskToChange={tasks[selectedTaskIndex]}
             index={selectedTaskIndex}
@@ -152,8 +195,103 @@ export default function App() {
             closeCreatePopup={() => {
               animateClosing(createPopupAnimation, () => setCreatePopup(false));
             }}
+            openDiscardPopup={() => {
+              setDiscardPopup(true);
+              animateOpening(discardPopupAnimation);
+            }}
+            openNoTextPopup={() => {
+              setNoTextPopup(true);
+              animateOpening(noTextPopupAnimation);
+              animateSlideIn(noTextPopupRightAnimation);
+            }}
             isAnyTaskCreated={tasks != null}
             setTasks={setTasks}
+          />
+        </Animated.View>
+      )}
+      {exitPopup && (
+        <Animated.View
+          style={[styles.fullscreenArea, { opacity: exitPopupAnimation }]}
+        >
+          <MessagePopup
+            close={() => {
+              animateClosing(exitPopupAnimation, () => setExitPopup(false));
+            }}
+            title={"Exit app"}
+            description={"This will close MyTasks. Are you sure?"}
+            actionName={"Exit"}
+            actionButtonColor={"#470c0c"}
+            action={() => BackHandler.exitApp()}
+          />
+        </Animated.View>
+      )}
+      {deletePopup && (
+        <Animated.View
+          style={[styles.fullscreenArea, { opacity: deletePopupAnimation }]}
+        >
+          <MessagePopup
+            close={() => {
+              animateClosing(deletePopupAnimation, () => setDeletePopup(false));
+            }}
+            title={"Delete task"}
+            description={"This will erase the selected task. Are you sure?"}
+            actionName={"Delete"}
+            actionButtonColor={"#470c0c"}
+            action={() => {
+              const updatedTasks = [...tasks];
+              updatedTasks.splice(selectedTaskIndex, 1);
+              setTasks(updatedTasks);
+              setSelectedTaskIndex(0);
+            }}
+          />
+        </Animated.View>
+      )}
+      {discardPopup && (
+        <Animated.View
+          style={[styles.fullscreenArea, { opacity: discardPopupAnimation }]}
+        >
+          <MessagePopup
+            close={() => {
+              animateClosing(discardPopupAnimation, () =>
+                setDiscardPopup(false)
+              );
+            }}
+            title={"Discard task"}
+            description={"All written text will be lost. Are you sure?"}
+            actionName={"Discard"}
+            actionButtonColor={"#470c0c"}
+            action={() => {
+              animateClosing(viewPopupAnimation, () => setViewPopup(false));
+              animateClosing(createPopupAnimation, () => setCreatePopup(false));
+            }}
+          />
+        </Animated.View>
+      )}
+      {noTextPopup && (
+        <MinimalPopup
+          opacityAnimation={noTextPopupAnimation}
+          rightAnimation={noTextPopupRightAnimation}
+          color="#bc0000"
+          close={() => {
+            animateClosing(noTextPopupAnimation, () => setNoTextPopup(false));
+            animateSlideOut(noTextPopupRightAnimation);
+          }}
+          message={"Please, insert any text!"}
+        />
+      )}
+      {errorPopup && (
+        <Animated.View
+          style={[styles.fullscreenArea, { opacity: errorPopupAnimation }]}
+        >
+          <MessagePopup
+            close={() => {
+              animateClosing(errorPopupAnimation, () => setErrorPopup(false));
+            }}
+            title={"Error"}
+            description={"An error happened."}
+            actionName={"OK"}
+            actionButtonColor={"#470c0c"}
+            action={() => null}
           />
         </Animated.View>
       )}
@@ -161,16 +299,16 @@ export default function App() {
         openMenu={() => {
           setOpenMenu(true);
           animateOpening(menuAnimation);
-          animateMenuLeftOpening(menuLeftAnimation);
+          animateSlideIn(menuLeftAnimation);
         }}
       />
       <TasksArea
         save={save}
         getValueFor={getValueFor}
         delete={(index) => {
-          const updatedTasks = [...tasks];
-          updatedTasks.splice(index, 1);
-          setTasks(updatedTasks);
+          setSelectedTaskIndex(index);
+          setDeletePopup(true);
+          animateOpening(deletePopupAnimation);
         }}
         tasks={tasks}
         setTasks={setTasks}

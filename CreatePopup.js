@@ -4,7 +4,6 @@ import {
   View,
   TextInput,
   TouchableHighlight,
-  Alert,
   BackHandler,
 } from "react-native";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
@@ -17,24 +16,25 @@ function CreatePopup(props) {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       () => {
-        Alert.alert("Discard task", "Are you sure?", [
-          { text: "Cancel", onPress: () => null },
-          { text: "OK", onPress: () => props.closeCreatePopup() },
-        ]);
+        typeof text === "string" &&
+        text.replace(/\s/g, "").length != 0 &&
+        text != props.taskToChange
+          ? props.openDiscardPopup()
+          : props.closeCreatePopup();
         return true;
       }
     );
     return () => backHandler.remove();
-  }, []);
+  }, [text]);
 
   function checkTextAndSave() {
-    if (text != "") {
+    if (typeof text === "string" && text.trim().length != 0) {
       props.isAnyTaskCreated
         ? props.setTasks((prev) => [...prev, text])
         : props.setTasks([text]);
       props.closeCreatePopup();
     } else {
-      alert("Please, insert any text!");
+      props.openNoTextPopup();
     }
   }
 
@@ -63,12 +63,13 @@ function CreatePopup(props) {
         <View style={styles.popupButtonRow}>
           <TouchableHighlight
             style={[styles.commonButton, { backgroundColor: "#470c0c" }]}
-            onPress={() =>
-              Alert.alert("Discard task", "Are you sure?", [
-                { text: "Cancel", onPress: () => null },
-                { text: "OK", onPress: () => props.closeCreatePopup() },
-              ])
-            }
+            onPress={() => {
+              typeof text === "string" &&
+              text.replace(/\s/g, "").length != 0 &&
+              (text != props.taskToChange) != ""
+                ? props.openDiscardPopup()
+                : props.closeCreatePopup();
+            }}
           >
             <View
               style={{
