@@ -7,9 +7,10 @@ import {
   BackHandler,
 } from "react-native";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
-import styles from "./styles";
+import { categorizeTask } from "../services/geminiService";
+import styles from "../styles/styles";
 
-function CreatePopup(props) {
+function CreateTaskPopup(props) {
   const [text, onChangeText] = useState("");
 
   useEffect(() => {
@@ -20,19 +21,34 @@ function CreatePopup(props) {
         text.replace(/\s/g, "").length != 0 &&
         text != props.taskToChange
           ? props.openDiscardPopup()
-          : props.closeCreatePopup();
+          : props.close();
         return true;
       }
     );
     return () => backHandler.remove();
   }, [text]);
 
-  function checkTextAndSave() {
-    if (typeof text === "string" && text.trim().length != 0) {
+  function saveTask() {
+    props.openLoadingPopup();
+    categorizeTask(text).then((category) => {
+      const task = {
+        text: text,
+        category: category,
+      };
       props.isAnyTaskCreated
-        ? props.setTasks((prev) => [...prev, text])
-        : props.setTasks([text]);
-      props.closeCreatePopup();
+        ? props.setTasks((prev) => [...prev, task])
+        : props.setTasks([task]);
+      props.closeLoadingPopup();
+      setTimeout(() => {
+        props.openSuccessPopup();
+      }, 500);
+    });
+    props.close();
+  }
+
+  function checkText() {
+    if (typeof text === "string" && text.trim().length != 0) {
+      saveTask();
     } else {
       props.openNoTextPopup();
     }
@@ -68,7 +84,7 @@ function CreatePopup(props) {
               text.replace(/\s/g, "").length != 0 &&
               (text != props.taskToChange) != ""
                 ? props.openDiscardPopup()
-                : props.closeCreatePopup();
+                : props.close();
             }}
           >
             <View
@@ -86,7 +102,7 @@ function CreatePopup(props) {
           <TouchableHighlight
             style={[styles.commonButton, { backgroundColor: "#0d4f6b" }]}
             onPress={() => {
-              checkTextAndSave();
+              checkText();
             }}
           >
             <View
@@ -107,4 +123,4 @@ function CreatePopup(props) {
   );
 }
 
-export default CreatePopup;
+export default CreateTaskPopup;

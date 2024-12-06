@@ -7,11 +7,11 @@ import {
   BackHandler,
 } from "react-native";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
-import styles from "./styles";
+import { categorizeTask } from "../services/geminiService";
+import styles from "../styles/styles";
 
-function ViewPoup(props) {
+function TaskViewPopup(props) {
   const [text, onChangeText] = useState("");
-  const [didTextChange, setTextChange] = useState(false);
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
@@ -21,7 +21,7 @@ function ViewPoup(props) {
         text.replace(/\s/g, "").length != 0 &&
         text != props.taskToChange
           ? props.openDiscardPopup()
-          : props.closeViewPopup();
+          : props.close();
         return true;
       }
     );
@@ -32,12 +32,27 @@ function ViewPoup(props) {
     onChangeText(props.taskToChange);
   }, []);
 
-  function checkTextAndSave() {
-    if (typeof text === "string" && text.trim().length != 0) {
-      props.tasks[props.index] = text;
+  function updateTask() {
+    props.openLoadingPopup();
+    categorizeTask(text).then((category) => {
+      const task = {
+        text: text,
+        category: category,
+      };
+      props.tasks[props.index] = task;
       props.setTasks(props.tasks);
       props.save();
-      props.closeViewPopup();
+      props.closeLoadingPopup();
+      setTimeout(() => {
+        props.openSuccessPopup();
+      }, 500);
+    });
+    props.close();
+  }
+
+  function checkText() {
+    if (typeof text === "string" && text.trim().length != 0) {
+      updateTask();
     } else {
       props.openNoTextPopup();
     }
@@ -74,7 +89,7 @@ function ViewPoup(props) {
               text.replace(/\s/g, "").length != 0 &&
               text != props.taskToChange
                 ? props.openDiscardPopup()
-                : props.closeViewPopup();
+                : props.close();
             }}
           >
             <View
@@ -92,7 +107,7 @@ function ViewPoup(props) {
           <TouchableHighlight
             style={[styles.commonButton, { backgroundColor: "#0d4f6b" }]}
             onPress={() => {
-              checkTextAndSave();
+              checkText();
             }}
           >
             <View
@@ -113,4 +128,4 @@ function ViewPoup(props) {
   );
 }
 
-export default ViewPoup;
+export default TaskViewPopup;

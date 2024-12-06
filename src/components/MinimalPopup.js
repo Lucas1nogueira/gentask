@@ -1,19 +1,22 @@
 import React, { useEffect } from "react";
-import { Text, Animated } from "react-native";
+import { Text, Animated, ActivityIndicator } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
-import styles from "./styles";
+import styles from "../styles/styles";
 
 function MinimalPopup(props) {
-  useEffect(() => {
-    setTimeout(() => {
-      props.close();
-    }, 3000);
-  }, []);
+  if (!props.loading) {
+    useEffect(() => {
+      setTimeout(() => {
+        props.close();
+      }, 3000);
+    }, []);
+  }
 
   return (
     <Animated.View
       style={[
         styles.minimalPopup,
+        props.customTop && { top: props.customTop },
         {
           backgroundColor: props.color,
           opacity: props.opacityAnimation,
@@ -28,8 +31,12 @@ function MinimalPopup(props) {
         },
       ]}
     >
-      <FontAwesome name="exclamation-circle" size={24} color="white" />
-      <Text style={styles.text}>{props.message}</Text>
+      {props.loading ? (
+        <ActivityIndicator size="small" color="white" />
+      ) : (
+        <FontAwesome name="exclamation-circle" size={24} color="white" />
+      )}
+      <Text style={[styles.text, { paddingLeft: 5 }]}>{props.message}</Text>
     </Animated.View>
   );
 }

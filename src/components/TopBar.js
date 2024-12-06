@@ -1,6 +1,6 @@
 import { Text, View } from "react-native";
 import { Entypo } from "@expo/vector-icons";
-import styles from "./styles";
+import styles from "../styles/styles";
 
 function TopBar(props) {
   return (

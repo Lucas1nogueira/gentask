@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
-import styles from "./styles";
+import styles from "../styles/styles";
 
 function TasksArea(props) {
   const [isAddTaskPressed, setAddTaskPressed] = useState(false);
@@ -22,15 +22,32 @@ function TasksArea(props) {
             <TouchableHighlight
               key={item.key}
               style={styles.listItem}
-              onPress={() => props.viewPopup(index)}
+              onPress={() => props.taskViewPopup(index)}
             >
               <View style={styles.listRow}>
-                <Text
-                  style={[styles.text, { maxWidth: "80%" }]}
-                  numberOfLines={3}
+                <View
+                  style={{
+                    width: "83%",
+                    flexDirection: "column",
+                  }}
                 >
-                  {item}
-                </Text>
+                  <Text style={styles.text} numberOfLines={3}>
+                    {item.text}
+                  </Text>
+                  <View
+                    style={{
+                      height: 25,
+                      flexDirection: "row",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: "#333",
+                    }}
+                  >
+                    <Text style={[styles.text, { textAlign: "center" }]}>
+                      {item.category}
+                    </Text>
+                  </View>
+                </View>
                 <TouchableHighlight
                   style={styles.deleteButton}
                   onPress={() => props.delete(index)}

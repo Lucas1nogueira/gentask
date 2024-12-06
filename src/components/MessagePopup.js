@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Text, View, TouchableHighlight, BackHandler } from "react-native";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
-import styles from "./styles";
+import styles from "../styles/styles";
 
 function MessagePopup(props) {
   useEffect(() => {

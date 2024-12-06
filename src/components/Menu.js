@@ -1,6 +1,6 @@
 import React from "react";
 import { Text, View, Animated, Pressable } from "react-native";
-import styles from "./styles";
+import styles from "../styles/styles";
 
 function Menu(props) {
   return (
@@ -24,7 +24,7 @@ function Menu(props) {
       >
         <Text style={styles.text}>MyTasks - Simple Task Manager</Text>
       </Animated.View>
-      <Pressable style={styles.menuRight} onPress={props.closeMenu} />
+      <Pressable style={styles.menuRight} onPress={props.close} />
     </View>
   );
 }

@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 70,
     right: 40,
-    width: 230,
+    width: "auto",
     height: 50,
     flexDirection: "row",
     justifyContent: "space-evenly",
@@ -140,6 +140,7 @@ const styles = StyleSheet.create({
     borderColor: "#777",
     borderRadius: 20,
     backgroundColor: "#333",
+    paddingHorizontal: 10,
     zIndex: 1,
   },
 });
