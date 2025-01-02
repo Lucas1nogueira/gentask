@@ -51,6 +51,16 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   text: {
+    fontFamily: "ReadexPro-Regular",
+    color: "#fff",
+  },
+  header: {
+    fontFamily: "ReadexPro-Bold",
+    color: "#fff",
+  },
+  category: {
+    fontFamily: "ReadexPro-Regular",
+    fontSize: 12,
     color: "#fff",
   },
   task: {
@@ -60,7 +70,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     borderColor: "#1f515e",
     backgroundColor: "#111",
-    paddingVertical: 20,
+    paddingVertical: 10,
     paddingHorizontal: 10,
   },
   listRow: {

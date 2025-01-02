@@ -13,7 +13,9 @@ function Task(props) {
         <View
           style={{
             width: "83%",
+            height: "100%",
             flexDirection: "column",
+            justifyContent: "space-between",
           }}
         >
           <Text style={styles.text} numberOfLines={3}>
@@ -31,7 +33,7 @@ function Task(props) {
           >
             <Octicons name="dot-fill" size={22} color={props.color} />
             <Text
-              style={[styles.text, { textAlign: "center", paddingLeft: 5 }]}
+              style={[styles.category, { textAlign: "center", paddingLeft: 5 }]}
             >
               {props.category}
             </Text>

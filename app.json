@@ -24,6 +24,19 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": ["expo-secure-store"]
+    "plugins": [
+      "expo-secure-store",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/Readex_Pro/ReadexPro-Bold.ttf",
+            "./assets/fonts/Readex_Pro/ReadexPro-Medium.ttf",
+            "./assets/fonts/Readex_Pro/ReadexPro-Regular.ttf",
+            "./assets/fonts/Readex_Pro/ReadexPro-SemiBold.ttf"
+          ]
+        }
+      ]
+    ]
   }
 }

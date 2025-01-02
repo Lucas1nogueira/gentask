@@ -12,7 +12,7 @@ function TopBar(props) {
         color="white"
         onPress={props.openMenu}
       />
-      <Text style={styles.text}>MyTasks</Text>
+      <Text style={styles.header}>MyTasks</Text>
     </View>
   );
 }
