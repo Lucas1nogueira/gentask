@@ -33,7 +33,8 @@ function CreateTaskPopup(props) {
     categorizeTask(text).then((category) => {
       const task = {
         text: text,
-        category: category,
+        category: category.name,
+        color: category.color,
       };
       props.isAnyTaskCreated
         ? props.setTasks((prev) => [...prev, task])

@@ -53,11 +53,14 @@ const styles = StyleSheet.create({
   text: {
     color: "#fff",
   },
-  listItem: {
-    height: 70,
+  task: {
+    height: 100,
+    marginVertical: 10,
     justifyContent: "center",
-    borderBottomWidth: 1,
+    borderRadius: 15,
     borderColor: "#1f515e",
+    backgroundColor: "#111",
+    paddingVertical: 20,
     paddingHorizontal: 10,
   },
   listRow: {

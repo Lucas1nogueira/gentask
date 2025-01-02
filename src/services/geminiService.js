@@ -1,6 +1,40 @@
 const API_URL = process.env.EXPO_PUBLIC_GEMINI_API_URL;
 const API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
 
+if (!API_URL || !API_KEY) {
+  throw new Error(
+    "API_URL or API_KEY is not defined. Please check environment variables."
+  );
+}
+
+const categories = [
+  { name: "Viagem", color: "yellow" },
+  { name: "Estudos", color: "blue" },
+  { name: "Culinária", color: "orange" },
+  { name: "Trabalho", color: "green" },
+  { name: "Fitness", color: "red" },
+  { name: "Limpeza", color: "brown" },
+  { name: "Compras", color: "purple" },
+  { name: "Desenvolvimento Pessoal", color: "teal" },
+  { name: "Saúde e Bem-Estar", color: "pink" },
+  { name: "Socialização", color: "cyan" },
+  { name: "Lazer", color: "lime" },
+  { name: "Finanças", color: "gold" },
+  { name: "Projetos Criativos", color: "magenta" },
+  { name: "Tecnologia", color: "silver" },
+  { name: "Família", color: "violet" },
+  { name: "Estética", color: "lavender" },
+  { name: "Hobbies", color: "peach" },
+  { name: "Jardinagem", color: "forestgreen" },
+  { name: "Voluntariado", color: "navy" },
+  { name: "Animais de Estimação", color: "chocolate" },
+  { name: "Outros", color: "gray" },
+];
+
+const promptTemplate = `Classify the following text as a task into exactly ONE of the categories below. Respond strictly and only with the name of the category as listed, without any additional comments or explanations. The categories are: (${categories
+  .map((category) => category.name)
+  .join("), (")}). Text: `;
+
 async function queryGemini(prePrompt, userInput) {
   const fullPrompt = `${prePrompt}: ${userInput}`;
 
@@ -33,6 +67,11 @@ async function queryGemini(prePrompt, userInput) {
     // Extract response content
     const responseText =
       responseData.candidates[0]?.content?.parts[0]?.text || "";
+
+    if (!responseText) {
+      throw new Error("Unexpected response format from Gemini API.");
+    }
+
     return responseText;
   } catch (error) {
     console.error("Error: ", error.message);
@@ -41,12 +80,15 @@ async function queryGemini(prePrompt, userInput) {
 }
 
 async function categorizeTask(str) {
-  const categoryResult = await queryGemini(
-    "Categorize the following text, considering it's a task, in just one of the following categories: (Travelling), (Studies / Learning), (Cooking / Meal Prep), (Work / Professional), (Fitness / Exercise), (Household / Cleaning), (Shopping / Errands), (Personal Development), (Health & Wellness), (Socializing / Networking), (Entertainment / Leisure), (Finance / Budgeting), (Creative Projects), (Technology / Gadgets), (Family / Relationships), (Self-care / Relaxation), (Hobbies / Crafts), (Gardening / Outdoors), (Volunteering / Community), (Pets / Animal Care), (Other). Answer strictly and only with the category. The text is: ",
-    str
+  const categoryName = await queryGemini(promptTemplate, str);
+  const categoryObject = categories.find(
+    (category) => category.name === categoryName.trim()
   );
-  console.log(categoryResult);
-  return categoryResult;
+  console.log(categoryObject);
+  if (!categoryObject) {
+    return { name: "Outros", color: "gray" };
+  }
+  return categoryObject;
 }
 
 export { categorizeTask };

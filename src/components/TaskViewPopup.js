@@ -37,7 +37,8 @@ function TaskViewPopup(props) {
     categorizeTask(text).then((category) => {
       const task = {
         text: text,
-        category: category,
+        category: category.name,
+        color: category.color,
       };
       props.tasks[props.index] = task;
       props.setTasks(props.tasks);
