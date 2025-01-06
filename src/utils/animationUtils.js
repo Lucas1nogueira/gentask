@@ -37,3 +37,14 @@ export function animateSlideOut(property) {
     useNativeDriver: true,
   }).start();
 }
+
+export function animateRotation(property) {
+  Animated.loop(
+    Animated.timing(property, {
+      toValue: 1,
+      duration: 2000,
+      useNativeDriver: true,
+      easing: Easing.linear,
+    })
+  ).start();
+}

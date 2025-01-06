@@ -18,14 +18,16 @@ import {
 } from "../utils/animationUtils";
 
 function HomeScreen() {
-  const [tasks, setTasks] = useState(null);
   const didFetch = useRef(false);
 
+  const [tasks, setTasks] = useState(null);
   const [openMenu, setOpenMenu] = useState(false);
   const [menuAnimation, setMenuAnimation] = useState(new Animated.Value(0));
   const [menuLeftAnimation, setMenuLeftAnimation] = useState(
     new Animated.Value(0)
   );
+  const [selectedTaskIndex, setSelectedTaskIndex] = useState(0);
+  const [minimalPopupMessage, setMinimalPopupMessage] = useState("");
 
   const [popups, setPopups] = useState({
     view: false,
@@ -53,8 +55,6 @@ function HomeScreen() {
     noTextRight: new Animated.Value(0),
     error: new Animated.Value(0),
   });
-
-  const [selectedTaskIndex, setSelectedTaskIndex] = useState(0);
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
@@ -137,6 +137,7 @@ function HomeScreen() {
               animateSlideOut(popupAnimations["loadingRight"]);
             }}
             openSuccessPopup={() => {
+              setMinimalPopupMessage("Tarefa atualizada!");
               setPopups((prevState) => ({
                 ...prevState,
                 success: true,
@@ -152,7 +153,8 @@ function HomeScreen() {
               animateOpening(popupAnimations["noText"]);
               animateSlideIn(popupAnimations["noTextRight"]);
             }}
-            taskToChange={tasks[selectedTaskIndex].text}
+            taskText={tasks[selectedTaskIndex].text}
+            isTaskCompleted={tasks[selectedTaskIndex].completed}
             index={selectedTaskIndex}
             tasks={tasks}
             save={() => save("tasks", tasks)}
@@ -198,6 +200,7 @@ function HomeScreen() {
               animateSlideOut(popupAnimations["loadingRight"]);
             }}
             openSuccessPopup={() => {
+              setMinimalPopupMessage("Tarefa adicionada!");
               setPopups((prevState) => ({
                 ...prevState,
                 success: true,
@@ -324,7 +327,7 @@ function HomeScreen() {
             );
             animateSlideOut(popupAnimations["successRight"]);
           }}
-          message={"Task added!"}
+          message={minimalPopupMessage}
         />
       )}
       {popups.noText && (
@@ -373,19 +376,16 @@ function HomeScreen() {
         }}
       />
       <TasksArea
-        save={save}
-        getValueFor={getValueFor}
-        delete={(index) => {
-          setSelectedTaskIndex(index);
-          setPopups((prevState) => ({
-            ...prevState,
-            delete: true,
-          }));
-          animateOpening(popupAnimations["delete"]);
-        }}
         tasks={tasks}
         setTasks={setTasks}
         didFetch={didFetch}
+        openCreatePopup={() => {
+          setPopups((prevState) => ({
+            ...prevState,
+            create: true,
+          }));
+          animateOpening(popupAnimations["create"]);
+        }}
         taskViewPopup={(index) => {
           setSelectedTaskIndex(index);
           setPopups((prevState) => ({
@@ -394,12 +394,18 @@ function HomeScreen() {
           }));
           animateOpening(popupAnimations["view"]);
         }}
-        openCreatePopup={() => {
+        delete={(index) => {
+          setSelectedTaskIndex(index);
           setPopups((prevState) => ({
             ...prevState,
-            create: true,
+            delete: true,
           }));
-          animateOpening(popupAnimations["create"]);
+          animateOpening(popupAnimations["delete"]);
+        }}
+        checkCompleted={(index) => {
+          const updatedTasks = [...tasks];
+          updatedTasks[index].completed = !updatedTasks[index].completed;
+          setTasks(updatedTasks);
         }}
       />
       <StatusBar style="light" translucent={false} />

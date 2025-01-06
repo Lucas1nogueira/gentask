@@ -17,9 +17,7 @@ function CreateTaskPopup(props) {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       () => {
-        typeof text === "string" &&
-        text.replace(/\s/g, "").length != 0 &&
-        text != props.taskToChange
+        typeof text === "string" && text.replace(/\s/g, "").length != 0
           ? props.openDiscardPopup()
           : props.close();
         return true;
@@ -32,9 +30,11 @@ function CreateTaskPopup(props) {
     props.openLoadingPopup();
     categorizeTask(text).then((category) => {
       const task = {
+        id: Date.now(),
         text: text,
         category: category.name,
         color: category.color,
+        completed: false,
       };
       props.isAnyTaskCreated
         ? props.setTasks((prev) => [...prev, task])
@@ -81,9 +81,7 @@ function CreateTaskPopup(props) {
           <TouchableHighlight
             style={[styles.commonButton, { backgroundColor: "#470c0c" }]}
             onPress={() => {
-              typeof text === "string" &&
-              text.replace(/\s/g, "").length != 0 &&
-              (text != props.taskToChange) != ""
+              typeof text === "string" && text.replace(/\s/g, "").length != 0
                 ? props.openDiscardPopup()
                 : props.close();
             }}
