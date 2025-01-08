@@ -16,15 +16,7 @@ function Task(props) {
   const scrollRef = useRef(null);
 
   return (
-    <View
-      style={{
-        marginVertical: 10,
-        width: "100%",
-        height: 100,
-        borderRadius: 15,
-        overflow: "hidden",
-      }}
-    >
+    <View style={styles.taskContainer}>
       <ScrollView
         ref={scrollRef}
         contentContainerStyle={{
@@ -55,14 +47,20 @@ function Task(props) {
         }}
       >
         <TouchableHighlight
-          style={styles.deleteButton}
+          style={styles.deleteTaskButton}
           onPress={() => {
             props.delete();
           }}
         >
           <AntDesign name="delete" size={24} color="white" />
         </TouchableHighlight>
-        <TouchableHighlight style={styles.task} onPress={() => props.action()}>
+        <TouchableHighlight
+          style={[
+            styles.task,
+            props.isUrgent && { backgroundColor: "#4c0800" },
+          ]}
+          onPress={() => props.action()}
+        >
           <View
             style={{
               width: "100%",
@@ -71,24 +69,35 @@ function Task(props) {
               justifyContent: "space-between",
             }}
           >
+            <View style={styles.taskLabels}>
+              {!props.isCompleted ? (
+                <View style={styles.pendingTaskLabel}>
+                  <Text style={styles.pendingTaskLabelText}>PENDENTE</Text>
+                </View>
+              ) : (
+                <View style={styles.completedTaskLabel}>
+                  <Text style={styles.completedTaskLabelText}>CONCLUÍDO</Text>
+                </View>
+              )}
+              {props.isUrgent && (
+                <View style={styles.urgentTaskLabel}>
+                  <Text style={styles.urgentTaskLabelText}>URGENTE</Text>
+                </View>
+              )}
+            </View>
             <Text style={styles.text} numberOfLines={3}>
-              {props.completed && "\u2714 "}
               {props.text}
             </Text>
             <View
-              style={{
-                height: 30,
-                flexDirection: "row",
-                alignItems: "center",
-                borderRadius: 10,
-                backgroundColor: "#333",
-                paddingHorizontal: 7,
-              }}
+              style={[
+                styles.category,
+                props.isUrgent && { backgroundColor: "#300500" },
+              ]}
             >
               <Octicons name="dot-fill" size={22} color={props.color} />
               <Text
                 style={[
-                  styles.category,
+                  styles.categoryText,
                   { textAlign: "center", paddingLeft: 5 },
                 ]}
               >
@@ -98,7 +107,11 @@ function Task(props) {
           </View>
         </TouchableHighlight>
         <TouchableHighlight
-          style={styles.completedButton}
+          style={
+            !props.isCompleted
+              ? styles.markTaskAsCompletedButton
+              : styles.markTaskAsPendingButton
+          }
           onPress={() => {
             props.checkCompleted();
             scrollRef.current?.scrollTo({
@@ -107,7 +120,11 @@ function Task(props) {
             });
           }}
         >
-          <AntDesign name="check" size={24} color="white" />
+          <AntDesign
+            name={!props.isCompleted ? "check" : "clockcircleo"}
+            size={24}
+            color="white"
+          />
         </TouchableHighlight>
       </ScrollView>
     </View>

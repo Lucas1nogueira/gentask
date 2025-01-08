@@ -154,7 +154,7 @@ function HomeScreen() {
               animateSlideIn(popupAnimations["noTextRight"]);
             }}
             taskText={tasks[selectedTaskIndex].text}
-            isTaskCompleted={tasks[selectedTaskIndex].completed}
+            isTaskCompleted={tasks[selectedTaskIndex].isCompleted}
             index={selectedTaskIndex}
             tasks={tasks}
             save={() => save("tasks", tasks)}
@@ -404,7 +404,7 @@ function HomeScreen() {
         }}
         checkCompleted={(index) => {
           const updatedTasks = [...tasks];
-          updatedTasks[index].completed = !updatedTasks[index].completed;
+          updatedTasks[index].isCompleted = !updatedTasks[index].isCompleted;
           setTasks(updatedTasks);
         }}
       />

@@ -34,13 +34,14 @@ function TaskViewPopup(props) {
 
   function updateTask() {
     props.openLoadingPopup();
-    categorizeTask(text).then((category) => {
+    categorizeTask(text).then((taskInfo) => {
       const task = {
         id: Date.now(),
         text: text,
-        category: category.name,
-        color: category.color,
-        completed: props.isTaskCompleted,
+        category: taskInfo.categoryName,
+        color: taskInfo.categoryColor,
+        isUrgent: taskInfo.isUrgent,
+        isCompleted: props.isTaskCompleted,
       };
       const updatedTasks = [...props.tasks];
       updatedTasks[props.index] = task;

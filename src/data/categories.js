@@ -1,0 +1,25 @@
+const categories = [
+  { name: "Viagem", color: "yellow" },
+  { name: "Estudos", color: "blue" },
+  { name: "Culinária", color: "orange" },
+  { name: "Trabalho", color: "green" },
+  { name: "Fitness", color: "red" },
+  { name: "Limpeza", color: "brown" },
+  { name: "Compras", color: "purple" },
+  { name: "Desenvolvimento Pessoal", color: "teal" },
+  { name: "Saúde e Bem-Estar", color: "pink" },
+  { name: "Socialização", color: "cyan" },
+  { name: "Lazer", color: "lime" },
+  { name: "Finanças", color: "gold" },
+  { name: "Projetos Criativos", color: "magenta" },
+  { name: "Tecnologia", color: "silver" },
+  { name: "Família", color: "violet" },
+  { name: "Estética", color: "lavender" },
+  { name: "Hobbies", color: "peach" },
+  { name: "Jardinagem", color: "forestgreen" },
+  { name: "Voluntariado", color: "navy" },
+  { name: "Animais de Estimação", color: "chocolate" },
+  { name: "Outros", color: "gray" },
+];
+
+export default categories;

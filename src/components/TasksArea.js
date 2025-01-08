@@ -9,6 +9,7 @@ import styles from "../styles/styles";
 function TasksArea(props) {
   const rotation = useRef(new Animated.Value(0)).current;
 
+  const [sortedTasks, setSortedTasks] = useState([]);
   const [isMagicAIPressed, setMagicAIPressed] = useState(false);
   const [isAddTaskPressed, setAddTaskPressed] = useState(false);
 
@@ -16,6 +17,12 @@ function TasksArea(props) {
     inputRange: [0, 1],
     outputRange: ["0deg", "360deg"],
   });
+
+  useEffect(() => {
+    if (props.tasks) {
+      setSortedTasks(props.tasks.sort((a, b) => b.isUrgent - a.isUrgent));
+    }
+  }, [props.tasks]);
 
   useEffect(() => {
     animateRotation(rotation);
@@ -26,7 +33,7 @@ function TasksArea(props) {
       {props.tasks && JSON.stringify(props.tasks) != "[]" ? (
         <FlatList
           style={{ maxHeight: 805 }}
-          data={props.tasks}
+          data={sortedTasks}
           renderItem={({ item, index }) => (
             <Task
               key={item.id}
@@ -34,7 +41,8 @@ function TasksArea(props) {
               text={item.text}
               category={item.category}
               color={item.color}
-              completed={item.completed}
+              isUrgent={item.isUrgent}
+              isCompleted={item.isCompleted}
               delete={() => props.delete(index)}
               checkCompleted={() => props.checkCompleted(index)}
             />

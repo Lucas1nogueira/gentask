@@ -1,3 +1,5 @@
+import categories from "../data/categories";
+
 const API_URL = process.env.EXPO_PUBLIC_GEMINI_API_URL;
 const API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
 
@@ -7,33 +9,11 @@ if (!API_URL || !API_KEY) {
   );
 }
 
-const categories = [
-  { name: "Viagem", color: "yellow" },
-  { name: "Estudos", color: "blue" },
-  { name: "Culinária", color: "orange" },
-  { name: "Trabalho", color: "green" },
-  { name: "Fitness", color: "red" },
-  { name: "Limpeza", color: "brown" },
-  { name: "Compras", color: "purple" },
-  { name: "Desenvolvimento Pessoal", color: "teal" },
-  { name: "Saúde e Bem-Estar", color: "pink" },
-  { name: "Socialização", color: "cyan" },
-  { name: "Lazer", color: "lime" },
-  { name: "Finanças", color: "gold" },
-  { name: "Projetos Criativos", color: "magenta" },
-  { name: "Tecnologia", color: "silver" },
-  { name: "Família", color: "violet" },
-  { name: "Estética", color: "lavender" },
-  { name: "Hobbies", color: "peach" },
-  { name: "Jardinagem", color: "forestgreen" },
-  { name: "Voluntariado", color: "navy" },
-  { name: "Animais de Estimação", color: "chocolate" },
-  { name: "Outros", color: "gray" },
-];
-
-const promptTemplate = `Classify the following text as a task into exactly ONE of the categories below. Respond strictly and only with the name of the category as listed, without any additional comments or explanations. The categories are: (${categories
+const categorizingPromptTemplate = `Classify the following text as a task into exactly ONE of the categories below. Respond strictly and only with the name of the category as listed, without any additional comments or explanations. The categories are: (${categories
   .map((category) => category.name)
   .join("), (")}). Text: `;
+
+const isUrgentPromptTemplate = `Considering the following text as a personal task, can this task be labeled as urgent? Consider just if the text is clearly talking about an urgent activity, and respond strictly and only with yes or no, without any additional comments or explanations. The text is: `;
 
 async function queryGemini(prePrompt, userInput) {
   const fullPrompt = `${prePrompt}: ${userInput}`;
@@ -80,15 +60,29 @@ async function queryGemini(prePrompt, userInput) {
 }
 
 async function categorizeTask(str) {
-  const categoryName = await queryGemini(promptTemplate, str);
+  const categoryName = await queryGemini(categorizingPromptTemplate, str);
   const categoryObject = categories.find(
     (category) => category.name === categoryName.trim()
   );
-  console.log(categoryObject);
-  if (!categoryObject) {
-    return { name: "Outros", color: "gray" };
+  let urgent = await queryGemini(isUrgentPromptTemplate, str);
+  if (!urgent) {
+    urgent = false;
+  } else {
+    urgent = urgent.toLowerCase().trim() == "yes" ? true : false;
   }
-  return categoryObject;
+  if (!categoryObject) {
+    return {
+      categoryName: "Outros",
+      categoryColor: "gray",
+      isUrgent: urgent,
+    };
+  } else {
+    return {
+      categoryName: categoryObject.name,
+      categoryColor: categoryObject.color,
+      isUrgent: urgent,
+    };
+  }
 }
 
 export { categorizeTask };

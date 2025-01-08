@@ -28,13 +28,14 @@ function CreateTaskPopup(props) {
 
   function saveTask() {
     props.openLoadingPopup();
-    categorizeTask(text).then((category) => {
+    categorizeTask(text).then((taskInfo) => {
       const task = {
         id: Date.now(),
         text: text,
-        category: category.name,
-        color: category.color,
-        completed: false,
+        category: taskInfo.categoryName,
+        color: taskInfo.categoryColor,
+        isUrgent: taskInfo.isUrgent,
+        isCompleted: false,
       };
       props.isAnyTaskCreated
         ? props.setTasks((prev) => [...prev, task])
