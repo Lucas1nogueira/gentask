@@ -1,8 +1,27 @@
-import React from "react";
-import { Animated, Image, Pressable, Text, View } from "react-native";
+import React, { useEffect } from "react";
+import {
+  Animated,
+  BackHandler,
+  Image,
+  Pressable,
+  Text,
+  View,
+} from "react-native";
+import MenuOption from "./MenuOption";
 import styles from "../styles/styles";
 
 function Menu(props) {
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        props.close();
+        return true;
+      }
+    );
+    return () => backHandler.remove();
+  }, []);
+
   return (
     <View
       style={[styles.fullscreenArea, { backgroundColor: "rgba(0,0,0,0.5)" }]}
@@ -31,6 +50,13 @@ function Menu(props) {
             <Text style={styles.text}>MyTasks</Text>
             <Text style={styles.text}>Task Manager + AI</Text>
           </View>
+        </View>
+        <View style={styles.menuOptions}>
+          <MenuOption
+            iconName="settings"
+            text="Ajustes"
+            action={props.openSettingsPopup}
+          />
         </View>
       </Animated.View>
       <Pressable style={styles.menuRight} onPress={props.close} />

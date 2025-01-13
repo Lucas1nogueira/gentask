@@ -44,12 +44,14 @@ function TasksArea(props) {
               isUrgent={item.isUrgent}
               isCompleted={item.isCompleted}
               delete={() => props.delete(index)}
-              checkCompleted={() => props.checkCompleted(index)}
+              checkCompleted={() => {
+                props.checkCompleted(index);
+              }}
             />
           )}
         />
       ) : (
-        <Text style={styles.text}>No tasks yet!</Text>
+        <Text style={styles.text}>{props.emptyMessage}</Text>
       )}
       <View
         style={{

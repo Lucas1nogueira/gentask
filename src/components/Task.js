@@ -4,6 +4,7 @@ import {
   ScrollView,
   Text,
   TouchableHighlight,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { AntDesign, Octicons } from "@expo/vector-icons";
@@ -46,14 +47,14 @@ function Task(props) {
           }
         }}
       >
-        <TouchableHighlight
+        <TouchableOpacity
           style={styles.deleteTaskButton}
           onPress={() => {
             props.delete();
           }}
         >
           <AntDesign name="delete" size={24} color="white" />
-        </TouchableHighlight>
+        </TouchableOpacity>
         <TouchableHighlight
           style={[
             styles.task,
@@ -106,7 +107,7 @@ function Task(props) {
             </View>
           </View>
         </TouchableHighlight>
-        <TouchableHighlight
+        <TouchableOpacity
           style={
             !props.isCompleted
               ? styles.markTaskAsCompletedButton
@@ -125,7 +126,7 @@ function Task(props) {
             size={24}
             color="white"
           />
-        </TouchableHighlight>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );

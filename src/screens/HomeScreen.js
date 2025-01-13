@@ -9,6 +9,7 @@ import TaskViewPopup from "../components/TaskViewPopup";
 import CreateTaskPopup from "../components/CreateTaskPopup";
 import MessagePopup from "../components/MessagePopup";
 import MinimalPopup from "../components/MinimalPopup";
+import SettingsPopup from "../components/SettingsPopup";
 import { getValueFor, save } from "../services/storage";
 import {
   animateOpening,
@@ -21,6 +22,7 @@ function HomeScreen() {
   const didFetch = useRef(false);
 
   const [tasks, setTasks] = useState(null);
+  const [filteredTasks, setFilteredTasks] = useState(null);
   const [openMenu, setOpenMenu] = useState(false);
   const [menuAnimation, setMenuAnimation] = useState(new Animated.Value(0));
   const [menuLeftAnimation, setMenuLeftAnimation] = useState(
@@ -39,6 +41,7 @@ function HomeScreen() {
     success: false,
     noText: false,
     error: false,
+    settings: false,
   });
 
   const [popupAnimations, setPopupAnimations] = useState({
@@ -54,6 +57,7 @@ function HomeScreen() {
     noText: new Animated.Value(0),
     noTextRight: new Animated.Value(0),
     error: new Animated.Value(0),
+    settings: new Animated.Value(0),
   });
 
   useEffect(() => {
@@ -95,6 +99,13 @@ function HomeScreen() {
             close={() => {
               animateClosing(menuAnimation, () => setOpenMenu(false));
               animateSlideOut(menuLeftAnimation);
+            }}
+            openSettingsPopup={() => {
+              setPopups((prevState) => ({
+                ...prevState,
+                settings: true,
+              }));
+              animateOpening(popupAnimations["settings"]);
             }}
           />
         </Animated.View>
@@ -368,17 +379,41 @@ function HomeScreen() {
           />
         </Animated.View>
       )}
+      {popups.settings && (
+        <Animated.View
+          style={[styles.fullscreenArea, { opacity: popupAnimations.settings }]}
+        >
+          <SettingsPopup
+            close={() => {
+              animateClosing(popupAnimations["settings"], () =>
+                setPopups((prevState) => ({
+                  ...prevState,
+                  settings: false,
+                }))
+              );
+            }}
+          />
+        </Animated.View>
+      )}
       <TopBar
         openMenu={() => {
           setOpenMenu(true);
           animateOpening(menuAnimation);
           animateSlideIn(menuLeftAnimation);
         }}
+        tasks={tasks}
+        setFilteredTasks={setFilteredTasks}
       />
       <TasksArea
-        tasks={tasks}
+        tasks={filteredTasks}
         setTasks={setTasks}
         didFetch={didFetch}
+        emptyMessage={
+          !tasks || JSON.stringify(tasks) == "[]"
+            ? "Nenhuma tarefa cadastrada!"
+            : JSON.stringify(filteredTasks) == "[]" &&
+              "Nenhuma tarefa encontrada!"
+        }
         openCreatePopup={() => {
           setPopups((prevState) => ({
             ...prevState,
