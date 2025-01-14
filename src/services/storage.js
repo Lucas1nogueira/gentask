@@ -1,8 +1,8 @@
 import * as SecureStore from "expo-secure-store";
 
 export async function save(key, value) {
-  const jsonValue = JSON.stringify(value);
   try {
+    const jsonValue = JSON.stringify(value);
     await SecureStore.setItemAsync(key, jsonValue);
   } catch (error) {
     console.log(`Error saving data: ${error}`);

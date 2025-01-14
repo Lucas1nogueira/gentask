@@ -19,7 +19,7 @@ function TaskViewPopup(props) {
       () => {
         typeof text === "string" &&
         text.replace(/\s/g, "").length != 0 &&
-        text != props.taskText
+        text != props.selectedTask.text
           ? props.openDiscardPopup()
           : props.close();
         return true;
@@ -29,28 +29,33 @@ function TaskViewPopup(props) {
   }, [text]);
 
   useEffect(() => {
-    onChangeText(props.taskText);
+    onChangeText(props.selectedTask.text);
   }, []);
 
   function updateTask() {
-    props.openLoadingPopup();
-    categorizeTask(text).then((taskInfo) => {
-      const task = {
-        id: Date.now(),
-        text: text,
-        category: taskInfo.categoryName,
-        color: taskInfo.categoryColor,
-        isUrgent: taskInfo.isUrgent,
-        isCompleted: props.isTaskCompleted,
-      };
-      const updatedTasks = [...props.tasks];
-      updatedTasks[props.index] = task;
-      props.setTasks(updatedTasks);
-      props.closeLoadingPopup();
-      setTimeout(() => {
-        props.openSuccessPopup();
-      }, 500);
-    });
+    if (text != props.selectedTask.text) {
+      props.openLoadingPopup();
+      categorizeTask(text).then((taskInfo) => {
+        const taskId = props.selectedTaskId;
+        const time = Date.now();
+        const task = {
+          text: text,
+          category: taskInfo.categoryName,
+          color: taskInfo.categoryColor,
+          isUrgent: taskInfo.isUrgent,
+          isCompleted: props.selectedTask.isCompleted,
+          createdAt: props.selectedTask.createdAt,
+          updatedAt: time,
+        };
+        const updatedTasks = { ...props.tasks };
+        updatedTasks[taskId] = task;
+        props.setTasks(updatedTasks);
+        props.closeLoadingPopup();
+        setTimeout(() => {
+          props.openSuccessPopup();
+        }, 500);
+      });
+    }
     props.close();
   }
 
@@ -79,7 +84,7 @@ function TaskViewPopup(props) {
           style={styles.taskInput}
           multiline={true}
           textAlignVertical="top"
-          defaultValue={props.taskText}
+          defaultValue={props.selectedTask.text}
           onChangeText={onChangeText}
           cursorColor={"#efdb00"}
           placeholder="Insert here..."
@@ -91,7 +96,7 @@ function TaskViewPopup(props) {
             onPress={() => {
               typeof text === "string" &&
               text.replace(/\s/g, "").length != 0 &&
-              text != props.taskText
+              text != props.selectedTask.text
                 ? props.openDiscardPopup()
                 : props.close();
             }}

@@ -19,13 +19,15 @@ function TopBar(props) {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       () => {
-        onChangeSearchText("");
-        setSearchbarActive(false);
-        return true;
+        if (isKeyboardVisible) {
+          onChangeSearchText("");
+          setSearchbarActive(false);
+          return true;
+        }
       }
     );
     return () => backHandler.remove();
-  }, [searchText]);
+  }, [isSearchbarActive, searchText]);
 
   useEffect(() => {
     const keyboardDidHideListener = Keyboard.addListener(
@@ -55,9 +57,14 @@ function TopBar(props) {
 
   useEffect(() => {
     if (props.tasks) {
-      const filteredTasks = props.tasks.filter((task) =>
-        task.text.toLowerCase().includes(searchText.toLowerCase())
-      );
+      const filteredTasks = Object.entries(props.tasks)
+        .filter(([taskId, task]) =>
+          task.text.toLowerCase().includes(searchText.toLowerCase())
+        )
+        .reduce((accumulator, [taskId, task]) => {
+          accumulator[taskId] = task;
+          return accumulator;
+        }, {});
       props.setFilteredTasks(filteredTasks);
     }
   }, [props.tasks, searchText]);

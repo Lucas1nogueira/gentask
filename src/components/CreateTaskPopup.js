@@ -6,6 +6,8 @@ import {
   TouchableHighlight,
   BackHandler,
 } from "react-native";
+import "react-native-get-random-values";
+import { v4 as uuidv4 } from "uuid";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { categorizeTask } from "../services/geminiService";
 import styles from "../styles/styles";
@@ -29,17 +31,21 @@ function CreateTaskPopup(props) {
   function saveTask() {
     props.openLoadingPopup();
     categorizeTask(text).then((taskInfo) => {
+      const id = uuidv4();
+      const time = Date.now();
       const task = {
-        id: Date.now(),
         text: text,
         category: taskInfo.categoryName,
         color: taskInfo.categoryColor,
         isUrgent: taskInfo.isUrgent,
         isCompleted: false,
+        createdAt: time,
+        updatedAt: time,
       };
-      props.isAnyTaskCreated
-        ? props.setTasks((prev) => [...prev, task])
-        : props.setTasks([task]);
+      props.setTasks((prev) => ({
+        ...prev,
+        [id]: task,
+      }));
       props.closeLoadingPopup();
       setTimeout(() => {
         props.openSuccessPopup();

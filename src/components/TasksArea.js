@@ -20,7 +20,12 @@ function TasksArea(props) {
 
   useEffect(() => {
     if (props.tasks) {
-      setSortedTasks(props.tasks.sort((a, b) => b.isUrgent - a.isUrgent));
+      const tasksArray = Object.entries(props.tasks).map(([id, task]) => ({
+        id,
+        ...task,
+      }));
+      const sorted = tasksArray.sort((a, b) => b.isUrgent - a.isUrgent);
+      setSortedTasks(sorted);
     }
   }, [props.tasks]);
 
@@ -30,22 +35,22 @@ function TasksArea(props) {
 
   return (
     <View style={styles.tasksArea}>
-      {props.tasks && JSON.stringify(props.tasks) != "[]" ? (
+      {props.tasks && Object.keys(props.tasks).length !== 0 ? (
         <FlatList
           style={{ maxHeight: 805 }}
           data={sortedTasks}
-          renderItem={({ item, index }) => (
+          renderItem={({ item }) => (
             <Task
               key={item.id}
-              action={() => props.taskViewPopup(index)}
+              action={() => props.taskViewPopup(item.id)}
               text={item.text}
               category={item.category}
               color={item.color}
               isUrgent={item.isUrgent}
               isCompleted={item.isCompleted}
-              delete={() => props.delete(index)}
+              delete={() => props.delete(item.id)}
               checkCompleted={() => {
-                props.checkCompleted(index);
+                props.checkCompleted(item.id);
               }}
             />
           )}

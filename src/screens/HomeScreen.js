@@ -28,7 +28,7 @@ function HomeScreen() {
   const [menuLeftAnimation, setMenuLeftAnimation] = useState(
     new Animated.Value(0)
   );
-  const [selectedTaskIndex, setSelectedTaskIndex] = useState(0);
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [minimalPopupMessage, setMinimalPopupMessage] = useState("");
 
   const [popups, setPopups] = useState({
@@ -164,10 +164,9 @@ function HomeScreen() {
               animateOpening(popupAnimations["noText"]);
               animateSlideIn(popupAnimations["noTextRight"]);
             }}
-            taskText={tasks[selectedTaskIndex].text}
-            isTaskCompleted={tasks[selectedTaskIndex].isCompleted}
-            index={selectedTaskIndex}
             tasks={tasks}
+            selectedTaskId={selectedTaskId}
+            selectedTask={tasks[selectedTaskId]}
             save={() => save("tasks", tasks)}
             setTasks={setTasks}
           />
@@ -271,10 +270,10 @@ function HomeScreen() {
             actionName={"Delete"}
             actionButtonColor={"#470c0c"}
             action={() => {
-              const updatedTasks = [...tasks];
-              updatedTasks.splice(selectedTaskIndex, 1);
+              const updatedTasks = { ...tasks };
+              delete updatedTasks[selectedTaskId];
               setTasks(updatedTasks);
-              setSelectedTaskIndex(0);
+              setSelectedTaskId(null);
             }}
           />
         </Animated.View>
@@ -409,9 +408,10 @@ function HomeScreen() {
         setTasks={setTasks}
         didFetch={didFetch}
         emptyMessage={
-          !tasks || JSON.stringify(tasks) == "[]"
+          !tasks || Object.keys(tasks).length === 0
             ? "Nenhuma tarefa cadastrada!"
-            : JSON.stringify(filteredTasks) == "[]" &&
+            : filteredTasks &&
+              Object.keys(filteredTasks).length === 0 &&
               "Nenhuma tarefa encontrada!"
         }
         openCreatePopup={() => {
@@ -421,26 +421,29 @@ function HomeScreen() {
           }));
           animateOpening(popupAnimations["create"]);
         }}
-        taskViewPopup={(index) => {
-          setSelectedTaskIndex(index);
+        taskViewPopup={(taskId) => {
+          setSelectedTaskId(taskId);
           setPopups((prevState) => ({
             ...prevState,
             view: true,
           }));
           animateOpening(popupAnimations["view"]);
         }}
-        delete={(index) => {
-          setSelectedTaskIndex(index);
+        delete={(taskId) => {
+          setSelectedTaskId(taskId);
           setPopups((prevState) => ({
             ...prevState,
             delete: true,
           }));
           animateOpening(popupAnimations["delete"]);
         }}
-        checkCompleted={(index) => {
-          const updatedTasks = [...tasks];
-          updatedTasks[index].isCompleted = !updatedTasks[index].isCompleted;
-          setTasks(updatedTasks);
+        checkCompleted={(taskId) => {
+          const updatedTasks = { ...tasks };
+          if (updatedTasks[taskId]) {
+            updatedTasks[taskId].isCompleted =
+              !updatedTasks[taskId].isCompleted;
+            setTasks(updatedTasks);
+          }
         }}
       />
       <StatusBar style="light" translucent={false} />
