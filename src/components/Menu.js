@@ -44,7 +44,7 @@ function Menu(props) {
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <Image
             source={require("../../assets/adaptive-icon.png")}
-            style={{ width: 80, height: 80 }}
+            style={{ width: 80, height: 80, marginLeft: -15, marginRight: -10 }}
           />
           <View>
             <Text style={styles.text}>MyTasks</Text>

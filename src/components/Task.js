@@ -11,7 +11,7 @@ import { AntDesign, Octicons } from "@expo/vector-icons";
 import styles from "../styles/styles";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
-const SCROLL_INITIAL_POSITION = SCREEN_WIDTH / 7 + 2.4;
+const SCROLL_INITIAL_POSITION = SCREEN_WIDTH / 6 + 2;
 
 function Task(props) {
   const scrollRef = useRef(null);
@@ -58,6 +58,7 @@ function Task(props) {
         <TouchableHighlight
           style={[
             styles.task,
+            { width: props.width },
             props.isUrgent && { backgroundColor: "#4c0800" },
           ]}
           onPress={() => props.action()}

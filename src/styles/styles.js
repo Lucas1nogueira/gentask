@@ -1,5 +1,4 @@
-import { StyleSheet } from "react-native";
-import { Dimensions } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
@@ -47,14 +46,32 @@ const styles = StyleSheet.create({
     borderColor: "#777",
     paddingHorizontal: 10,
   },
+  filteringBar: {
+    minWidth: "100%",
+    width: "100%",
+    height: 50,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    alignSelf: "center",
+    paddingHorizontal: 25,
+  },
+  categorySelectionButton: {
+    height: 40,
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 15,
+    backgroundColor: "#222",
+    paddingHorizontal: 10,
+  },
   topBar: {
-    width: screenWidth,
+    minWidth: "100%",
+    width: "100%",
     height: 60,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#000",
-    paddingHorizontal: 25,
+    paddingHorizontal: 20,
   },
   searchbar: {
     width: "100%",
@@ -66,8 +83,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   tasksArea: {
-    width: screenWidth - 50,
-    height: screenHeight - 110,
+    width: "90%",
+    height: screenHeight - 150,
     marginTop: 10,
     alignSelf: "center",
     flexDirection: "column",
@@ -143,8 +160,6 @@ const styles = StyleSheet.create({
     color: "#ff503d",
   },
   task: {
-    minWidth: screenWidth - 90,
-    width: screenWidth - 90,
     height: "100%",
     justifyContent: "center",
     backgroundColor: "#111",
@@ -219,12 +234,12 @@ const styles = StyleSheet.create({
   },
   commonButton: {
     width: 100,
-    height: 40,
+    height: 45,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
     borderRadius: 10,
-    borderColor: "#4c4c4c",
+    borderColor: "#777",
     backgroundColor: "#1e1e1e",
   },
   messagePopup: {
@@ -272,6 +287,30 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     backgroundColor: "rgba(0,0,0,0.3)",
     paddingHorizontal: 10,
+  },
+  selectPopup: {
+    width: 400,
+    height: 560,
+    flexDirection: "column",
+    alignItems: "center",
+    borderRadius: 25,
+    backgroundColor: "#222",
+    padding: 25,
+  },
+  categoriesList: {
+    width: "100%",
+    marginTop: 20,
+    borderRadius: 15,
+    backgroundColor: "#111",
+  },
+  selectOption: {
+    width: "100%",
+    height: 50,
+    flexDirection: "row",
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderColor: "#050505",
+    paddingHorizontal: 15,
   },
 });
 

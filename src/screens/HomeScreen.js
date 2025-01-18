@@ -4,7 +4,9 @@ import { StatusBar } from "expo-status-bar";
 import styles from "../styles/styles";
 import Menu from "../components/Menu";
 import TopBar from "../components/TopBar";
+import FilteringBar from "../components/FilteringBar";
 import TasksArea from "../components/TasksArea";
+import SelectPopup from "../components/SelectPopup";
 import TaskViewPopup from "../components/TaskViewPopup";
 import CreateTaskPopup from "../components/CreateTaskPopup";
 import MessagePopup from "../components/MessagePopup";
@@ -23,15 +25,20 @@ function HomeScreen() {
 
   const [tasks, setTasks] = useState(null);
   const [filteredTasks, setFilteredTasks] = useState(null);
-  const [openMenu, setOpenMenu] = useState(false);
-  const [menuAnimation, setMenuAnimation] = useState(new Animated.Value(0));
-  const [menuLeftAnimation, setMenuLeftAnimation] = useState(
-    new Animated.Value(0)
-  );
+  const [foundTasks, setFoundTasks] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState({
+    name: "Tudo",
+    color: "white",
+  });
   const [selectedTaskId, setSelectedTaskId] = useState(null);
+
+  const [openMenu, setOpenMenu] = useState(false);
+  const [menuAnimation] = useState(new Animated.Value(0));
+  const [menuLeftAnimation] = useState(new Animated.Value(0));
   const [minimalPopupMessage, setMinimalPopupMessage] = useState("");
 
   const [popups, setPopups] = useState({
+    select: false,
     view: false,
     create: false,
     exit: false,
@@ -44,7 +51,8 @@ function HomeScreen() {
     settings: false,
   });
 
-  const [popupAnimations, setPopupAnimations] = useState({
+  const [popupAnimations] = useState({
+    select: new Animated.Value(0),
     view: new Animated.Value(0),
     create: new Animated.Value(0),
     exit: new Animated.Value(0),
@@ -107,6 +115,23 @@ function HomeScreen() {
               }));
               animateOpening(popupAnimations["settings"]);
             }}
+          />
+        </Animated.View>
+      )}
+      {popups.select && (
+        <Animated.View
+          style={[styles.fullscreenArea, { opacity: popupAnimations.select }]}
+        >
+          <SelectPopup
+            close={() => {
+              animateClosing(popupAnimations["select"], () =>
+                setPopups((prevState) => ({
+                  ...prevState,
+                  select: false,
+                }))
+              );
+            }}
+            setSelectedCategory={setSelectedCategory}
           />
         </Animated.View>
       )}
@@ -400,18 +425,30 @@ function HomeScreen() {
           animateOpening(menuAnimation);
           animateSlideIn(menuLeftAnimation);
         }}
+        filteredTasks={filteredTasks}
+        setFoundTasks={setFoundTasks}
+      />
+      <FilteringBar
         tasks={tasks}
         setFilteredTasks={setFilteredTasks}
+        selectedCategory={selectedCategory}
+        openSelectPopup={() => {
+          setPopups((prevState) => ({
+            ...prevState,
+            select: true,
+          }));
+          animateOpening(popupAnimations["select"]);
+        }}
       />
       <TasksArea
-        tasks={filteredTasks}
+        foundTasks={foundTasks}
         setTasks={setTasks}
         didFetch={didFetch}
         emptyMessage={
           !tasks || Object.keys(tasks).length === 0
             ? "Nenhuma tarefa cadastrada!"
-            : filteredTasks &&
-              Object.keys(filteredTasks).length === 0 &&
+            : foundTasks &&
+              Object.keys(foundTasks).length === 0 &&
               "Nenhuma tarefa encontrada!"
         }
         openCreatePopup={() => {

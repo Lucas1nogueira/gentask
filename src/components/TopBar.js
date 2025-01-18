@@ -56,8 +56,8 @@ function TopBar(props) {
   }, [isKeyboardVisible, searchText]);
 
   useEffect(() => {
-    if (props.tasks) {
-      const filteredTasks = Object.entries(props.tasks)
+    if (props.filteredTasks) {
+      const foundTasks = Object.entries(props.filteredTasks)
         .filter(([taskId, task]) =>
           task.text.toLowerCase().includes(searchText.toLowerCase())
         )
@@ -65,9 +65,9 @@ function TopBar(props) {
           accumulator[taskId] = task;
           return accumulator;
         }, {});
-      props.setFilteredTasks(filteredTasks);
+      props.setFoundTasks(foundTasks);
     }
-  }, [props.tasks, searchText]);
+  }, [props.filteredTasks, searchText]);
 
   return (
     <View style={styles.topBar}>

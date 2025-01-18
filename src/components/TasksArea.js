@@ -12,6 +12,7 @@ function TasksArea(props) {
   const [sortedTasks, setSortedTasks] = useState([]);
   const [isMagicAIPressed, setMagicAIPressed] = useState(false);
   const [isAddTaskPressed, setAddTaskPressed] = useState(false);
+  const [taskWidth, setTaskWidth] = useState(0);
 
   const spin = rotation.interpolate({
     inputRange: [0, 1],
@@ -19,29 +20,36 @@ function TasksArea(props) {
   });
 
   useEffect(() => {
-    if (props.tasks) {
-      const tasksArray = Object.entries(props.tasks).map(([id, task]) => ({
+    if (props.foundTasks) {
+      const tasksArray = Object.entries(props.foundTasks).map(([id, task]) => ({
         id,
         ...task,
       }));
       const sorted = tasksArray.sort((a, b) => b.isUrgent - a.isUrgent);
       setSortedTasks(sorted);
     }
-  }, [props.tasks]);
+  }, [props.foundTasks]);
 
   useEffect(() => {
     animateRotation(rotation);
   }, [rotation]);
 
+  const handleTaskListLayout = (event) => {
+    const { width } = event.nativeEvent.layout;
+    setTaskWidth(width);
+  };
+
   return (
     <View style={styles.tasksArea}>
-      {props.tasks && Object.keys(props.tasks).length !== 0 ? (
+      {props.foundTasks && Object.keys(props.foundTasks).length !== 0 ? (
         <FlatList
-          style={{ maxHeight: 805 }}
+          style={{ width: "100%", maxHeight: 805 }}
           data={sortedTasks}
+          onLayout={handleTaskListLayout}
           renderItem={({ item }) => (
             <Task
               key={item.id}
+              width={taskWidth}
               action={() => props.taskViewPopup(item.id)}
               text={item.text}
               category={item.category}
