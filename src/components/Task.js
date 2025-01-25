@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import {
   Dimensions,
   ScrollView,
@@ -16,6 +16,15 @@ const SCROLL_INITIAL_POSITION = SCREEN_WIDTH / 6 + 2;
 function Task(props) {
   const scrollRef = useRef(null);
 
+  useEffect(() => {
+    if (scrollRef) {
+      scrollRef.current?.scrollTo({
+        x: SCROLL_INITIAL_POSITION,
+        animated: false,
+      });
+    }
+  }, [scrollRef]);
+
   return (
     <View style={styles.taskContainer}>
       <ScrollView
@@ -31,7 +40,13 @@ function Task(props) {
         horizontal
         showsHorizontalScrollIndicator={false}
         decelerationRate="normal"
-        contentOffset={{ x: SCROLL_INITIAL_POSITION, y: 0 }}
+        contentOffset={{ x: SCROLL_INITIAL_POSITION }}
+        onLayout={() => {
+          scrollRef.current?.scrollTo({
+            x: SCROLL_INITIAL_POSITION,
+            animated: false,
+          });
+        }}
         onScrollEndDrag={(event) => {
           const offsetX = event.nativeEvent.contentOffset.x;
 

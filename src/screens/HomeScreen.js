@@ -5,8 +5,9 @@ import styles from "../styles/styles";
 import Menu from "../components/Menu";
 import TopBar from "../components/TopBar";
 import FilteringBar from "../components/FilteringBar";
-import TasksArea from "../components/TasksArea";
-import SelectPopup from "../components/SelectPopup";
+import TasksContainer from "../components/TasksContainer";
+import CategoryPickerPopup from "../components/CategoryPickerPopup";
+import SortPickerPopup from "../components/SortPickerPopup";
 import TaskViewPopup from "../components/TaskViewPopup";
 import CreateTaskPopup from "../components/CreateTaskPopup";
 import MessagePopup from "../components/MessagePopup";
@@ -24,12 +25,15 @@ function HomeScreen() {
   const didFetch = useRef(false);
 
   const [tasks, setTasks] = useState(null);
-  const [filteredTasks, setFilteredTasks] = useState(null);
+  const [sortedTasks, setSortedTasks] = useState(null);
   const [foundTasks, setFoundTasks] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState({
     name: "Tudo",
     color: "white",
   });
+  const [selectedSort, setSelectedSort] = useState("created_asc");
+  const [urgentTasksFirst, setUrgentTasksFirst] = useState(true);
+  const [completedTasksFirst, setCompletedTasksFirst] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
 
   const [openMenu, setOpenMenu] = useState(false);
@@ -38,7 +42,8 @@ function HomeScreen() {
   const [minimalPopupMessage, setMinimalPopupMessage] = useState("");
 
   const [popups, setPopups] = useState({
-    select: false,
+    categoryPicker: false,
+    sortPicker: false,
     view: false,
     create: false,
     exit: false,
@@ -52,7 +57,8 @@ function HomeScreen() {
   });
 
   const [popupAnimations] = useState({
-    select: new Animated.Value(0),
+    categoryPicker: new Animated.Value(0),
+    sortPicker: new Animated.Value(0),
     view: new Animated.Value(0),
     create: new Animated.Value(0),
     exit: new Animated.Value(0),
@@ -118,20 +124,48 @@ function HomeScreen() {
           />
         </Animated.View>
       )}
-      {popups.select && (
+      {popups.categoryPicker && (
         <Animated.View
-          style={[styles.fullscreenArea, { opacity: popupAnimations.select }]}
+          style={[
+            styles.fullscreenArea,
+            { opacity: popupAnimations.categoryPicker },
+          ]}
         >
-          <SelectPopup
+          <CategoryPickerPopup
             close={() => {
-              animateClosing(popupAnimations["select"], () =>
+              animateClosing(popupAnimations["categoryPicker"], () =>
                 setPopups((prevState) => ({
                   ...prevState,
-                  select: false,
+                  categoryPicker: false,
                 }))
               );
             }}
             setSelectedCategory={setSelectedCategory}
+          />
+        </Animated.View>
+      )}
+      {popups.sortPicker && (
+        <Animated.View
+          style={[
+            styles.fullscreenArea,
+            { opacity: popupAnimations.sortPicker },
+          ]}
+        >
+          <SortPickerPopup
+            close={() => {
+              animateClosing(popupAnimations["sortPicker"], () =>
+                setPopups((prevState) => ({
+                  ...prevState,
+                  sortPicker: false,
+                }))
+              );
+            }}
+            selectedSort={selectedSort}
+            urgentTasksFirst={urgentTasksFirst}
+            completedTasksFirst={completedTasksFirst}
+            setSelectedSort={setSelectedSort}
+            setUrgentTasksFirst={setUrgentTasksFirst}
+            setCompletedTasksFirst={setCompletedTasksFirst}
           />
         </Animated.View>
       )}
@@ -425,22 +459,32 @@ function HomeScreen() {
           animateOpening(menuAnimation);
           animateSlideIn(menuLeftAnimation);
         }}
-        filteredTasks={filteredTasks}
+        sortedTasks={sortedTasks}
         setFoundTasks={setFoundTasks}
       />
       <FilteringBar
         tasks={tasks}
-        setFilteredTasks={setFilteredTasks}
+        setSortedTasks={setSortedTasks}
         selectedCategory={selectedCategory}
-        openSelectPopup={() => {
+        selectedSort={selectedSort}
+        urgentTasksFirst={urgentTasksFirst}
+        completedTasksFirst={completedTasksFirst}
+        openCategoryPickerPopup={() => {
           setPopups((prevState) => ({
             ...prevState,
-            select: true,
+            categoryPicker: true,
           }));
-          animateOpening(popupAnimations["select"]);
+          animateOpening(popupAnimations["categoryPicker"]);
+        }}
+        openSortPickerPopup={() => {
+          setPopups((prevState) => ({
+            ...prevState,
+            sortPicker: true,
+          }));
+          animateOpening(popupAnimations["sortPicker"]);
         }}
       />
-      <TasksArea
+      <TasksContainer
         foundTasks={foundTasks}
         setTasks={setTasks}
         didFetch={didFetch}

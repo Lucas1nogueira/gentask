@@ -2,9 +2,9 @@ import { useEffect } from "react";
 import { BackHandler, FlatList, Text, View } from "react-native";
 import categories from "../data/categories";
 import styles from "../styles/styles";
-import SelectOption from "./SelectOption";
+import PickerOption from "./PickerOption";
 
-function SelectPopup(props) {
+function CategoryPickerPopup(props) {
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
@@ -27,15 +27,15 @@ function SelectPopup(props) {
         },
       ]}
     >
-      <View style={styles.selectPopup}>
+      <View style={[styles.pickerPopup, { height: 570 }]}>
         <Text style={styles.text}>Selecione uma categoria</Text>
         <FlatList
-          style={styles.categoriesList}
+          style={styles.pickerOptionsList}
           data={[{ name: "Tudo", color: "white" }, ...categories]}
           renderItem={({ item }) => (
-            <SelectOption
-              categoryName={item.name}
-              categoryColor={item.color}
+            <PickerOption
+              title={item.name}
+              iconColor={item.color}
               action={() => {
                 props.setSelectedCategory(item);
                 props.close();
@@ -48,4 +48,4 @@ function SelectPopup(props) {
   );
 }
 
-export default SelectPopup;
+export default CategoryPickerPopup;

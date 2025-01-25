@@ -42,7 +42,7 @@ export function animateRotation(property) {
   Animated.loop(
     Animated.timing(property, {
       toValue: 1,
-      duration: 2000,
+      duration: 4000,
       useNativeDriver: true,
       easing: Easing.linear,
     })

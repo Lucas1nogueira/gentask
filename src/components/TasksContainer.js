@@ -1,18 +1,26 @@
 import { useEffect, useRef, useState } from "react";
-import { Animated, FlatList, Pressable, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Animated,
+  FlatList,
+  Pressable,
+  Text,
+  View,
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { animateRotation } from "../utils/animationUtils";
 import Task from "./Task";
 import styles from "../styles/styles";
 
-function TasksArea(props) {
+function TasksContainer(props) {
   const rotation = useRef(new Animated.Value(0)).current;
 
-  const [sortedTasks, setSortedTasks] = useState([]);
+  const [didTasksLoad, setTasksLoad] = useState(false);
+  const [tasks, setTasks] = useState([]);
   const [isMagicAIPressed, setMagicAIPressed] = useState(false);
   const [isAddTaskPressed, setAddTaskPressed] = useState(false);
-  const [taskWidth, setTaskWidth] = useState(0);
+  const [taskWidth, setTaskWidth] = useState(null);
 
   const spin = rotation.interpolate({
     inputRange: [0, 1],
@@ -25,10 +33,17 @@ function TasksArea(props) {
         id,
         ...task,
       }));
-      const sorted = tasksArray.sort((a, b) => b.isUrgent - a.isUrgent);
-      setSortedTasks(sorted);
+      setTasks(tasksArray);
     }
   }, [props.foundTasks]);
+
+  useEffect(() => {
+    if (props.didFetch.current && taskWidth) {
+      setTimeout(() => {
+        setTasksLoad(true);
+      }, 1000);
+    }
+  }, [props.didFetch.current, taskWidth]);
 
   useEffect(() => {
     animateRotation(rotation);
@@ -40,32 +55,58 @@ function TasksArea(props) {
   };
 
   return (
-    <View style={styles.tasksArea}>
-      {props.foundTasks && Object.keys(props.foundTasks).length !== 0 ? (
-        <FlatList
-          style={{ width: "100%", maxHeight: 805 }}
-          data={sortedTasks}
-          onLayout={handleTaskListLayout}
-          renderItem={({ item }) => (
-            <Task
-              key={item.id}
-              width={taskWidth}
-              action={() => props.taskViewPopup(item.id)}
-              text={item.text}
-              category={item.category}
-              color={item.color}
-              isUrgent={item.isUrgent}
-              isCompleted={item.isCompleted}
-              delete={() => props.delete(item.id)}
-              checkCompleted={() => {
-                props.checkCompleted(item.id);
-              }}
+    <View style={styles.tasksContainer}>
+      <View
+        style={{
+          width: "100%",
+          maxHeight: "89.5%",
+          borderRadius: 15,
+          overflow: "hidden",
+        }}
+        onLayout={handleTaskListLayout}
+      >
+        {!didTasksLoad ? (
+          <View
+            style={{
+              width: "100%",
+              height: "100%",
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <ActivityIndicator
+              size="small"
+              color={styles.activityIndicator.color}
             />
-          )}
-        />
-      ) : (
-        <Text style={styles.text}>{props.emptyMessage}</Text>
-      )}
+            <Text style={[styles.text, { paddingLeft: 5 }]}>
+              Carregando tarefas...
+            </Text>
+          </View>
+        ) : props.foundTasks && Object.keys(props.foundTasks).length !== 0 ? (
+          <FlatList
+            data={tasks}
+            renderItem={({ item }) => (
+              <Task
+                key={item.id}
+                width={taskWidth}
+                action={() => props.taskViewPopup(item.id)}
+                text={item.text}
+                category={item.category}
+                color={item.color}
+                isUrgent={item.isUrgent}
+                isCompleted={item.isCompleted}
+                delete={() => props.delete(item.id)}
+                checkCompleted={() => {
+                  props.checkCompleted(item.id);
+                }}
+              />
+            )}
+          />
+        ) : (
+          <Text style={styles.text}>{props.emptyMessage}</Text>
+        )}
+      </View>
       <View
         style={{
           width: "100%",
@@ -92,7 +133,7 @@ function TasksArea(props) {
           </Animated.View>
           <MaterialCommunityIcons
             name="robot-happy-outline"
-            size={30}
+            size={25}
             color="white"
           />
         </Pressable>
@@ -105,7 +146,7 @@ function TasksArea(props) {
           onPressIn={() => setAddTaskPressed(true)}
           onPressOut={() => setAddTaskPressed(false)}
         >
-          <Text style={styles.text}>New task</Text>
+          <Text style={styles.text}>Nova tarefa</Text>
           <Ionicons name="add" size={40} color="white" />
         </Pressable>
       </View>
@@ -113,4 +154,4 @@ function TasksArea(props) {
   );
 }
 
-export default TasksArea;
+export default TasksContainer;

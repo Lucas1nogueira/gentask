@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     alignSelf: "center",
-    paddingHorizontal: 25,
+    paddingHorizontal: 22,
   },
   categorySelectionButton: {
     height: 40,
@@ -82,16 +82,16 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 10,
   },
-  tasksArea: {
-    width: "90%",
-    height: screenHeight - 150,
+  tasksContainer: {
+    width: "92%",
+    height: screenHeight - 143,
     marginTop: 10,
     alignSelf: "center",
     flexDirection: "column",
     justifyContent: "space-between",
     borderRadius: 20,
     backgroundColor: "#191919",
-    padding: 20,
+    padding: 15,
   },
   text: {
     fontFamily: "ReadexPro-Regular",
@@ -100,6 +100,9 @@ const styles = StyleSheet.create({
   header: {
     fontFamily: "ReadexPro-Bold",
     color: "#fff",
+  },
+  activityIndicator: {
+    color: "#AAA",
   },
   category: {
     height: 30,
@@ -190,8 +193,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#59b2db",
   },
   magicAIButton: {
-    width: 60,
-    height: 60,
+    width: 55,
+    height: 55,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
@@ -200,7 +203,7 @@ const styles = StyleSheet.create({
   },
   addTaskButton: {
     width: 155,
-    height: 60,
+    height: 55,
     marginLeft: 17,
     flexDirection: "row",
     justifyContent: "center",
@@ -235,12 +238,14 @@ const styles = StyleSheet.create({
   commonButton: {
     width: 100,
     height: 45,
-    justifyContent: "center",
+    flexDirection: "row",
+    justifyContent: "space-around",
     alignItems: "center",
     borderWidth: 1,
     borderRadius: 10,
     borderColor: "#777",
     backgroundColor: "#1e1e1e",
+    paddingHorizontal: 10,
   },
   messagePopup: {
     width: 400,
@@ -288,25 +293,26 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.3)",
     paddingHorizontal: 10,
   },
-  selectPopup: {
+  pickerPopup: {
     width: 400,
-    height: 560,
     flexDirection: "column",
     alignItems: "center",
     borderRadius: 25,
     backgroundColor: "#222",
     padding: 25,
   },
-  categoriesList: {
+  pickerOptionsList: {
     width: "100%",
     marginTop: 20,
     borderRadius: 15,
     backgroundColor: "#111",
+    overflow: "hidden",
   },
-  selectOption: {
+  pickerOption: {
     width: "100%",
     height: 50,
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
     borderBottomWidth: 1,
     borderColor: "#050505",
