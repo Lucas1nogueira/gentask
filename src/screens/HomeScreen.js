@@ -32,8 +32,9 @@ function HomeScreen() {
     color: "white",
   });
   const [selectedSort, setSelectedSort] = useState("created_asc");
-  const [urgentTasksFirst, setUrgentTasksFirst] = useState(true);
+  const [pendingTasksFirst, setPendingTasksFirst] = useState(false);
   const [completedTasksFirst, setCompletedTasksFirst] = useState(false);
+  const [urgentTasksFirst, setUrgentTasksFirst] = useState(true);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
 
   const [openMenu, setOpenMenu] = useState(false);
@@ -161,11 +162,13 @@ function HomeScreen() {
               );
             }}
             selectedSort={selectedSort}
-            urgentTasksFirst={urgentTasksFirst}
+            pendingTasksFirst={pendingTasksFirst}
             completedTasksFirst={completedTasksFirst}
+            urgentTasksFirst={urgentTasksFirst}
             setSelectedSort={setSelectedSort}
-            setUrgentTasksFirst={setUrgentTasksFirst}
+            setPendingTasksFirst={setPendingTasksFirst}
             setCompletedTasksFirst={setCompletedTasksFirst}
+            setUrgentTasksFirst={setUrgentTasksFirst}
           />
         </Animated.View>
       )}
@@ -467,8 +470,9 @@ function HomeScreen() {
         setSortedTasks={setSortedTasks}
         selectedCategory={selectedCategory}
         selectedSort={selectedSort}
-        urgentTasksFirst={urgentTasksFirst}
+        pendingTasksFirst={pendingTasksFirst}
         completedTasksFirst={completedTasksFirst}
+        urgentTasksFirst={urgentTasksFirst}
         openCategoryPickerPopup={() => {
           setPopups((prevState) => ({
             ...prevState,

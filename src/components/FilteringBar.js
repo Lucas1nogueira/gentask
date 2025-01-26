@@ -67,8 +67,23 @@ function FilteringBar(props) {
 
   useEffect(() => {
     if (tasksSortedByTime) {
-      if (props.completedTasksFirst === false) {
+      if (
+        props.pendingTasksFirst === false &&
+        props.completedTasksFirst === false
+      ) {
         setTasksSortedByCompletion(tasksSortedByTime);
+      } else if (props.pendingTasksFirst === true) {
+        const sortedTasks = Object.entries(tasksSortedByTime)
+          .sort(([, taskA], [, taskB]) => {
+            if (taskA.isCompleted && !taskB.isCompleted) return 1;
+            if (!taskA.isCompleted && taskB.isCompleted) return -1;
+            return 0;
+          })
+          .reduce((accumulator, [taskId, task]) => {
+            accumulator[taskId] = task;
+            return accumulator;
+          }, {});
+        setTasksSortedByCompletion(sortedTasks);
       } else if (props.completedTasksFirst === true) {
         const sortedTasks = Object.entries(tasksSortedByTime)
           .sort(([, taskA], [, taskB]) => {
@@ -83,7 +98,7 @@ function FilteringBar(props) {
         setTasksSortedByCompletion(sortedTasks);
       }
     }
-  }, [tasksSortedByTime, props.completedTasksFirst]);
+  }, [tasksSortedByTime, props.pendingTasksFirst, props.completedTasksFirst]);
 
   useEffect(() => {
     if (tasksSortedByCompletion) {

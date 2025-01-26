@@ -6,8 +6,9 @@ import PickerOption from "./PickerOption";
 
 function SortPickerPopup(props) {
   const [selectedSort, setSelectedSort] = useState(null);
-  const [urgentTasksFirst, setUrgentTasksFirst] = useState(null);
+  const [pendingTasksFirst, setPendingTasksFirst] = useState(null);
   const [completedTasksFirst, setCompletedTasksFirst] = useState(null);
+  const [urgentTasksFirst, setUrgentTasksFirst] = useState(null);
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
@@ -22,8 +23,9 @@ function SortPickerPopup(props) {
 
   useEffect(() => {
     setSelectedSort(props.selectedSort);
-    setUrgentTasksFirst(props.urgentTasksFirst);
+    setPendingTasksFirst(props.pendingTasksFirst);
     setCompletedTasksFirst(props.completedTasksFirst);
+    setUrgentTasksFirst(props.urgentTasksFirst);
   }, []);
 
   return (
@@ -89,13 +91,30 @@ function SortPickerPopup(props) {
           <PickerOption
             title="Padrão"
             iconName="format-list-bulleted"
-            action={() => setCompletedTasksFirst(false)}
-            selected={completedTasksFirst === false}
+            action={() => {
+              setPendingTasksFirst(false);
+              setCompletedTasksFirst(false);
+            }}
+            selected={
+              pendingTasksFirst === false && completedTasksFirst === false
+            }
+          />
+          <PickerOption
+            title="Pendentes primeiro"
+            iconName="checkbox-blank-badge-outline"
+            action={() => {
+              setPendingTasksFirst(true);
+              setCompletedTasksFirst(false);
+            }}
+            selected={pendingTasksFirst === true}
           />
           <PickerOption
             title="Concluídas primeiro"
-            iconName="checkbox-marked-circle-outline"
-            action={() => setCompletedTasksFirst(true)}
+            iconName="checkbox-marked-outline"
+            action={() => {
+              setPendingTasksFirst(false);
+              setCompletedTasksFirst(true);
+            }}
             selected={completedTasksFirst === true}
           />
         </View>
@@ -112,6 +131,9 @@ function SortPickerPopup(props) {
           onPress={() => {
             if (selectedSort !== null) {
               props.setSelectedSort(selectedSort);
+            }
+            if (pendingTasksFirst !== null) {
+              props.setPendingTasksFirst(pendingTasksFirst);
             }
             if (completedTasksFirst !== null) {
               props.setCompletedTasksFirst(completedTasksFirst);
