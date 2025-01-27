@@ -111,14 +111,14 @@ function Task(props) {
                 props.isUrgent && { backgroundColor: "#300500" },
               ]}
             >
-              <Octicons name="dot-fill" size={22} color={props.color} />
+              <Octicons name="dot-fill" size={22} color={props.categoryColor} />
               <Text
                 style={[
                   styles.categoryText,
                   { textAlign: "center", paddingLeft: 5 },
                 ]}
               >
-                {props.category}
+                {props.categoryName}
               </Text>
             </View>
           </View>

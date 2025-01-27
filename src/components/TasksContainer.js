@@ -16,7 +16,7 @@ import styles from "../styles/styles";
 function TasksContainer(props) {
   const rotation = useRef(new Animated.Value(0)).current;
 
-  const [didTasksLoad, setTasksLoad] = useState(false);
+  const [showTasks, setShowTasks] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [isMagicAIPressed, setMagicAIPressed] = useState(false);
   const [isAddTaskPressed, setAddTaskPressed] = useState(false);
@@ -38,12 +38,12 @@ function TasksContainer(props) {
   }, [props.foundTasks]);
 
   useEffect(() => {
-    if (props.didFetch.current && taskWidth) {
+    if (props.didTasksLoad && taskWidth) {
       setTimeout(() => {
-        setTasksLoad(true);
-      }, 1000);
+        setShowTasks(true);
+      }, 500);
     }
-  }, [props.didFetch.current, taskWidth]);
+  }, [props.didTasksLoad, taskWidth]);
 
   useEffect(() => {
     animateRotation(rotation);
@@ -65,7 +65,7 @@ function TasksContainer(props) {
         }}
         onLayout={handleTaskListLayout}
       >
-        {!didTasksLoad ? (
+        {!showTasks ? (
           <View
             style={{
               width: "100%",
@@ -92,8 +92,8 @@ function TasksContainer(props) {
                 width={taskWidth}
                 action={() => props.taskViewPopup(item.id)}
                 text={item.text}
-                category={item.category}
-                color={item.color}
+                categoryName={item.categoryName}
+                categoryColor={item.categoryColor}
                 isUrgent={item.isUrgent}
                 isCompleted={item.isCompleted}
                 delete={() => props.delete(item.id)}

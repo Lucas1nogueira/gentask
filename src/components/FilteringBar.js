@@ -16,7 +16,8 @@ function FilteringBar(props) {
       } else {
         const filteredTasks = Object.entries(props.tasks)
           .filter(
-            ([taskId, task]) => task.category === props.selectedCategory.name
+            ([taskId, task]) =>
+              task.categoryName === props.selectedCategory.name
           )
           .reduce((accumulator, [taskId, task]) => {
             accumulator[taskId] = task;

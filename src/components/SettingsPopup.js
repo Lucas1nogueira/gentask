@@ -32,7 +32,7 @@ function SettingsPopup(props) {
           style={{
             width: "100%",
             flexDirection: "row",
-            justifyContent: "space-around",
+            justifyContent: "space-between",
             alignItems: "center",
           }}
         >
@@ -55,7 +55,7 @@ function SettingsPopup(props) {
           style={{
             width: "100%",
             flexDirection: "row",
-            justifyContent: "space-around",
+            justifyContent: "space-between",
             alignItems: "center",
           }}
         >

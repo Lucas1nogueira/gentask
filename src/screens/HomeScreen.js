@@ -25,6 +25,7 @@ function HomeScreen() {
   const didFetch = useRef(false);
 
   const [tasks, setTasks] = useState(null);
+  const [didTasksLoad, setTasksLoad] = useState(false);
   const [sortedTasks, setSortedTasks] = useState(null);
   const [foundTasks, setFoundTasks] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState({
@@ -94,6 +95,7 @@ function HomeScreen() {
     getValueFor("tasks").then((data) => {
       if (data) setTasks(data);
       didFetch.current = true;
+      setTasksLoad(true);
     });
   }, []);
 
@@ -306,9 +308,9 @@ function HomeScreen() {
                 }))
               );
             }}
-            title={"Exit app"}
-            description={"This will close MyTasks. Are you sure?"}
-            actionName={"Exit"}
+            title={"Sair do MyTasks"}
+            description={"Isso fechará o app. Tem certeza?"}
+            actionName={"Sair"}
             actionButtonColor={"#470c0c"}
             action={() => BackHandler.exitApp()}
           />
@@ -327,15 +329,22 @@ function HomeScreen() {
                 }))
               );
             }}
-            title={"Delete task"}
-            description={"This will erase the selected task. Are you sure?"}
-            actionName={"Delete"}
+            title={"Deletar tarefa"}
+            description={"Isso apagará a tarefa selecionada. Tem certeza?"}
+            actionName={"Deletar"}
             actionButtonColor={"#470c0c"}
             action={() => {
               const updatedTasks = { ...tasks };
               delete updatedTasks[selectedTaskId];
               setTasks(updatedTasks);
               setSelectedTaskId(null);
+              setMinimalPopupMessage("Tarefa removida!");
+              setPopups((prevState) => ({
+                ...prevState,
+                success: true,
+              }));
+              animateOpening(popupAnimations["success"]);
+              animateSlideIn(popupAnimations["successRight"]);
             }}
           />
         </Animated.View>
@@ -353,9 +362,9 @@ function HomeScreen() {
                 }))
               );
             }}
-            title={"Discard task"}
-            description={"All written text will be lost. Are you sure?"}
-            actionName={"Discard"}
+            title={"Descartar tarefa"}
+            description={"O texto inserido será perdido. Tem certeza?"}
+            actionName={"Sim"}
             actionButtonColor={"#470c0c"}
             action={() => {
               animateClosing(popupAnimations["view"], () =>
@@ -381,7 +390,7 @@ function HomeScreen() {
           opacityAnimation={popupAnimations.loading}
           rightAnimation={popupAnimations.loadingRight}
           color="#555"
-          message={"Saving your task..."}
+          message={"Salvando tarefa..."}
         />
       )}
       {popups.success && (
@@ -389,7 +398,7 @@ function HomeScreen() {
           customTop={40}
           opacityAnimation={popupAnimations.success}
           rightAnimation={popupAnimations.successRight}
-          color="#5adb23"
+          color={styles.minimalPopupSuccess.backgroundColor}
           close={() => {
             animateClosing(popupAnimations["success"], () =>
               setPopups((prevState) => ({
@@ -406,7 +415,7 @@ function HomeScreen() {
         <MinimalPopup
           opacityAnimation={popupAnimations.noText}
           rightAnimation={popupAnimations.noTextRight}
-          color="#bc0000"
+          color={styles.minimalPopupNoText.backgroundColor}
           close={() => {
             animateClosing(popupAnimations["noText"], () =>
               setPopups((prevState) => ({
@@ -416,7 +425,7 @@ function HomeScreen() {
             );
             animateSlideOut(popupAnimations["noTextRight"]);
           }}
-          message={"Please, insert any text!"}
+          message={"Por favor, insira algum texto!"}
         />
       )}
       {popups.error && (
@@ -491,7 +500,7 @@ function HomeScreen() {
       <TasksContainer
         foundTasks={foundTasks}
         setTasks={setTasks}
-        didFetch={didFetch}
+        didTasksLoad={didTasksLoad}
         emptyMessage={
           !tasks || Object.keys(tasks).length === 0
             ? "Nenhuma tarefa cadastrada!"

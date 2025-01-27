@@ -15,8 +15,10 @@ const categorizingPromptTemplate = `Classify the following text as a task into e
 
 const isUrgentPromptTemplate = `Considering the following text as a personal task, can this task be labeled as urgent? Consider just if the text is clearly talking about an urgent activity, and respond strictly and only with yes or no, without any additional comments or explanations. The text is: `;
 
+const insightsPromptTemplate = `Considering the following text as a personal task, provide actionable insights and step-by-step guidance on how to efficiently complete it. Focus on practical tips, prioritization, and time management strategies. Answer in Brazilian Portuguese and limit the response to 80 characters. The text is: `;
+
 async function queryGemini(prePrompt, userInput) {
-  const fullPrompt = `${prePrompt}: ${userInput}`;
+  const fullPrompt = `${prePrompt} ${userInput}`;
 
   try {
     const response = await fetch(`${API_URL}?key=${API_KEY}`, {
@@ -37,7 +39,6 @@ async function queryGemini(prePrompt, userInput) {
       }),
     });
 
-    // Checking for response errors
     if (!response.ok) {
       throw new Error(`Gemini error: ${response.statusText}`);
     }
@@ -54,33 +55,58 @@ async function queryGemini(prePrompt, userInput) {
 
     return responseText;
   } catch (error) {
-    console.error("Error: ", error.message);
     throw error;
   }
 }
 
 async function categorizeTask(str) {
-  const categoryName = await queryGemini(categorizingPromptTemplate, str);
+  let categoryName;
+  let isTaskUrgent;
+  let taskInsights;
+
+  try {
+    categoryName = await queryGemini(categorizingPromptTemplate, str);
+  } catch (error) {
+    console.warn("Error categorizing task:", error);
+    categoryName = "Outros";
+  }
+
+  try {
+    isTaskUrgent = await queryGemini(isUrgentPromptTemplate, str);
+    if (!isTaskUrgent) {
+      isTaskUrgent = false;
+    } else {
+      isTaskUrgent = isTaskUrgent.toLowerCase().trim() === "yes";
+    }
+  } catch (error) {
+    console.warn("Error checking task urgency:", error);
+    isTaskUrgent = false;
+  }
+
+  try {
+    taskInsights = await queryGemini(insightsPromptTemplate, str);
+  } catch (error) {
+    console.warn("Error obtaining insights:", error);
+    taskInsights = null;
+  }
+
   const categoryObject = categories.find(
     (category) => category.name === categoryName.trim()
   );
-  let urgent = await queryGemini(isUrgentPromptTemplate, str);
-  if (!urgent) {
-    urgent = false;
-  } else {
-    urgent = urgent.toLowerCase().trim() == "yes" ? true : false;
-  }
+
   if (!categoryObject) {
     return {
       categoryName: "Outros",
       categoryColor: "gray",
-      isUrgent: urgent,
+      isUrgent: isTaskUrgent,
+      insights: taskInsights,
     };
   } else {
     return {
       categoryName: categoryObject.name,
       categoryColor: categoryObject.color,
-      isUrgent: urgent,
+      isUrgent: isTaskUrgent,
+      insights: taskInsights,
     };
   }
 }

@@ -214,7 +214,6 @@ const styles = StyleSheet.create({
   },
   taskPopup: {
     width: 400,
-    height: 560,
     alignItems: "center",
     borderRadius: 25,
     backgroundColor: "#222",
@@ -223,14 +222,22 @@ const styles = StyleSheet.create({
   taskInput: {
     width: "100%",
     height: 410,
-    marginVertical: 20,
+    marginTop: 20,
     backgroundColor: "#191919",
     borderRadius: 15,
     padding: 10,
     color: "#fff",
   },
+  taskInsight: {
+    width: "100%",
+    marginTop: 20,
+    backgroundColor: "#191919",
+    borderRadius: 15,
+    padding: 10,
+  },
   popupButtonRow: {
     width: "100%",
+    marginTop: 20,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -248,7 +255,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   messagePopup: {
-    width: 400,
+    width: 370,
     height: 200,
     justifyContent: "space-between",
     alignItems: "flex-start",
@@ -272,11 +279,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     zIndex: 1,
   },
+  minimalPopupSuccess: {
+    backgroundColor: "#448c25",
+  },
+  minimalPopupNoText: {
+    backgroundColor: "#bc0000",
+  },
   settingsPopup: {
-    width: 400,
+    width: 370,
     height: 200,
     justifyContent: "space-between",
-    alignItems: "flex-start",
     borderRadius: 25,
     backgroundColor: "#222",
     padding: 25,

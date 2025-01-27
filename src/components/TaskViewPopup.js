@@ -6,7 +6,7 @@ import {
   TouchableHighlight,
   BackHandler,
 } from "react-native";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { categorizeTask } from "../services/geminiService";
 import styles from "../styles/styles";
 
@@ -40,8 +40,9 @@ function TaskViewPopup(props) {
         const time = Date.now();
         const task = {
           text: text,
-          category: taskInfo.categoryName,
-          color: taskInfo.categoryColor,
+          categoryName: taskInfo.categoryName,
+          categoryColor: taskInfo.categoryColor,
+          insights: taskInfo.insights,
           isUrgent: taskInfo.isUrgent,
           isCompleted: props.selectedTask.isCompleted,
           createdAt: props.selectedTask.createdAt,
@@ -79,7 +80,7 @@ function TaskViewPopup(props) {
       ]}
     >
       <View style={styles.taskPopup}>
-        <Text style={styles.text}>Task view</Text>
+        <Text style={styles.text}>Visualização da tarefa</Text>
         <TextInput
           style={styles.taskInput}
           multiline={true}
@@ -87,9 +88,18 @@ function TaskViewPopup(props) {
           defaultValue={props.selectedTask.text}
           onChangeText={onChangeText}
           cursorColor={"#efdb00"}
-          placeholder="Insert here..."
+          placeholder="Digite aqui..."
           placeholderTextColor={"#b5b5b5"}
         />
+        {props.selectedTask.insights && (
+          <View style={styles.taskInsight}>
+            <View style={{ flexDirection: "row" }}>
+              <MaterialIcons name="insights" size={24} color="white" />
+              <Text style={[styles.header, { paddingLeft: 5 }]}>Insights</Text>
+            </View>
+            <Text style={styles.text}>{props.selectedTask.insights}</Text>
+          </View>
+        )}
         <View style={styles.popupButtonRow}>
           <TouchableHighlight
             style={[styles.commonButton, { backgroundColor: "#470c0c" }]}
@@ -110,7 +120,7 @@ function TaskViewPopup(props) {
               }}
             >
               <AntDesign name="back" size={20} color="#fff" />
-              <Text style={styles.text}>Close</Text>
+              <Text style={styles.text}>Voltar</Text>
             </View>
           </TouchableHighlight>
           <TouchableHighlight
@@ -128,7 +138,7 @@ function TaskViewPopup(props) {
               }}
             >
               <Ionicons name="save-outline" size={20} color="#fff" />
-              <Text style={styles.text}>Save</Text>
+              <Text style={styles.text}>Salvar</Text>
             </View>
           </TouchableHighlight>
         </View>

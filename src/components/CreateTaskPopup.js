@@ -35,8 +35,9 @@ function CreateTaskPopup(props) {
       const time = Date.now();
       const task = {
         text: text,
-        category: taskInfo.categoryName,
-        color: taskInfo.categoryColor,
+        categoryName: taskInfo.categoryName,
+        categoryColor: taskInfo.categoryColor,
+        insights: taskInfo.insights,
         isUrgent: taskInfo.isUrgent,
         isCompleted: false,
         createdAt: time,
@@ -74,14 +75,14 @@ function CreateTaskPopup(props) {
       ]}
     >
       <View style={styles.taskPopup}>
-        <Text style={styles.text}>New task</Text>
+        <Text style={styles.text}>Criar nova tarefa</Text>
         <TextInput
           style={styles.taskInput}
           multiline={true}
           textAlignVertical="top"
           onChangeText={onChangeText}
           cursorColor={"#efdb00"}
-          placeholder="Insert here..."
+          placeholder="Digite aqui..."
           placeholderTextColor={"#b5b5b5"}
         />
         <View style={styles.popupButtonRow}>
@@ -102,7 +103,7 @@ function CreateTaskPopup(props) {
               }}
             >
               <AntDesign name="back" size={20} color="#fff" />
-              <Text style={styles.text}>Cancel</Text>
+              <Text style={styles.text}>Voltar</Text>
             </View>
           </TouchableHighlight>
           <TouchableHighlight
@@ -120,7 +121,7 @@ function CreateTaskPopup(props) {
               }}
             >
               <Ionicons name="save-outline" size={20} color="#fff" />
-              <Text style={styles.text}>Add</Text>
+              <Text style={styles.text}>Salvar</Text>
             </View>
           </TouchableHighlight>
         </View>

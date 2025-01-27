@@ -43,7 +43,7 @@ function MessagePopup(props) {
               }}
             >
               <AntDesign name="back" size={20} color="#fff" />
-              <Text style={styles.text}>Cancel</Text>
+              <Text style={styles.text}>Voltar</Text>
             </View>
           </TouchableHighlight>
           <TouchableHighlight
