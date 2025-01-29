@@ -48,3 +48,27 @@ export function animateRotation(property) {
     })
   ).start();
 }
+
+export function animateExpanding(property) {
+  Animated.timing(property, {
+    toValue: 1,
+    duration: 150,
+    useNativeDriver: false,
+  }).start();
+}
+
+export function animateCollapsing(property) {
+  Animated.timing(property, {
+    toValue: 0,
+    duration: 100,
+    useNativeDriver: false,
+  }).start();
+}
+
+export function animateToggleSwitch(property, toValue, callbackFunction) {
+  Animated.timing(property, {
+    toValue: toValue,
+    duration: 300,
+    useNativeDriver: true,
+  }).start(callbackFunction);
+}

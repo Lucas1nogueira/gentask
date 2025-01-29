@@ -31,7 +31,7 @@ function CategoryPickerPopup(props) {
         <Text style={styles.text}>Selecione uma categoria</Text>
         <FlatList
           style={styles.pickerOptionsList}
-          data={[{ name: "Tudo", color: "white" }, ...categories]}
+          data={[props.defaultOption, ...categories]}
           renderItem={({ item }) => (
             <PickerOption
               title={item.name}

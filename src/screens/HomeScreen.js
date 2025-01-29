@@ -144,6 +144,7 @@ function HomeScreen() {
               );
             }}
             setSelectedCategory={setSelectedCategory}
+            defaultOption={{ name: "Tudo", color: "white" }}
           />
         </Animated.View>
       )}
