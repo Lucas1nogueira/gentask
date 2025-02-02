@@ -1,6 +1,6 @@
-import { useRef, useState } from "react";
-import { Animated, Modal, Text, TouchableOpacity, View } from "react-native";
-import { Entypo, Octicons } from "@expo/vector-icons/";
+import { useEffect, useRef, useState } from "react";
+import { Animated, Text, TouchableOpacity, View } from "react-native";
+import { Entypo, MaterialIcons, Octicons } from "@expo/vector-icons/";
 import {
   animateCollapsing,
   animateExpanding,
@@ -16,7 +16,7 @@ function ExpandableSelection(props) {
 
   const heightInterpolate = expandAnimation.interpolate({
     inputRange: [0, 1],
-    outputRange: [25, 165],
+    outputRange: [25, 175],
   });
 
   const backgroundColor = toggleSwitchAnimation.interpolate({
@@ -28,6 +28,12 @@ function ExpandableSelection(props) {
     inputRange: [0, 1],
     outputRange: [0, 22],
   });
+
+  useEffect(() => {
+    if (props.isTaskUrgent) {
+      animateToggleSwitch(toggleSwitchAnimation, 1);
+    }
+  }, [props.isTaskUrgent]);
 
   return (
     <View style={[styles.expandableSelection]}>
@@ -48,21 +54,24 @@ function ExpandableSelection(props) {
             }
           }}
         >
-          <Text style={styles.text}>Avançado</Text>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <MaterialIcons name="settings" size={20} color="white" />
+            <Text style={[styles.text, { paddingLeft: 5 }]}>Avançado</Text>
+          </View>
           <Entypo name="select-arrows" size={20} color="white" />
         </TouchableOpacity>
         {showAdvancedOptions && (
           <>
             <View
               style={{
-                marginTop: 10,
+                marginTop: 15,
                 flexDirection: "row",
                 justifyContent: "space-between",
                 alignItems: "center",
               }}
             >
               <Text style={[styles.text, { paddingRight: 10 }]}>
-                Selecione uma categoria:
+                Categoria:
               </Text>
               <TouchableOpacity
                 style={styles.categorySelectionButton}
@@ -89,28 +98,76 @@ function ExpandableSelection(props) {
               <Text style={[styles.text, { paddingRight: 10 }]}>
                 Marcar como urgente?
               </Text>
-              <TouchableOpacity
-                onPress={() => {
-                  animateToggleSwitch(
-                    toggleSwitchAnimation,
-                    props.isTaskUrgent ? 0 : 1,
-                    props.setTaskUrgent(!props.isTaskUrgent)
-                  );
+              <View
+                style={{
+                  width: 150,
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
                 }}
               >
-                <Animated.View
-                  style={[styles.toggleSwitchContainer, { backgroundColor }]}
+                <TouchableOpacity
+                  style={styles.categorySelectionButton}
+                  onPress={() => {
+                    if (props.isTaskUrgent === null) {
+                      props.setTaskUrgent(false);
+                    } else {
+                      animateToggleSwitch(
+                        toggleSwitchAnimation,
+                        0,
+                        props.setTaskUrgent(null)
+                      );
+                    }
+                  }}
                 >
+                  <MaterialIcons name="insights" size={20} color="white" />
+                  <Text style={[styles.text, { paddingLeft: 5 }]}>
+                    {props.isTaskUrgent === null ? "Auto" : "Manual"}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    if (
+                      props.isTaskUrgent === null ||
+                      props.isTaskUrgent === false
+                    ) {
+                      animateToggleSwitch(
+                        toggleSwitchAnimation,
+                        1,
+                        props.setTaskUrgent(true)
+                      );
+                    } else if (props.isTaskUrgent === true) {
+                      animateToggleSwitch(
+                        toggleSwitchAnimation,
+                        0,
+                        props.setTaskUrgent(false)
+                      );
+                    }
+                  }}
+                >
+                  {/* Bug conhecido: background do switch com mal-funcionamento */}
                   <Animated.View
                     style={[
-                      styles.toggleSwitchBall,
-                      {
-                        transform: [{ translateX: ballPosition }],
-                      },
+                      styles.toggleSwitchContainer,
+                      props.isTaskUrgent !== null
+                        ? { backgroundColor: backgroundColor }
+                        : { backgroundColor: "#333" },
                     ]}
-                  />
-                </Animated.View>
-              </TouchableOpacity>
+                  >
+                    <Animated.View
+                      style={[
+                        styles.toggleSwitchBall,
+                        props.isTaskUrgent === null && {
+                          backgroundColor: "#999",
+                        },
+                        {
+                          transform: [{ translateX: ballPosition }],
+                        },
+                      ]}
+                    />
+                  </Animated.View>
+                </TouchableOpacity>
+              </View>
             </View>
             <View
               style={{

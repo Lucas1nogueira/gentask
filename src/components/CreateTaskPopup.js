@@ -24,8 +24,8 @@ function CreateTaskPopup(props) {
     name: "Escolhido por IA",
     color: "white",
   });
-  const [isTaskUrgent, setTaskUrgent] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(Date.now());
+  const [isTaskUrgent, setTaskUrgent] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   const [popups, setPopups] = useState({
     categoryPicker: false,
@@ -52,28 +52,35 @@ function CreateTaskPopup(props) {
 
   function saveTask() {
     props.openLoadingPopup();
-    categorizeTask(text).then((taskInfo) => {
-      const id = uuidv4();
-      const time = Date.now();
-      const task = {
-        text: text,
-        categoryName: taskInfo.categoryName,
-        categoryColor: taskInfo.categoryColor,
-        insights: taskInfo.insights,
-        isUrgent: taskInfo.isUrgent,
-        isCompleted: false,
-        createdAt: time,
-        updatedAt: time,
-      };
-      props.setTasks((prev) => ({
-        ...prev,
-        [id]: task,
-      }));
-      props.closeLoadingPopup();
-      setTimeout(() => {
-        props.openSuccessPopup();
-      }, 500);
-    });
+    const taskCategory =
+      selectedCategory.name === "Escolhido por IA"
+        ? null
+        : selectedCategory.name;
+    categorizeTask(text, taskCategory, isTaskUrgent, selectedDate).then(
+      (taskInfo) => {
+        const id = uuidv4();
+        const time = Date.now();
+        const task = {
+          text: text,
+          categoryName: taskInfo.categoryName,
+          categoryColor: taskInfo.categoryColor,
+          dueDate: taskInfo.dueDate,
+          isUrgent: taskInfo.isUrgent,
+          insights: taskInfo.insights,
+          isCompleted: false,
+          createdAt: time,
+          updatedAt: time,
+        };
+        props.setTasks((prev) => ({
+          ...prev,
+          [id]: task,
+        }));
+        props.closeLoadingPopup();
+        setTimeout(() => {
+          props.openSuccessPopup();
+        }, 500);
+      }
+    );
     props.close();
   }
 
@@ -165,7 +172,6 @@ function CreateTaskPopup(props) {
             animateOpening(popupAnimations["datePicker"]);
           }}
           selectedCategory={selectedCategory}
-          setSelectedCategory={setSelectedCategory}
           isTaskUrgent={isTaskUrgent}
           setTaskUrgent={setTaskUrgent}
           selectedDate={selectedDate}

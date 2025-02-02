@@ -70,5 +70,7 @@ export function animateToggleSwitch(property, toValue, callbackFunction) {
     toValue: toValue,
     duration: 300,
     useNativeDriver: true,
-  }).start(callbackFunction);
+  }).start(() => {
+    callbackFunction;
+  });
 }

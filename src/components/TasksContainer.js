@@ -94,6 +94,7 @@ function TasksContainer(props) {
                 text={item.text}
                 categoryName={item.categoryName}
                 categoryColor={item.categoryColor}
+                dueDate={item.dueDate}
                 isUrgent={item.isUrgent}
                 isCompleted={item.isCompleted}
                 delete={() => props.delete(item.id)}

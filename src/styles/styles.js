@@ -126,6 +126,8 @@ const styles = StyleSheet.create({
   },
   taskLabels: {
     flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   pendingTaskLabel: {
     marginRight: 5,
@@ -161,6 +163,12 @@ const styles = StyleSheet.create({
     fontFamily: "ReadexPro-SemiBold",
     fontSize: 9,
     color: "#ff503d",
+  },
+  dueDateTaskLabelText: {
+    fontFamily: "ReadexPro-SemiBold",
+    fontSize: 12,
+    color: "#fff",
+    paddingLeft: 3,
   },
   task: {
     height: "100%",
@@ -221,7 +229,7 @@ const styles = StyleSheet.create({
   },
   taskInput: {
     width: "100%",
-    height: 410,
+    height: 350,
     marginTop: 20,
     backgroundColor: "#191919",
     borderRadius: 15,

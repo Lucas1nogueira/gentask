@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { AntDesign, Octicons } from "@expo/vector-icons";
+import { AntDesign, MaterialIcons, Octicons } from "@expo/vector-icons";
 import styles from "../styles/styles";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
@@ -87,18 +87,32 @@ function Task(props) {
             }}
           >
             <View style={styles.taskLabels}>
-              {!props.isCompleted ? (
-                <View style={styles.pendingTaskLabel}>
-                  <Text style={styles.pendingTaskLabelText}>PENDENTE</Text>
-                </View>
-              ) : (
-                <View style={styles.completedTaskLabel}>
-                  <Text style={styles.completedTaskLabelText}>CONCLUÍDO</Text>
-                </View>
-              )}
-              {props.isUrgent && (
-                <View style={styles.urgentTaskLabel}>
-                  <Text style={styles.urgentTaskLabelText}>URGENTE</Text>
+              <View style={{ flexDirection: "row" }}>
+                {!props.isCompleted ? (
+                  <View style={styles.pendingTaskLabel}>
+                    <Text style={styles.pendingTaskLabelText}>PENDENTE</Text>
+                  </View>
+                ) : (
+                  <View style={styles.completedTaskLabel}>
+                    <Text style={styles.completedTaskLabelText}>CONCLUÍDO</Text>
+                  </View>
+                )}
+                {props.isUrgent && (
+                  <View style={styles.urgentTaskLabel}>
+                    <Text style={styles.urgentTaskLabelText}>URGENTE</Text>
+                  </View>
+                )}
+              </View>
+              {props.dueDate && (
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <MaterialIcons
+                    name="calendar-today"
+                    size={16}
+                    color="white"
+                  />
+                  <Text style={styles.dueDateTaskLabelText}>
+                    {new Date(props.dueDate).toLocaleDateString("pt-BR")}
+                  </Text>
                 </View>
               )}
             </View>
