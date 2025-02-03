@@ -46,7 +46,7 @@ function TaskViewPopup(props) {
             text != props.selectedTask.text) ||
           props.selectedTask.categoryName !== selectedCategory.name ||
           props.selectedTask.isUrgent !== isTaskUrgent ||
-          props.selectedTask.dueDate !== selectedDate
+          (selectedDate && props.selectedTask.dueDate !== selectedDate)
         ) {
           props.openDiscardPopup();
         } else {
@@ -73,7 +73,7 @@ function TaskViewPopup(props) {
       text != props.selectedTask.text ||
       props.selectedTask.categoryName !== selectedCategory.name ||
       props.selectedTask.isUrgent !== isTaskUrgent ||
-      props.selectedTask.dueDate !== selectedDate
+      (selectedDate && props.selectedTask.dueDate !== selectedDate)
     ) {
       props.openLoadingPopup();
       const taskCategory =
@@ -214,7 +214,7 @@ function TaskViewPopup(props) {
                   text != props.selectedTask.text) ||
                 props.selectedTask.categoryName !== selectedCategory.name ||
                 props.selectedTask.isUrgent !== isTaskUrgent ||
-                props.selectedTask.dueDate !== selectedDate
+                (selectedDate && props.selectedTask.dueDate !== selectedDate)
               ) {
                 props.openDiscardPopup();
               } else {

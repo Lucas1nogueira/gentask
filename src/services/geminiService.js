@@ -120,7 +120,7 @@ async function categorizeTask(text, categoryName, isUrgent, dueDate) {
     (category) => category.name === taskCategoryName.trim()
   );
 
-  if (taskDueDate) {
+  if (taskDueDate && typeof taskDueDate === "string") {
     const timestampString = taskDueDate.trim();
     if (/^\d+$/.test(timestampString)) {
       const timestamp = Number(timestampString);
