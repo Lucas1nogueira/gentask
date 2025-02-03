@@ -364,7 +364,7 @@ function HomeScreen() {
               );
             }}
             title={"Descartar tarefa"}
-            description={"O texto inserido será perdido. Tem certeza?"}
+            description={"Todo o conteúdo inserido será perdido. Tem certeza?"}
             actionName={"Sim"}
             actionButtonColor={"#470c0c"}
             action={() => {
@@ -429,6 +429,7 @@ function HomeScreen() {
           message={"Por favor, insira algum texto!"}
         />
       )}
+      {/* Ainda não usado */}
       {popups.error && (
         <Animated.View
           style={[styles.fullscreenArea, { opacity: popupAnimations.error }]}
@@ -442,8 +443,8 @@ function HomeScreen() {
                 }))
               );
             }}
-            title={"Error"}
-            description={"An error happened."}
+            title={"Erro"}
+            description={"Ocorreu um erro!"}
             actionName={"OK"}
             actionButtonColor={"#470c0c"}
             action={() => null}

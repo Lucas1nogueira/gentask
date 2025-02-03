@@ -7,10 +7,11 @@ import {
   TouchableHighlight,
   BackHandler,
 } from "react-native";
-import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { categorizeTask } from "../services/geminiService";
 import { animateClosing, animateOpening } from "../utils/animationUtils";
-import ExpandableSelection from "./ExpandableSelection";
+import TaskInsights from "./TaskInsights";
+import TaskAdvancedOptions from "./TaskAdvancedOptions";
 import CategoryPickerPopup from "./CategoryPickerPopup";
 import DatePickerPopup from "./DatePickerPopup";
 import styles from "../styles/styles";
@@ -39,16 +40,23 @@ function TaskViewPopup(props) {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       () => {
-        typeof text === "string" &&
-        text.replace(/\s/g, "").length != 0 &&
-        text != props.selectedTask.text
-          ? props.openDiscardPopup()
-          : props.close();
+        if (
+          (typeof text === "string" &&
+            text.replace(/\s/g, "").length != 0 &&
+            text != props.selectedTask.text) ||
+          props.selectedTask.categoryName !== selectedCategory.name ||
+          props.selectedTask.isUrgent !== isTaskUrgent ||
+          props.selectedTask.dueDate !== selectedDate
+        ) {
+          props.openDiscardPopup();
+        } else {
+          props.close();
+        }
         return true;
       }
     );
     return () => backHandler.remove();
-  }, [text]);
+  }, [text, selectedCategory, isTaskUrgent, selectedDate]);
 
   useEffect(() => {
     onChangeText(props.selectedTask.text);
@@ -57,11 +65,16 @@ function TaskViewPopup(props) {
       color: props.selectedTask.categoryColor,
     });
     setTaskUrgent(props.selectedTask.isUrgent);
-    setSelectedDate(props.selectedTask.dueDate);
+    setSelectedDate(props.selectedTask.dueDate || false);
   }, []);
 
   function updateTask() {
-    if (text != props.selectedTask.text) {
+    if (
+      text != props.selectedTask.text ||
+      props.selectedTask.categoryName !== selectedCategory.name ||
+      props.selectedTask.isUrgent !== isTaskUrgent ||
+      props.selectedTask.dueDate !== selectedDate
+    ) {
       props.openLoadingPopup();
       const taskCategory =
         selectedCategory.name === "Escolhido por IA"
@@ -169,15 +182,9 @@ function TaskViewPopup(props) {
           placeholderTextColor={"#b5b5b5"}
         />
         {props.selectedTask.insights && (
-          <View style={styles.taskInsight}>
-            <View style={{ flexDirection: "row" }}>
-              <MaterialIcons name="insights" size={20} color="white" />
-              <Text style={[styles.header, { paddingLeft: 5 }]}>Insights</Text>
-            </View>
-            <Text style={styles.text}>{props.selectedTask.insights}</Text>
-          </View>
+          <TaskInsights insights={props.selectedTask.insights} />
         )}
-        <ExpandableSelection
+        <TaskAdvancedOptions
           openCategoryPickerPopup={() => {
             setPopups((prevState) => ({
               ...prevState,
@@ -201,11 +208,18 @@ function TaskViewPopup(props) {
           <TouchableHighlight
             style={[styles.commonButton, { backgroundColor: "#470c0c" }]}
             onPress={() => {
-              typeof text === "string" &&
-              text.replace(/\s/g, "").length != 0 &&
-              text != props.selectedTask.text
-                ? props.openDiscardPopup()
-                : props.close();
+              if (
+                (typeof text === "string" &&
+                  text.replace(/\s/g, "").length != 0 &&
+                  text != props.selectedTask.text) ||
+                props.selectedTask.categoryName !== selectedCategory.name ||
+                props.selectedTask.isUrgent !== isTaskUrgent ||
+                props.selectedTask.dueDate !== selectedDate
+              ) {
+                props.openDiscardPopup();
+              } else {
+                props.close();
+              }
             }}
           >
             <View

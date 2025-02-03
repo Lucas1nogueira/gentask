@@ -12,7 +12,7 @@ import { v4 as uuidv4 } from "uuid";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { categorizeTask } from "../services/geminiService";
 import { animateClosing, animateOpening } from "../utils/animationUtils";
-import ExpandableSelection from "./ExpandableSelection";
+import TaskAdvancedOptions from "./TaskAdvancedOptions";
 import CategoryPickerPopup from "./CategoryPickerPopup";
 import DatePickerPopup from "./DatePickerPopup";
 import styles from "../styles/styles";
@@ -41,14 +41,21 @@ function CreateTaskPopup(props) {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       () => {
-        typeof text === "string" && text.replace(/\s/g, "").length != 0
-          ? props.openDiscardPopup()
-          : props.close();
+        if (
+          (typeof text === "string" && text.replace(/\s/g, "").length != 0) ||
+          selectedCategory.name !== "Escolhido por IA" ||
+          isTaskUrgent !== null ||
+          selectedDate
+        ) {
+          props.openDiscardPopup();
+        } else {
+          props.close();
+        }
         return true;
       }
     );
     return () => backHandler.remove();
-  }, [text]);
+  }, [text, selectedCategory, isTaskUrgent, selectedDate]);
 
   function saveTask() {
     props.openLoadingPopup();
@@ -156,7 +163,7 @@ function CreateTaskPopup(props) {
           placeholder="Digite aqui..."
           placeholderTextColor={"#b5b5b5"}
         />
-        <ExpandableSelection
+        <TaskAdvancedOptions
           openCategoryPickerPopup={() => {
             setPopups((prevState) => ({
               ...prevState,
@@ -180,9 +187,17 @@ function CreateTaskPopup(props) {
           <TouchableHighlight
             style={[styles.commonButton, { backgroundColor: "#470c0c" }]}
             onPress={() => {
-              typeof text === "string" && text.replace(/\s/g, "").length != 0
-                ? props.openDiscardPopup()
-                : props.close();
+              if (
+                (typeof text === "string" &&
+                  text.replace(/\s/g, "").length != 0) ||
+                selectedCategory.name !== "Escolhido por IA" ||
+                isTaskUrgent !== null ||
+                selectedDate
+              ) {
+                props.openDiscardPopup();
+              } else {
+                props.close();
+              }
             }}
           >
             <View

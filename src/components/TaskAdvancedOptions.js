@@ -8,7 +8,7 @@ import {
 } from "../utils/animationUtils";
 import styles from "../styles/styles";
 
-function ExpandableSelection(props) {
+function TaskAdvancedOptions(props) {
   const expandAnimation = useRef(new Animated.Value(0)).current;
   const toggleSwitchAnimation = useRef(new Animated.Value(0)).current;
 
@@ -16,7 +16,7 @@ function ExpandableSelection(props) {
 
   const heightInterpolate = expandAnimation.interpolate({
     inputRange: [0, 1],
-    outputRange: [25, 175],
+    outputRange: [25, 180],
   });
 
   const backgroundColor = toggleSwitchAnimation.interpolate({
@@ -186,8 +186,10 @@ function ExpandableSelection(props) {
               >
                 <Octicons name="calendar" size={14} color="white" />
                 <Text style={[styles.text, { paddingLeft: 5 }]}>
-                  {!props.selectedDate
+                  {props.selectedDate === null
                     ? "Escolhido por IA"
+                    : props.selectedDate === false
+                    ? "Não definida"
                     : new Date(props.selectedDate).toLocaleDateString("pt-BR")}
                 </Text>
               </TouchableOpacity>
@@ -199,4 +201,4 @@ function ExpandableSelection(props) {
   );
 }
 
-export default ExpandableSelection;
+export default TaskAdvancedOptions;

@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
   },
   taskInput: {
     width: "100%",
-    height: 350,
+    height: 320,
     marginTop: 20,
     backgroundColor: "#191919",
     borderRadius: 15,
@@ -238,10 +238,8 @@ const styles = StyleSheet.create({
   },
   taskInsight: {
     width: "100%",
-    marginTop: 20,
-    backgroundColor: "#191919",
+    marginTop: 10,
     borderRadius: 15,
-    padding: 10,
   },
   popupButtonRow: {
     width: "100%",

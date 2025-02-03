@@ -1,11 +1,22 @@
-import { Text, TouchableHighlight, View } from "react-native";
+import { useEffect, useState } from "react";
+import { BackHandler, Text, TouchableHighlight, View } from "react-native";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { Calendar } from "react-native-calendars";
 import styles from "../styles/styles";
-import { useState } from "react";
 
 function DatePickerPopup(props) {
   const [date, setDate] = useState(null);
+
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        props.close();
+        return true;
+      }
+    );
+    return () => backHandler.remove();
+  }, []);
 
   return (
     <View
