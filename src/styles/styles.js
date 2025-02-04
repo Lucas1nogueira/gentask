@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     margin: 0,
     backgroundColor: "#59b2db",
   },
-  magicAIButton: {
+  taskAnalysisButton: {
     width: 55,
     height: 55,
     flexDirection: "row",
@@ -208,6 +208,41 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 30,
     overflow: "hidden",
+  },
+  taskAnalysisFloatingMenu: {
+    position: "absolute",
+    top: -145,
+    left: -75,
+  },
+  taskAnalysisFloatingMenuBox: {
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#333",
+    backgroundColor: "#222",
+    overflow: "hidden",
+    elevation: 5,
+  },
+  taskAnalysisFloatingMenuBottomTriangle: {
+    width: 0,
+    height: 0,
+    backgroundColor: "transparent",
+    borderStyle: "solid",
+    borderTopWidth: 10,
+    borderRightWidth: 10,
+    borderBottomWidth: 0,
+    borderLeftWidth: 10,
+    borderTopColor: "#333",
+    borderRightColor: "transparent",
+    borderBottomColor: "transparent",
+    borderLeftColor: "transparent",
+    alignSelf: "center",
+  },
+  taskAnalysisMenuOption: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 20,
+    borderBottomWidth: 1,
+    borderColor: "#333",
   },
   addTaskButton: {
     width: 155,
@@ -221,7 +256,7 @@ const styles = StyleSheet.create({
     paddingLeft: 7,
   },
   taskPopup: {
-    width: 400,
+    width: 370,
     alignItems: "center",
     borderRadius: 25,
     backgroundColor: "#222",
@@ -229,7 +264,7 @@ const styles = StyleSheet.create({
   },
   taskInput: {
     width: "100%",
-    height: 320,
+    height: 300,
     marginTop: 20,
     backgroundColor: "#191919",
     borderRadius: 15,

@@ -74,3 +74,39 @@ export function animateToggleSwitch(property, toValue, callbackFunction) {
     callbackFunction;
   });
 }
+
+export function animateOpeningUp(opacityAnimation, topAnimation) {
+  Animated.parallel([
+    Animated.timing(opacityAnimation, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: false,
+    }),
+    Animated.timing(topAnimation, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: false,
+    }),
+  ]).start();
+}
+
+export function animateClosingDown(
+  opacityAnimation,
+  topAnimation,
+  callbackFunction
+) {
+  Animated.parallel([
+    Animated.timing(opacityAnimation, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: false,
+    }),
+    Animated.timing(topAnimation, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: false,
+    }),
+  ]).start(() => {
+    callbackFunction();
+  });
+}

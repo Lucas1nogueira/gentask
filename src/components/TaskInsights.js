@@ -11,7 +11,7 @@ function TaskInsights(props) {
 
   const heightInterpolate = expandAnimation.interpolate({
     inputRange: [0, 1],
-    outputRange: [25, 80],
+    outputRange: [25, 95],
   });
 
   return (

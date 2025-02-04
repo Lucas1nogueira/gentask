@@ -1,31 +1,21 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Animated,
   FlatList,
   Pressable,
   Text,
   View,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { animateRotation } from "../utils/animationUtils";
+import { MaterialIcons } from "@expo/vector-icons";
 import Task from "./Task";
 import styles from "../styles/styles";
+import TaskAnalysisButton from "./TaskAnalysisButton";
 
 function TasksContainer(props) {
-  const rotation = useRef(new Animated.Value(0)).current;
-
   const [showTasks, setShowTasks] = useState(false);
   const [tasks, setTasks] = useState([]);
-  const [isMagicAIPressed, setMagicAIPressed] = useState(false);
   const [isAddTaskPressed, setAddTaskPressed] = useState(false);
   const [taskWidth, setTaskWidth] = useState(null);
-
-  const spin = rotation.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["0deg", "360deg"],
-  });
 
   useEffect(() => {
     if (props.foundTasks) {
@@ -44,10 +34,6 @@ function TasksContainer(props) {
       }, 500);
     }
   }, [props.didTasksLoad, taskWidth]);
-
-  useEffect(() => {
-    animateRotation(rotation);
-  }, [rotation]);
 
   const handleTaskListLayout = (event) => {
     const { width } = event.nativeEvent.layout;
@@ -115,29 +101,7 @@ function TasksContainer(props) {
           justifyContent: "flex-end",
         }}
       >
-        <Pressable
-          style={[
-            styles.magicAIButton,
-            isMagicAIPressed ? { opacity: 0.5 } : { opacity: 1 },
-          ]}
-          onPress={() => null}
-          onPressIn={() => setMagicAIPressed(true)}
-          onPressOut={() => setMagicAIPressed(false)}
-        >
-          <Animated.View
-            style={{ position: "absolute", transform: [{ rotate: spin }] }}
-          >
-            <LinearGradient
-              colors={["#2a7eaa", "#2aaa6c"]}
-              style={{ width: 60, height: 60 }}
-            />
-          </Animated.View>
-          <MaterialCommunityIcons
-            name="robot-happy-outline"
-            size={25}
-            color="white"
-          />
-        </Pressable>
+        <TaskAnalysisButton />
         <Pressable
           style={[
             styles.addTaskButton,
@@ -148,7 +112,7 @@ function TasksContainer(props) {
           onPressOut={() => setAddTaskPressed(false)}
         >
           <Text style={styles.text}>Nova tarefa</Text>
-          <Ionicons name="add" size={40} color="white" />
+          <MaterialIcons name="add" size={35} color="white" />
         </Pressable>
       </View>
     </View>

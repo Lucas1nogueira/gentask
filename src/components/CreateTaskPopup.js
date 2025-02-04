@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import "react-native-get-random-values";
 import { v4 as uuidv4 } from "uuid";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { categorizeTask } from "../services/geminiService";
 import { animateClosing, animateOpening } from "../utils/animationUtils";
 import TaskAdvancedOptions from "./TaskAdvancedOptions";
@@ -153,7 +153,12 @@ function CreateTaskPopup(props) {
         </Animated.View>
       )}
       <View style={styles.taskPopup}>
-        <Text style={styles.text}>Criar nova tarefa</Text>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <MaterialIcons name="post-add" size={20} color="white" />
+          <Text style={[styles.header, { paddingLeft: 3 }]}>
+            Criar nova tarefa
+          </Text>
+        </View>
         <TextInput
           style={styles.taskInput}
           multiline={true}

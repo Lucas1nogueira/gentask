@@ -56,7 +56,7 @@ function TaskAdvancedOptions(props) {
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <MaterialIcons name="settings" size={20} color="white" />
-            <Text style={[styles.text, { paddingLeft: 5 }]}>Avançado</Text>
+            <Text style={[styles.header, { paddingLeft: 5 }]}>Avançado</Text>
           </View>
           <Entypo name="select-arrows" size={20} color="white" />
         </TouchableOpacity>
@@ -95,9 +95,7 @@ function TaskAdvancedOptions(props) {
                 alignItems: "center",
               }}
             >
-              <Text style={[styles.text, { paddingRight: 10 }]}>
-                Marcar como urgente?
-              </Text>
+              <Text style={[styles.text, { paddingRight: 10 }]}>Urgência:</Text>
               <View
                 style={{
                   width: 150,

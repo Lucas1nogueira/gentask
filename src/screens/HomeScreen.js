@@ -1,7 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { View, Animated, BackHandler } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import styles from "../styles/styles";
 import Menu from "../components/Menu";
 import TopBar from "../components/TopBar";
 import FilteringBar from "../components/FilteringBar";
@@ -20,6 +19,7 @@ import {
   animateSlideIn,
   animateSlideOut,
 } from "../utils/animationUtils";
+import styles from "../styles/styles";
 
 function HomeScreen() {
   const didFetch = useRef(false);

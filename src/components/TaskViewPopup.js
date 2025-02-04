@@ -7,7 +7,7 @@ import {
   TouchableHighlight,
   BackHandler,
 } from "react-native";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { categorizeTask } from "../services/geminiService";
 import { animateClosing, animateOpening } from "../utils/animationUtils";
 import TaskInsights from "./TaskInsights";
@@ -170,7 +170,10 @@ function TaskViewPopup(props) {
         </Animated.View>
       )}
       <View style={styles.taskPopup}>
-        <Text style={styles.text}>Visualização da tarefa</Text>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <MaterialIcons name="edit-note" size={20} color="white" />
+          <Text style={styles.header}>Visualização da tarefa</Text>
+        </View>
         <TextInput
           style={styles.taskInput}
           multiline={true}

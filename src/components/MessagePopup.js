@@ -27,8 +27,10 @@ function MessagePopup(props) {
       ]}
     >
       <View style={styles.messagePopup}>
-        <Text style={styles.text}>{props.title}</Text>
-        <Text style={styles.text}>{props.description}</Text>
+        <Text style={styles.header}>{props.title}</Text>
+        <Text style={[styles.text, { marginTop: 10 }]}>
+          {props.description}
+        </Text>
         <View style={styles.popupButtonRow}>
           <TouchableHighlight
             style={[styles.commonButton, { backgroundColor: "#0d4f6b" }]}
