@@ -13,7 +13,7 @@ import TaskAnalysisPopup from "../components/TaskAnalysisPopup";
 import MessagePopup from "../components/MessagePopup";
 import MinimalPopup from "../components/MinimalPopup";
 import SettingsPopup from "../components/SettingsPopup";
-import { getValueFor, save } from "../services/storage";
+import { getData, storeData } from "../services/storage";
 import {
   animateOpening,
   animateClosing,
@@ -96,7 +96,7 @@ function HomeScreen() {
   }, []);
 
   useEffect(() => {
-    getValueFor("tasks").then((data) => {
+    getData().then((data) => {
       if (data) setTasks(data);
       didFetch.current = true;
       setTasksLoad(true);
@@ -105,7 +105,7 @@ function HomeScreen() {
 
   useEffect(() => {
     if (didFetch.current) {
-      save("tasks", tasks);
+      storeData(tasks);
     }
   }, [tasks]);
 
@@ -257,7 +257,6 @@ function HomeScreen() {
             tasks={tasks}
             selectedTaskId={selectedTaskId}
             selectedTask={tasks[selectedTaskId]}
-            save={() => save("tasks", tasks)}
             setTasks={setTasks}
           />
         </Animated.View>
@@ -478,9 +477,7 @@ function HomeScreen() {
               );
             }}
             title={"Erro"}
-            description={
-              "Nenhuma tarefa encontrada para o período selecionado!"
-            }
+            description={"Ocorreu um erro!"}
             actionName={"OK"}
             actionButtonColor={"#470c0c"}
             action={() => null}
