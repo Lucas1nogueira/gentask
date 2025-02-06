@@ -1,6 +1,8 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useContext } from "react";
 import { View, Animated, BackHandler } from "react-native";
 import { StatusBar } from "expo-status-bar";
+import { getData, storeData } from "../services/storage";
+import { ThemeContext } from "../contexts/ThemeContext";
 import Menu from "../components/Menu";
 import TopBar from "../components/TopBar";
 import FilteringBar from "../components/FilteringBar";
@@ -13,16 +15,15 @@ import TaskAnalysisPopup from "../components/TaskAnalysisPopup";
 import MessagePopup from "../components/MessagePopup";
 import MinimalPopup from "../components/MinimalPopup";
 import SettingsPopup from "../components/SettingsPopup";
-import { getData, storeData } from "../services/storage";
 import {
   animateOpening,
   animateClosing,
   animateSlideIn,
   animateSlideOut,
 } from "../utils/animationUtils";
-import styles from "../styles/styles";
 
 function HomeScreen() {
+  const { styles } = useContext(ThemeContext);
   const didFetch = useRef(false);
 
   const [tasks, setTasks] = useState(null);
@@ -31,7 +32,7 @@ function HomeScreen() {
   const [foundTasks, setFoundTasks] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState({
     name: "Tudo",
-    color: "white",
+    color: "grey",
   });
   const [selectedSort, setSelectedSort] = useState("created_asc");
   const [pendingTasksFirst, setPendingTasksFirst] = useState(false);
@@ -148,7 +149,7 @@ function HomeScreen() {
               );
             }}
             setSelectedCategory={setSelectedCategory}
-            defaultOption={{ name: "Tudo", color: "white" }}
+            defaultOption={{ name: "Tudo", color: "grey" }}
           />
         </Animated.View>
       )}
@@ -339,7 +340,6 @@ function HomeScreen() {
             title={"Sair do MyTasks"}
             description={"Isso fechará o app. Tem certeza?"}
             actionName={"Sair"}
-            actionButtonColor={"#470c0c"}
             action={() => BackHandler.exitApp()}
           />
         </Animated.View>
@@ -363,7 +363,6 @@ function HomeScreen() {
             title={"Deletar tarefa"}
             description={"Isso apagará a tarefa selecionada. Tem certeza?"}
             actionName={"Deletar"}
-            actionButtonColor={"#470c0c"}
             action={() => {
               const updatedTasks = { ...tasks };
               delete updatedTasks[selectedTaskId];
@@ -399,7 +398,6 @@ function HomeScreen() {
             title={"Descartar tarefa"}
             description={"Todo o conteúdo inserido será perdido. Tem certeza?"}
             actionName={"Sim"}
-            actionButtonColor={"#470c0c"}
             action={() => {
               animateClosing(popupAnimations["taskView"], () =>
                 setPopups((prevState) => ({
@@ -479,7 +477,6 @@ function HomeScreen() {
             title={"Erro"}
             description={"Ocorreu um erro!"}
             actionName={"OK"}
-            actionButtonColor={"#470c0c"}
             action={() => null}
           />
         </Animated.View>
@@ -592,7 +589,11 @@ function HomeScreen() {
           animateOpening(popupAnimations["taskAnalysis"]);
         }}
       />
-      <StatusBar style="light" translucent={false} />
+      <StatusBar
+        style={styles.statusBar.style}
+        backgroundColor={styles.statusBar.backgroundColor}
+        translucent={false}
+      />
     </View>
   );
 }

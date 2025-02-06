@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { Octicons } from "@expo/vector-icons";
-import styles from "../styles/styles";
+import { ThemeContext } from "../contexts/ThemeContext";
 
 function FilteringBar(props) {
+  const { styles } = useContext(ThemeContext);
+
   const [tasksFilteredByCategory, setTasksFilteredByCategory] = useState(null);
   const [tasksSortedByTime, setTasksSortedByTime] = useState(null);
   const [tasksSortedByCompletion, setTasksSortedByCompletion] = useState(null);
@@ -146,7 +148,7 @@ function FilteringBar(props) {
         </TouchableOpacity>
       </View>
       <TouchableOpacity onPress={() => props.openSortPickerPopup()}>
-        <Octicons name="sort-desc" size={22} color="white" />
+        <Octicons name="sort-desc" size={22} color={styles.icon.color} />
       </TouchableOpacity>
     </View>
   );

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import {
   Animated,
   BackHandler,
@@ -7,10 +7,12 @@ import {
   Text,
   View,
 } from "react-native";
+import { ThemeContext } from "../contexts/ThemeContext";
 import MenuOption from "./MenuOption";
-import styles from "../styles/styles";
 
 function Menu(props) {
+  const { styles } = useContext(ThemeContext);
+
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",

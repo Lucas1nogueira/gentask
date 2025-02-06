@@ -1,10 +1,13 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { BackHandler, FlatList, Text, View } from "react-native";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import categories from "../data/categories";
-import styles from "../styles/styles";
+import { ThemeContext } from "../contexts/ThemeContext";
 import PickerOption from "./PickerOption";
 
 function CategoryPickerPopup(props) {
+  const { styles } = useContext(ThemeContext);
+
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
@@ -28,7 +31,12 @@ function CategoryPickerPopup(props) {
       ]}
     >
       <View style={[styles.pickerPopup, { height: 570 }]}>
-        <Text style={styles.text}>Selecione uma categoria</Text>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <MaterialIcons name="category" size={18} color={styles.icon.color} />
+          <Text style={[styles.header, { paddingLeft: 3 }]}>
+            Selecione uma categoria
+          </Text>
+        </View>
         <FlatList
           style={styles.pickerOptionsList}
           data={[props.defaultOption, ...categories]}

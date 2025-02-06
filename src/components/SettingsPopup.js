@@ -1,9 +1,11 @@
-import React, { useEffect } from "react";
-import { Text, View, TouchableHighlight, BackHandler } from "react-native";
+import React, { useContext, useEffect } from "react";
+import { Text, View, TouchableOpacity, BackHandler } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons/";
-import styles from "../styles/styles";
+import { ThemeContext } from "../contexts/ThemeContext";
 
 function SettingsPopup(props) {
+  const { styles, toggleTheme } = useContext(ThemeContext);
+
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
@@ -34,7 +36,7 @@ function SettingsPopup(props) {
             alignItems: "center",
           }}
         >
-          <Ionicons name="settings-sharp" size={18} color="white" />
+          <Ionicons name="settings-sharp" size={18} color={styles.icon.color} />
           <Text style={[styles.header, { paddingLeft: 5 }]}>Configurações</Text>
         </View>
         <View
@@ -45,20 +47,21 @@ function SettingsPopup(props) {
             alignItems: "center",
           }}
         >
-          <TouchableHighlight style={styles.settingsButton}>
-            <>
-              <MaterialIcons name="email" size={24} color="white" />
-              <Text style={[styles.text, { paddingLeft: 3 }]}>Contato</Text>
-            </>
-          </TouchableHighlight>
-          <TouchableHighlight style={styles.settingsButton}>
-            <>
-              <MaterialIcons name="mode-night" size={24} color="white" />
-              <Text style={[styles.text, { paddingLeft: 3 }]}>
-                Modo noturno
-              </Text>
-            </>
-          </TouchableHighlight>
+          <TouchableOpacity style={styles.settingsButton}>
+            <MaterialIcons name="email" size={24} color={styles.icon.color} />
+            <Text style={[styles.text, { paddingLeft: 3 }]}>Contato</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.settingsButton}
+            onPress={() => toggleTheme()}
+          >
+            <MaterialIcons
+              name="mode-night"
+              size={24}
+              color={styles.icon.color}
+            />
+            <Text style={[styles.text, { paddingLeft: 3 }]}>Modo noturno</Text>
+          </TouchableOpacity>
         </View>
         <View
           style={{
@@ -68,20 +71,20 @@ function SettingsPopup(props) {
             alignItems: "center",
           }}
         >
-          <TouchableHighlight style={styles.settingsButton}>
-            <>
-              <MaterialIcons name="cleaning-services" size={24} color="white" />
-              <Text style={[styles.text, { paddingLeft: 3 }]}>
-                Limpar tarefas
-              </Text>
-            </>
-          </TouchableHighlight>
-          <TouchableHighlight style={styles.settingsButton}>
-            <>
-              <MaterialIcons name="logout" size={24} color="white" />
-              <Text style={[styles.text, { paddingLeft: 3 }]}>Desconectar</Text>
-            </>
-          </TouchableHighlight>
+          <TouchableOpacity style={styles.settingsButton}>
+            <MaterialIcons
+              name="cleaning-services"
+              size={24}
+              color={styles.icon.color}
+            />
+            <Text style={[styles.text, { paddingLeft: 3 }]}>
+              Limpar tarefas
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.settingsButton}>
+            <MaterialIcons name="logout" size={24} color={styles.icon.color} />
+            <Text style={[styles.text, { paddingLeft: 3 }]}>Desconectar</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>

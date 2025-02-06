@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import {
   Animated,
   BackHandler,
   Text,
-  TouchableHighlight,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -14,9 +13,11 @@ import {
   animateOpeningUp,
   animateRotation,
 } from "../utils/animationUtils";
-import styles from "../styles/styles";
+import { ThemeContext } from "../contexts/ThemeContext";
 
 function TaskAnalysisButton(props) {
+  const { styles } = useContext(ThemeContext);
+
   const rotation = useRef(new Animated.Value(0)).current;
   const opacityAnimation = useRef(new Animated.Value(0)).current;
   const topAnimation = useRef(new Animated.Value(0)).current;
@@ -67,22 +68,30 @@ function TaskAnalysisButton(props) {
           ]}
         >
           <View style={styles.taskAnalysisFloatingMenuBox}>
-            <TouchableHighlight onPress={() => props.openWeeklyTaskAnalysis()}>
+            <TouchableOpacity onPress={() => props.openWeeklyTaskAnalysis()}>
               <View style={styles.taskAnalysisMenuOption}>
-                <MaterialIcons name="view-week" size={20} color="white" />
+                <MaterialIcons
+                  name="view-week"
+                  size={20}
+                  color={styles.icon.color}
+                />
                 <Text style={[styles.text, { paddingLeft: 3 }]}>
                   Ajuda para a semana
                 </Text>
               </View>
-            </TouchableHighlight>
-            <TouchableHighlight onPress={() => props.openMonthlyTaskAnalysis()}>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => props.openMonthlyTaskAnalysis()}>
               <View style={styles.taskAnalysisMenuOption}>
-                <MaterialIcons name="calendar-month" size={20} color="white" />
+                <MaterialIcons
+                  name="calendar-month"
+                  size={20}
+                  color={styles.icon.color}
+                />
                 <Text style={[styles.text, { paddingLeft: 3 }]}>
                   Ajuda para o mês
                 </Text>
               </View>
-            </TouchableHighlight>
+            </TouchableOpacity>
           </View>
           <View style={styles.taskAnalysisFloatingMenuBottomTriangle} />
         </Animated.View>
@@ -109,14 +118,14 @@ function TaskAnalysisButton(props) {
           style={{ position: "absolute", transform: [{ rotate: spin }] }}
         >
           <LinearGradient
-            colors={["#2a7eaa", "#2aaa6c"]}
+            colors={styles.taskAnalysisButtonGradient.colors}
             style={{ width: 60, height: 60 }}
           />
         </Animated.View>
         <MaterialCommunityIcons
           name="robot-happy-outline"
           size={25}
-          color="white"
+          color={styles.icon.color}
         />
       </TouchableOpacity>
     </View>

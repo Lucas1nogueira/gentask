@@ -1,10 +1,12 @@
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { Animated, Text, TouchableOpacity, View } from "react-native";
 import { Entypo, MaterialIcons } from "@expo/vector-icons/";
 import { animateCollapsing, animateExpanding } from "../utils/animationUtils";
-import styles from "../styles/styles";
+import { ThemeContext } from "../contexts/ThemeContext";
 
 function TaskInsights(props) {
+  const { styles } = useContext(ThemeContext);
+
   const expandAnimation = useRef(new Animated.Value(1)).current;
 
   const [showInsights, setShowInsights] = useState(true);
@@ -34,10 +36,14 @@ function TaskInsights(props) {
           }}
         >
           <View style={{ flexDirection: "row" }}>
-            <MaterialIcons name="insights" size={20} color="white" />
+            <MaterialIcons
+              name="insights"
+              size={20}
+              color={styles.icon.color}
+            />
             <Text style={[styles.header, { paddingLeft: 5 }]}>Insights</Text>
           </View>
-          <Entypo name="select-arrows" size={20} color="white" />
+          <Entypo name="select-arrows" size={20} color={styles.icon.color} />
         </TouchableOpacity>
         <View style={styles.taskInsight}>
           <Text style={styles.text}>{props.insights}</Text>

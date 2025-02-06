@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   BackHandler,
   Keyboard,
@@ -8,9 +8,11 @@ import {
   View,
 } from "react-native";
 import { Entypo } from "@expo/vector-icons";
-import styles from "../styles/styles";
+import { ThemeContext } from "../contexts/ThemeContext";
 
 function TopBar(props) {
+  const { styles } = useContext(ThemeContext);
+
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const [isSearchbarActive, setSearchbarActive] = useState(false);
   const [searchText, onChangeSearchText] = useState("");
@@ -84,12 +86,16 @@ function TopBar(props) {
               style={{ paddingRight: 7 }}
               onPress={props.openMenu}
             >
-              <Entypo name="menu" size={24} color="white" />
+              <Entypo name="menu" size={24} color={styles.icon.color} />
             </TouchableOpacity>
             <Text style={styles.header}>MyTasks</Text>
           </View>
           <TouchableOpacity onPress={() => setSearchbarActive(true)}>
-            <Entypo name="magnifying-glass" size={24} color="white" />
+            <Entypo
+              name="magnifying-glass"
+              size={24}
+              color={styles.icon.color}
+            />
           </TouchableOpacity>
         </>
       ) : (

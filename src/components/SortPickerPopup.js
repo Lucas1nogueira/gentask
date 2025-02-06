@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
-import { BackHandler, Text, TouchableHighlight, View } from "react-native";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import styles from "../styles/styles";
+import { useContext, useEffect, useState } from "react";
+import { BackHandler, Text, TouchableOpacity, View } from "react-native";
+import { AntDesign, FontAwesome } from "@expo/vector-icons/";
+import { ThemeContext } from "../contexts/ThemeContext";
 import PickerOption from "./PickerOption";
 
 function SortPickerPopup(props) {
+  const { styles } = useContext(ThemeContext);
+
   const [selectedSort, setSelectedSort] = useState(null);
   const [pendingTasksFirst, setPendingTasksFirst] = useState(null);
   const [completedTasksFirst, setCompletedTasksFirst] = useState(null);
@@ -40,7 +42,10 @@ function SortPickerPopup(props) {
       ]}
     >
       <View style={styles.pickerPopup}>
-        <Text style={styles.text}>Ordenar por</Text>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <FontAwesome name="sort" size={18} color={styles.icon.color} />
+          <Text style={[styles.header, { paddingLeft: 5 }]}>Ordenar por</Text>
+        </View>
         <View style={styles.pickerOptionsList}>
           <PickerOption
             title="Data de criação (recentes)"
@@ -67,7 +72,7 @@ function SortPickerPopup(props) {
             selected={selectedSort === "updated_asc"}
           />
         </View>
-        <Text style={[styles.text, { marginTop: 20 }]}>
+        <Text style={[styles.header, { marginTop: 20 }]}>
           Prioridade de urgência
         </Text>
         <View style={styles.pickerOptionsList}>
@@ -84,7 +89,7 @@ function SortPickerPopup(props) {
             selected={urgentTasksFirst === true}
           />
         </View>
-        <Text style={[styles.text, { marginTop: 20 }]}>
+        <Text style={[styles.header, { marginTop: 20 }]}>
           Prioridade de conclusão
         </Text>
         <View style={styles.pickerOptionsList}>
@@ -118,14 +123,14 @@ function SortPickerPopup(props) {
             selected={completedTasksFirst === true}
           />
         </View>
-        <TouchableHighlight
+        <TouchableOpacity
           style={[
             styles.commonButton,
+            styles.confirmButton,
             {
               width: 80,
               marginTop: 20,
               alignSelf: "flex-end",
-              backgroundColor: "#0d4f6b",
             },
           ]}
           onPress={() => {
@@ -144,11 +149,9 @@ function SortPickerPopup(props) {
             props.close();
           }}
         >
-          <>
-            <AntDesign name="check" size={24} color="white" />
-            <Text style={styles.text}>OK</Text>
-          </>
-        </TouchableHighlight>
+          <AntDesign name="check" size={24} color={styles.icon.color} />
+          <Text style={styles.text}>OK</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

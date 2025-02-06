@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Animated, Text, TouchableOpacity, View } from "react-native";
 import { Entypo, MaterialIcons, Octicons } from "@expo/vector-icons/";
 import {
@@ -6,9 +6,11 @@ import {
   animateExpanding,
   animateToggleSwitch,
 } from "../utils/animationUtils";
-import styles from "../styles/styles";
+import { ThemeContext } from "../contexts/ThemeContext";
 
 function TaskAdvancedOptions(props) {
+  const { styles } = useContext(ThemeContext);
+
   const expandAnimation = useRef(new Animated.Value(0)).current;
   const toggleSwitchAnimation = useRef(new Animated.Value(0)).current;
 
@@ -55,10 +57,14 @@ function TaskAdvancedOptions(props) {
           }}
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <MaterialIcons name="settings" size={20} color="white" />
+            <MaterialIcons
+              name="settings"
+              size={20}
+              color={styles.icon.color}
+            />
             <Text style={[styles.header, { paddingLeft: 5 }]}>Avançado</Text>
           </View>
-          <Entypo name="select-arrows" size={20} color="white" />
+          <Entypo name="select-arrows" size={20} color={styles.icon.color} />
         </TouchableOpacity>
         {showAdvancedOptions && (
           <>
@@ -118,7 +124,11 @@ function TaskAdvancedOptions(props) {
                     }
                   }}
                 >
-                  <MaterialIcons name="insights" size={20} color="white" />
+                  <MaterialIcons
+                    name="insights"
+                    size={20}
+                    color={styles.icon.color}
+                  />
                   <Text style={[styles.text, { paddingLeft: 5 }]}>
                     {props.isTaskUrgent === null ? "Auto" : "Manual"}
                   </Text>
@@ -149,7 +159,7 @@ function TaskAdvancedOptions(props) {
                       styles.toggleSwitchContainer,
                       props.isTaskUrgent !== null
                         ? { backgroundColor: backgroundColor }
-                        : { backgroundColor: "#333" },
+                        : styles.switch,
                     ]}
                   >
                     <Animated.View
@@ -182,7 +192,7 @@ function TaskAdvancedOptions(props) {
                 style={styles.categorySelectionButton}
                 onPress={() => props.openDatePickerPopup()}
               >
-                <Octicons name="calendar" size={14} color="white" />
+                <Octicons name="calendar" size={14} color={styles.icon.color} />
                 <Text style={[styles.text, { paddingLeft: 5 }]}>
                   {props.selectedDate === null
                     ? "Escolhido por IA"

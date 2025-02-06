@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -8,10 +8,12 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import Task from "./Task";
-import styles from "../styles/styles";
+import { ThemeContext } from "../contexts/ThemeContext";
 import TaskAnalysisButton from "./TaskAnalysisButton";
 
 function TaskContainer(props) {
+  const { styles } = useContext(ThemeContext);
+
   const [showTasks, setShowTasks] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [isAddTaskPressed, setAddTaskPressed] = useState(false);
@@ -116,7 +118,7 @@ function TaskContainer(props) {
           onPressOut={() => setAddTaskPressed(false)}
         >
           <Text style={styles.text}>Nova tarefa</Text>
-          <MaterialIcons name="add" size={35} color="white" />
+          <MaterialIcons name="add" size={35} color={styles.icon.color} />
         </Pressable>
       </View>
     </View>

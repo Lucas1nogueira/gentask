@@ -1,27 +1,29 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Animated,
   Text,
   View,
   TextInput,
-  TouchableHighlight,
   BackHandler,
+  TouchableOpacity,
 } from "react-native";
 import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { categorizeTask } from "../services/geminiService";
 import { animateClosing, animateOpening } from "../utils/animationUtils";
+import { ThemeContext } from "../contexts/ThemeContext";
 import TaskInsights from "./TaskInsights";
 import TaskAdvancedOptions from "./TaskAdvancedOptions";
 import CategoryPickerPopup from "./CategoryPickerPopup";
 import DatePickerPopup from "./DatePickerPopup";
-import styles from "../styles/styles";
 
 function TaskViewPopup(props) {
+  const { styles } = useContext(ThemeContext);
+
   const [text, onChangeText] = useState("");
 
   const [selectedCategory, setSelectedCategory] = useState({
     name: "Escolhido por IA",
-    color: "white",
+    color: "grey",
   });
   const [isTaskUrgent, setTaskUrgent] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -144,7 +146,7 @@ function TaskViewPopup(props) {
               );
             }}
             setSelectedCategory={setSelectedCategory}
-            defaultOption={{ name: "Escolhido por IA", color: "white" }}
+            defaultOption={{ name: "Escolhido por IA", color: "grey" }}
           />
         </Animated.View>
       )}
@@ -171,7 +173,7 @@ function TaskViewPopup(props) {
       )}
       <View style={styles.taskPopup}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <MaterialIcons name="edit-note" size={20} color="white" />
+          <MaterialIcons name="edit-note" size={20} color={styles.icon.color} />
           <Text style={styles.header}>Visualização da tarefa</Text>
         </View>
         <TextInput
@@ -208,8 +210,8 @@ function TaskViewPopup(props) {
           selectedDate={selectedDate}
         />
         <View style={styles.popupButtonRow}>
-          <TouchableHighlight
-            style={[styles.commonButton, { backgroundColor: "#470c0c" }]}
+          <TouchableOpacity
+            style={[styles.commonButton, styles.cancelButton]}
             onPress={() => {
               if (
                 (typeof text === "string" &&
@@ -233,12 +235,12 @@ function TaskViewPopup(props) {
                 alignItems: "center",
               }}
             >
-              <AntDesign name="back" size={20} color="#fff" />
+              <AntDesign name="back" size={20} color={styles.icon.color} />
               <Text style={styles.text}>Voltar</Text>
             </View>
-          </TouchableHighlight>
-          <TouchableHighlight
-            style={[styles.commonButton, { backgroundColor: "#0d4f6b" }]}
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.commonButton, styles.confirmButton]}
             onPress={() => {
               checkText();
             }}
@@ -251,10 +253,14 @@ function TaskViewPopup(props) {
                 alignItems: "center",
               }}
             >
-              <Ionicons name="save-outline" size={20} color="#fff" />
+              <Ionicons
+                name="save-outline"
+                size={20}
+                color={styles.icon.color}
+              />
               <Text style={styles.text}>Salvar</Text>
             </View>
-          </TouchableHighlight>
+          </TouchableOpacity>
         </View>
       </View>
     </View>

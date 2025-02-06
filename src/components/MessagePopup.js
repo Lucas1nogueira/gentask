@@ -1,9 +1,11 @@
-import React, { useEffect } from "react";
-import { Text, View, TouchableHighlight, BackHandler } from "react-native";
+import React, { useContext, useEffect } from "react";
+import { Text, View, BackHandler, TouchableOpacity } from "react-native";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
-import styles from "../styles/styles";
+import { ThemeContext } from "../contexts/ThemeContext";
 
 function MessagePopup(props) {
+  const { styles } = useContext(ThemeContext);
+
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
@@ -32,8 +34,8 @@ function MessagePopup(props) {
           {props.description}
         </Text>
         <View style={styles.popupButtonRow}>
-          <TouchableHighlight
-            style={[styles.commonButton, { backgroundColor: "#0d4f6b" }]}
+          <TouchableOpacity
+            style={[styles.commonButton, styles.cancelButton]}
             onPress={() => props.close()}
           >
             <View
@@ -44,15 +46,12 @@ function MessagePopup(props) {
                 alignItems: "center",
               }}
             >
-              <AntDesign name="back" size={20} color="#fff" />
+              <AntDesign name="back" size={20} color={styles.icon.color} />
               <Text style={styles.text}>Voltar</Text>
             </View>
-          </TouchableHighlight>
-          <TouchableHighlight
-            style={[
-              styles.commonButton,
-              { backgroundColor: props.actionButtonColor },
-            ]}
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.commonButton, styles.confirmButton]}
             onPress={() => {
               props.action();
               props.close();
@@ -75,11 +74,11 @@ function MessagePopup(props) {
                     : "checkmark"
                 }
                 size={20}
-                color="#fff"
+                color={styles.icon.color}
               />
               <Text style={styles.text}>{props.actionName}</Text>
             </View>
-          </TouchableHighlight>
+          </TouchableOpacity>
         </View>
       </View>
     </View>

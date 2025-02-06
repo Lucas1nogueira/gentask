@@ -1,11 +1,12 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
+import { ThemeContext, ThemeProvider } from "./contexts/ThemeContext";
 import HomeScreen from "./screens/HomeScreen";
 
 SplashScreen.preventAutoHideAsync();
 
-export default function App() {
+function AppPreConfig() {
   const [loaded, error] = useFonts({
     "ReadexPro-Bold": require("../assets/fonts/Readex_Pro/ReadexPro-Bold.ttf"),
     "ReadexPro-Medium": require("../assets/fonts/Readex_Pro/ReadexPro-Medium.ttf"),
@@ -13,15 +14,25 @@ export default function App() {
     "ReadexPro-SemiBold": require("../assets/fonts/Readex_Pro/ReadexPro-SemiBold.ttf"),
   });
 
+  const { isLoading } = useContext(ThemeContext);
+
   useEffect(() => {
-    if (loaded || error) {
+    if ((loaded || error) && !isLoading) {
       SplashScreen.hideAsync();
     }
-  }, [loaded, error]);
+  }, [loaded, error, isLoading]);
 
   if (!loaded && !error) {
     return null;
   }
 
   return <HomeScreen />;
+}
+
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppPreConfig />
+    </ThemeProvider>
+  );
 }

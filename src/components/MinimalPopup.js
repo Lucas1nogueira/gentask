@@ -1,9 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { Text, Animated, ActivityIndicator } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
-import styles from "../styles/styles";
+import { ThemeContext } from "../contexts/ThemeContext";
 
 function MinimalPopup(props) {
+  const { styles } = useContext(ThemeContext);
+
   if (!props.loading) {
     useEffect(() => {
       setTimeout(() => {
@@ -32,11 +34,13 @@ function MinimalPopup(props) {
       ]}
     >
       {props.loading ? (
-        <ActivityIndicator size="small" color="white" />
+        <ActivityIndicator size="small" color={styles.icon.color} />
       ) : (
         <FontAwesome name="exclamation-circle" size={24} color="white" />
       )}
-      <Text style={[styles.text, { paddingLeft: 5 }]}>{props.message}</Text>
+      <Text style={[styles.text, { color: "white", paddingLeft: 5 }]}>
+        {props.message}
+      </Text>
     </Animated.View>
   );
 }

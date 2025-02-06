@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import {
   Animated,
   BackHandler,
   ScrollView,
   Text,
-  TouchableHighlight,
+  TouchableOpacity,
   View,
 } from "react-native";
 import {
@@ -14,9 +14,11 @@ import {
 } from "@expo/vector-icons/";
 import { getTaskAnalysis } from "../services/geminiService";
 import { animateBlinking } from "../utils/animationUtils";
-import styles from "../styles/styles";
+import { ThemeContext } from "../contexts/ThemeContext";
 
 function TaskAnalysisPopup(props) {
+  const { styles } = useContext(ThemeContext);
+
   const opacityAnimation = useRef(new Animated.Value(1)).current;
 
   const [didAnalysisLoad, setAnalysisLoad] = useState(null);
@@ -86,7 +88,7 @@ function TaskAnalysisPopup(props) {
           <MaterialCommunityIcons
             name="timeline-help"
             size={20}
-            color="white"
+            color={styles.icon.color}
           />
           <Text style={[styles.header, { paddingLeft: 5 }]}>
             {props.taskAnalysisMode === "weekly"
@@ -105,7 +107,11 @@ function TaskAnalysisPopup(props) {
             }}
           >
             <Animated.View style={{ opacity: opacityAnimation }}>
-              <MaterialIcons name="insights" size={120} color="white" />
+              <MaterialIcons
+                name="insights"
+                size={120}
+                color={styles.icon.color}
+              />
             </Animated.View>
             <Text style={styles.text}>Por favor, aguarde...</Text>
           </View>
@@ -137,7 +143,7 @@ function TaskAnalysisPopup(props) {
                   <MaterialCommunityIcons
                     name="robot-dead-outline"
                     size={120}
-                    color="white"
+                    color={styles.icon.color}
                   />
                   <View style={{ width: "100%", marginTop: 10 }}>
                     <Text style={[styles.text, { textAlign: "justify" }]}>
@@ -147,15 +153,15 @@ function TaskAnalysisPopup(props) {
                 </View>
               )
             )}
-            <TouchableHighlight
+            <TouchableOpacity
               style={styles.confirmBigButton}
               onPress={() => props.close()}
             >
               <>
-                <Feather name="check" size={24} color="white" />
+                <Feather name="check" size={24} color={styles.icon.color} />
                 <Text style={styles.text}>OK</Text>
               </>
-            </TouchableHighlight>
+            </TouchableOpacity>
           </View>
         )}
       </View>

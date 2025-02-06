@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { BackHandler, Text, TouchableHighlight, View } from "react-native";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { Calendar } from "react-native-calendars";
-import styles from "../styles/styles";
+import { ThemeContext } from "../contexts/ThemeContext";
 
 function DatePickerPopup(props) {
+  const { styles } = useContext(ThemeContext);
+
   const [date, setDate] = useState(null);
 
   useEffect(() => {
@@ -29,14 +31,7 @@ function DatePickerPopup(props) {
         },
       ]}
     >
-      <View
-        style={{
-          borderRadius: 20,
-          borderColor: "gray",
-          backgroundColor: "#121212",
-          padding: 20,
-        }}
-      >
+      <View style={styles.dateContainer}>
         <Calendar
           theme={styles.datePicker}
           markedDates={{

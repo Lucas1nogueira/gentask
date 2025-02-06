@@ -3,7 +3,7 @@ import { Dimensions, StyleSheet } from "react-native";
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
 
-const styles = StyleSheet.create({
+const darkStyles = StyleSheet.create({
   container: {
     flex: 1,
     minWidth: screenWidth,
@@ -295,6 +295,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#1e1e1e",
     paddingHorizontal: 10,
   },
+  cancelButton: {
+    backgroundColor: "#470c0c",
+  },
+  confirmButton: {
+    backgroundColor: "#0d4f6b",
+  },
   confirmBigButton: {
     width: "100%",
     height: 45,
@@ -405,6 +411,12 @@ const styles = StyleSheet.create({
     borderRadius: 13,
     backgroundColor: "white",
   },
+  dateContainer: {
+    borderRadius: 20,
+    borderColor: "gray",
+    backgroundColor: "#121212",
+    padding: 20,
+  },
   datePicker: {
     backgroundColor: "#121212",
     calendarBackground: "#121212",
@@ -415,6 +427,36 @@ const styles = StyleSheet.create({
     dayTextColor: "#ffffff",
     textDisabledColor: "#666666",
   },
+  taskControlScroll: {
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "white",
+    borderRadius: 15,
+    overflow: "hidden",
+  },
+  urgentTask: {
+    backgroundColor: "#4c0800",
+  },
+  urgentTaskCategoryLabel: {
+    backgroundColor: "#300500",
+  },
+  selectedPickerOption: {
+    backgroundColor: "#274c4b",
+  },
+  taskAnalysisButtonGradient: {
+    colors: ["#2a7eaa", "#2aaa6c"],
+  },
+  switch: {
+    backgroundColor: "#333",
+  },
+  icon: {
+    color: "white",
+  },
+  statusBar: {
+    style: "light",
+    backgroundColor: "#000",
+  },
 });
 
-export default styles;
+export default darkStyles;

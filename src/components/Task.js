@@ -1,19 +1,20 @@
-import { useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import {
   Dimensions,
   ScrollView,
   Text,
-  TouchableHighlight,
   TouchableOpacity,
   View,
 } from "react-native";
 import { AntDesign, MaterialIcons, Octicons } from "@expo/vector-icons";
-import styles from "../styles/styles";
+import { ThemeContext } from "../contexts/ThemeContext";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const SCROLL_INITIAL_POSITION = SCREEN_WIDTH / 6 + 2;
 
 function Task(props) {
+  const { styles } = useContext(ThemeContext);
+
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -29,14 +30,7 @@ function Task(props) {
     <View style={styles.taskControl}>
       <ScrollView
         ref={scrollRef}
-        contentContainerStyle={{
-          justifyContent: "center",
-          alignItems: "center",
-          borderWidth: 1,
-          borderColor: "white",
-          borderRadius: 15,
-          overflow: "hidden",
-        }}
+        contentContainerStyle={styles.taskControlScroll}
         horizontal
         showsHorizontalScrollIndicator={false}
         decelerationRate="normal"
@@ -70,11 +64,13 @@ function Task(props) {
         >
           <AntDesign name="delete" size={24} color="white" />
         </TouchableOpacity>
-        <TouchableHighlight
+        <TouchableOpacity
           style={[
             styles.task,
             { width: props.width },
-            props.isUrgent && { backgroundColor: "#4c0800" },
+            props.isUrgent && {
+              backgroundColor: styles.urgentTask.backgroundColor,
+            },
           ]}
           onPress={() => props.action()}
         >
@@ -114,7 +110,7 @@ function Task(props) {
                   <MaterialIcons
                     name="calendar-today"
                     size={16}
-                    color="white"
+                    color={styles.icon.color}
                   />
                   <Text style={styles.dueDateTaskLabelText}>
                     {new Date(props.dueDate).toLocaleDateString("pt-BR")}
@@ -128,7 +124,7 @@ function Task(props) {
             <View
               style={[
                 styles.category,
-                props.isUrgent && { backgroundColor: "#300500" },
+                props.isUrgent && styles.urgentTaskCategoryLabel,
               ]}
             >
               <Octicons name="dot-fill" size={22} color={props.categoryColor} />
@@ -142,7 +138,7 @@ function Task(props) {
               </Text>
             </View>
           </View>
-        </TouchableHighlight>
+        </TouchableOpacity>
         <TouchableOpacity
           style={
             !props.isCompleted
@@ -160,7 +156,7 @@ function Task(props) {
           <AntDesign
             name={!props.isCompleted ? "check" : "clockcircleo"}
             size={24}
-            color="white"
+            color="#fff"
           />
         </TouchableOpacity>
       </ScrollView>
