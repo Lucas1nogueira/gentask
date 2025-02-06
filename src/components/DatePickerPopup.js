@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { BackHandler, Text, TouchableHighlight, View } from "react-native";
+import { BackHandler, Text, TouchableOpacity, View } from "react-native";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { Calendar } from "react-native-calendars";
 import { ThemeContext } from "../contexts/ThemeContext";
@@ -46,8 +46,8 @@ function DatePickerPopup(props) {
           }}
         />
         <View style={styles.popupButtonRow}>
-          <TouchableHighlight
-            style={[styles.commonButton, { backgroundColor: "#222" }]}
+          <TouchableOpacity
+            style={styles.commonButton}
             onPress={() => props.close()}
           >
             <View
@@ -58,12 +58,12 @@ function DatePickerPopup(props) {
                 alignItems: "center",
               }}
             >
-              <AntDesign name="back" size={20} color="#fff" />
+              <AntDesign name="back" size={20} color={styles.icon.color} />
               <Text style={styles.text}>Voltar</Text>
             </View>
-          </TouchableHighlight>
-          <TouchableHighlight
-            style={[styles.commonButton, { backgroundColor: "#0d4f6b" }]}
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.commonButton, styles.confirmButton]}
             onPress={() => {
               if (date) {
                 props.setSelectedDate(date.timestamp + 86400000);
@@ -83,10 +83,10 @@ function DatePickerPopup(props) {
                 alignItems: "center",
               }}
             >
-              <Ionicons name="checkmark" size={20} color="#fff" />
+              <Ionicons name="checkmark" size={20} color={styles.icon.color} />
               <Text style={styles.text}>Pronto</Text>
             </View>
-          </TouchableHighlight>
+          </TouchableOpacity>
         </View>
       </View>
     </View>

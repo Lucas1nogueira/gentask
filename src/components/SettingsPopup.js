@@ -1,5 +1,6 @@
 import React, { useContext, useEffect } from "react";
-import { Text, View, TouchableOpacity, BackHandler } from "react-native";
+import { Text, View, TouchableOpacity, BackHandler, Alert } from "react-native";
+import * as MailComposer from "expo-mail-composer";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons/";
 import { ThemeContext } from "../contexts/ThemeContext";
 
@@ -47,9 +48,34 @@ function SettingsPopup(props) {
             alignItems: "center",
           }}
         >
-          <TouchableOpacity style={styles.settingsButton}>
+          <TouchableOpacity
+            style={styles.settingsButton}
+            onPress={async () => {
+              try {
+                const isAvailable = await MailComposer.isAvailableAsync();
+                if (!isAvailable) {
+                  Alert.alert(
+                    "Erro",
+                    "Nenhum cliente de e-mail configurado no dispositivo."
+                  );
+                  return;
+                }
+                await MailComposer.composeAsync({
+                  recipients: ["lucasbastos@programmer.net"],
+                  subject: "Contato | MyTasks",
+                  body: "(Dúvidas, sugestões, reports de erros...)",
+                });
+              } catch (error) {
+                Alert.alert(
+                  "Erro",
+                  "Ocorreu um erro ao tentar abrir o cliente de e-mail."
+                );
+                console.warn(error);
+              }
+            }}
+          >
             <MaterialIcons name="email" size={24} color={styles.icon.color} />
-            <Text style={[styles.text, { paddingLeft: 3 }]}>Contato</Text>
+            <Text style={[styles.text, { paddingLeft: 3 }]}>Contate-nos</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.settingsButton}
@@ -71,7 +97,13 @@ function SettingsPopup(props) {
             alignItems: "center",
           }}
         >
-          <TouchableOpacity style={styles.settingsButton}>
+          <TouchableOpacity
+            style={styles.settingsButton}
+            onPress={() => {
+              props.close();
+              props.openTaskClearPopup();
+            }}
+          >
             <MaterialIcons
               name="cleaning-services"
               size={24}

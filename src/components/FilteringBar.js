@@ -27,6 +27,11 @@ function FilteringBar(props) {
           }, {});
         setTasksFilteredByCategory(filteredTasks);
       }
+    } else {
+      setTasksFilteredByCategory(null);
+      setTasksSortedByTime(null);
+      setTasksSortedByCompletion(null);
+      setTasksSortedByUrgency(null);
     }
   }, [props.tasks, props.selectedCategory]);
 

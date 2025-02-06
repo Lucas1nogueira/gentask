@@ -8,7 +8,7 @@ export async function storeData(value) {
     const jsonValue = JSON.stringify(value);
     await AsyncStorage.setItem(TASKS_STORAGE_KEY, jsonValue);
   } catch (error) {
-    console.log(`Error saving data: ${error}`);
+    console.error(`Error saving data: ${error}`);
   }
 }
 
@@ -21,7 +21,17 @@ export async function getData() {
       return null;
     }
   } catch (error) {
-    Alert.alert(`Error retrieving data ${error}`);
+    console.error(`Error retrieving data ${error}`);
+  }
+}
+
+export async function eraseData() {
+  try {
+    await AsyncStorage.removeItem(TASKS_STORAGE_KEY);
+    return true;
+  } catch (error) {
+    console.error(`Error erasing data ${error}`);
+    return false;
   }
 }
 
@@ -30,7 +40,7 @@ export async function saveTheme(value) {
     const jsonValue = JSON.stringify(value);
     await AsyncStorage.setItem(THEME_STORAGE_KEY, jsonValue);
   } catch (error) {
-    console.log(`Error saving theme: ${error}`);
+    console.error(`Error saving theme: ${error}`);
   }
 }
 
@@ -43,6 +53,6 @@ export async function getTheme() {
       return false;
     }
   } catch (error) {
-    Alert.alert(`Error retrieving theme ${error}`);
+    console.error(`Error retrieving theme ${error}`);
   }
 }

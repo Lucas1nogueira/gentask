@@ -337,7 +337,7 @@ const lightStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#777",
     borderRadius: 20,
-    backgroundColor: "#e0e0e0",
+    backgroundColor: "#d1d1d1",
     paddingHorizontal: 10,
     zIndex: 1,
   },

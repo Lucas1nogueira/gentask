@@ -19,8 +19,8 @@ function MinimalPopup(props) {
       style={[
         styles.minimalPopup,
         props.customTop && { top: props.customTop },
+        props.color && { backgroundColor: props.color },
         {
-          backgroundColor: props.color,
           opacity: props.opacityAnimation,
           transform: [
             {
@@ -38,7 +38,13 @@ function MinimalPopup(props) {
       ) : (
         <FontAwesome name="exclamation-circle" size={24} color="white" />
       )}
-      <Text style={[styles.text, { color: "white", paddingLeft: 5 }]}>
+      <Text
+        style={[
+          styles.text,
+          props.color && { color: "white" },
+          { paddingLeft: 5 },
+        ]}
+      >
         {props.message}
       </Text>
     </Animated.View>

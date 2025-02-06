@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect, useContext } from "react";
-import { View, Animated, BackHandler } from "react-native";
+import { View, Animated, BackHandler, Alert } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { getData, storeData } from "../services/storage";
+import { eraseData, getData, storeData } from "../services/storage";
 import { ThemeContext } from "../contexts/ThemeContext";
 import Menu from "../components/Menu";
 import TopBar from "../components/TopBar";
@@ -54,6 +54,7 @@ function HomeScreen() {
     taskCreation: false,
     taskRemoval: false,
     taskDiscard: false,
+    taskClear: false,
     exit: false,
     loading: false,
     success: false,
@@ -70,6 +71,7 @@ function HomeScreen() {
     taskCreation: new Animated.Value(0),
     taskRemoval: new Animated.Value(0),
     taskDiscard: new Animated.Value(0),
+    taskClear: new Animated.Value(0),
     exit: new Animated.Value(0),
     loading: new Animated.Value(0),
     loadingRight: new Animated.Value(0),
@@ -324,26 +326,6 @@ function HomeScreen() {
           />
         </Animated.View>
       )}
-      {popups.exit && (
-        <Animated.View
-          style={[styles.fullscreenArea, { opacity: popupAnimations.exit }]}
-        >
-          <MessagePopup
-            close={() => {
-              animateClosing(popupAnimations["exit"], () =>
-                setPopups((prevState) => ({
-                  ...prevState,
-                  exit: false,
-                }))
-              );
-            }}
-            title={"Sair do MyTasks"}
-            description={"Isso fechará o app. Tem certeza?"}
-            actionName={"Sair"}
-            action={() => BackHandler.exitApp()}
-          />
-        </Animated.View>
-      )}
       {popups.taskRemoval && (
         <Animated.View
           style={[
@@ -415,13 +397,91 @@ function HomeScreen() {
           />
         </Animated.View>
       )}
+      {popups.taskClear && (
+        <Animated.View
+          style={[
+            styles.fullscreenArea,
+            { opacity: popupAnimations.taskClear },
+          ]}
+        >
+          <MessagePopup
+            close={() => {
+              animateClosing(popupAnimations["taskClear"], () =>
+                setPopups((prevState) => ({
+                  ...prevState,
+                  taskClear: false,
+                }))
+              );
+            }}
+            title={"Limpar tarefas"}
+            description={
+              "Isso apagará todas as tarefas cadastradas. Tem certeza?"
+            }
+            actionName={"Limpar"}
+            action={() => {
+              setPopups((prevState) => ({
+                ...prevState,
+                loading: true,
+              }));
+              animateOpening(popupAnimations["loading"]);
+              animateSlideIn(popupAnimations["loadingRight"]);
+              eraseData().then((wasDataErased) => {
+                animateClosing(popupAnimations["loading"], () =>
+                  setPopups((prevState) => ({
+                    ...prevState,
+                    loading: false,
+                  }))
+                );
+                animateSlideOut(popupAnimations["loadingRight"]);
+                if (wasDataErased) {
+                  setTasks(null);
+                  setSortedTasks(null);
+                  setFoundTasks(null);
+                  setSelectedTaskId(null);
+                  setMinimalPopupMessage("Tarefas apagadas!");
+                  setPopups((prevState) => ({
+                    ...prevState,
+                    success: true,
+                  }));
+                  animateOpening(popupAnimations["success"]);
+                  animateSlideIn(popupAnimations["successRight"]);
+                } else {
+                  Alert.alert(
+                    "Erro",
+                    "Ocorreu um erro ao limpar tarefas. Por favor, contate o desenvolvedor!"
+                  );
+                }
+              });
+            }}
+          />
+        </Animated.View>
+      )}
+      {popups.exit && (
+        <Animated.View
+          style={[styles.fullscreenArea, { opacity: popupAnimations.exit }]}
+        >
+          <MessagePopup
+            close={() => {
+              animateClosing(popupAnimations["exit"], () =>
+                setPopups((prevState) => ({
+                  ...prevState,
+                  exit: false,
+                }))
+              );
+            }}
+            title={"Sair do MyTasks"}
+            description={"Isso fechará o app. Tem certeza?"}
+            actionName={"Sair"}
+            action={() => BackHandler.exitApp()}
+          />
+        </Animated.View>
+      )}
       {popups.loading && (
         <MinimalPopup
           loading={true}
           customTop={40}
           opacityAnimation={popupAnimations.loading}
           rightAnimation={popupAnimations.loadingRight}
-          color="#555"
           message={"Salvando tarefa..."}
         />
       )}
@@ -493,6 +553,13 @@ function HomeScreen() {
                   settings: false,
                 }))
               );
+            }}
+            openTaskClearPopup={() => {
+              setPopups((prevState) => ({
+                ...prevState,
+                taskClear: true,
+              }));
+              animateOpening(popupAnimations["taskClear"]);
             }}
           />
         </Animated.View>
