@@ -103,7 +103,7 @@ function TopBar(props) {
           <Entypo
             name="magnifying-glass"
             size={18}
-            color="#c1c1c1"
+            color={styles.icon.color}
             style={{ paddingRight: 2 }}
           />
           <TextInput
@@ -111,7 +111,7 @@ function TopBar(props) {
             value={searchText}
             onChangeText={onChangeSearchText}
             placeholder="Buscar tarefa..."
-            placeholderTextColor="#c1c1c1"
+            placeholderTextColor={styles.icon.color}
             autoFocus={true}
           />
         </View>

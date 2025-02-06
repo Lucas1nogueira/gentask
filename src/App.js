@@ -1,6 +1,7 @@
 import { useContext, useEffect } from "react";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
+import * as NavigationBar from "expo-navigation-bar";
 import { ThemeContext, ThemeProvider } from "./contexts/ThemeContext";
 import HomeScreen from "./screens/HomeScreen";
 
@@ -14,13 +15,20 @@ function AppPreConfig() {
     "ReadexPro-SemiBold": require("../assets/fonts/Readex_Pro/ReadexPro-SemiBold.ttf"),
   });
 
-  const { isLoading } = useContext(ThemeContext);
+  const { isLoading, styles } = useContext(ThemeContext);
 
   useEffect(() => {
     if ((loaded || error) && !isLoading) {
       SplashScreen.hideAsync();
     }
   }, [loaded, error, isLoading]);
+
+  useEffect(() => {
+    if (styles) {
+      NavigationBar.setBackgroundColorAsync(styles.navigationBar.color);
+      NavigationBar.setButtonStyleAsync(styles.navigationBar.buttonStyle);
+    }
+  }, [styles]);
 
   if (!loaded && !error) {
     return null;

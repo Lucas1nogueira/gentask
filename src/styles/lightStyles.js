@@ -61,7 +61,7 @@ const lightStyles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 15,
-    backgroundColor: "#c9c9c9",
+    backgroundColor: "#dbdbdb",
     paddingHorizontal: 10,
   },
   topBar: {
@@ -90,7 +90,7 @@ const lightStyles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-between",
     borderRadius: 20,
-    backgroundColor: "#d6d6d6",
+    backgroundColor: "#dbdbdb",
     padding: 15,
   },
   text: {
@@ -109,7 +109,7 @@ const lightStyles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 10,
-    backgroundColor: "#b7b7b7",
+    backgroundColor: "#d6d6d6",
     paddingHorizontal: 7,
   },
   categoryText: {
@@ -121,6 +121,8 @@ const lightStyles = StyleSheet.create({
     marginVertical: 10,
     width: "100%",
     height: 140,
+    borderWidth: 1,
+    borderColor: "#CCC",
     borderRadius: 15,
     overflow: "hidden",
   },
@@ -173,7 +175,7 @@ const lightStyles = StyleSheet.create({
   task: {
     height: "100%",
     justifyContent: "center",
-    backgroundColor: "#c9c9c9",
+    backgroundColor: "#ededed",
     padding: 10,
   },
   deleteTaskButton: {
@@ -217,8 +219,8 @@ const lightStyles = StyleSheet.create({
   taskAnalysisFloatingMenuBox: {
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#a5a5a5",
-    backgroundColor: "#d6d6d6",
+    borderColor: "#c1c1c1",
+    backgroundColor: "#e2e2e2",
     overflow: "hidden",
   },
   taskAnalysisFloatingMenuBottomTriangle: {
@@ -230,7 +232,7 @@ const lightStyles = StyleSheet.create({
     borderRightWidth: 10,
     borderBottomWidth: 0,
     borderLeftWidth: 10,
-    borderTopColor: "#a5a5a5",
+    borderTopColor: "#c1c1c1",
     borderRightColor: "transparent",
     borderBottomColor: "transparent",
     borderLeftColor: "transparent",
@@ -251,7 +253,7 @@ const lightStyles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 30,
-    backgroundColor: "#1de2cf",
+    backgroundColor: "#49eddc",
     paddingLeft: 7,
   },
   taskPopup: {
@@ -441,10 +443,10 @@ const lightStyles = StyleSheet.create({
     backgroundColor: "#d8867d",
   },
   selectedPickerOption: {
-    backgroundColor: "#b5b5b5",
+    backgroundColor: "#bfbfbf",
   },
   taskAnalysisButtonGradient: {
-    colors: ["#46bcfc", "#41fca2"],
+    colors: ["#63ffbe", "#29e8d5"],
   },
   switch: {
     backgroundColor: "#cecece",
@@ -455,6 +457,10 @@ const lightStyles = StyleSheet.create({
   statusBar: {
     style: "dark",
     backgroundColor: "#eaeaea",
+  },
+  navigationBar: {
+    color: "#eaeaea",
+    buttonStyle: "dark",
   },
 });
 

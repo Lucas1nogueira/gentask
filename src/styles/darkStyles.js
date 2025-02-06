@@ -121,6 +121,8 @@ const darkStyles = StyleSheet.create({
     marginVertical: 10,
     width: "100%",
     height: 140,
+    borderWidth: 1,
+    borderColor: "#111",
     borderRadius: 15,
     overflow: "hidden",
   },
@@ -456,6 +458,10 @@ const darkStyles = StyleSheet.create({
   statusBar: {
     style: "light",
     backgroundColor: "#000",
+  },
+  navigationBar: {
+    color: "#000",
+    buttonStyle: "light",
   },
 });
 
