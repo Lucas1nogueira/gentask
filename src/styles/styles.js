@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 10,
   },
-  tasksContainer: {
+  taskContainer: {
     width: "92%",
     height: screenHeight - 143,
     marginTop: 10,
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#fff",
   },
-  taskContainer: {
+  taskControl: {
     marginVertical: 10,
     width: "100%",
     height: 140,
@@ -295,6 +295,20 @@ const styles = StyleSheet.create({
     backgroundColor: "#1e1e1e",
     paddingHorizontal: 10,
   },
+  confirmBigButton: {
+    width: "100%",
+    height: 45,
+    marginTop: 20,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "flex-end",
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: "#333",
+    backgroundColor: "#0d4f6b",
+    paddingHorizontal: 10,
+  },
   messagePopup: {
     width: 370,
     height: 200,
@@ -328,7 +342,7 @@ const styles = StyleSheet.create({
   },
   settingsPopup: {
     width: 370,
-    height: 200,
+    height: 220,
     justifyContent: "space-between",
     borderRadius: 25,
     backgroundColor: "#222",

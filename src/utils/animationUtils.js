@@ -110,3 +110,21 @@ export function animateClosingDown(
     callbackFunction();
   });
 }
+
+export const animateBlinking = (property) =>
+  Animated.loop(
+    Animated.sequence([
+      Animated.timing(property, {
+        toValue: 0.5,
+        duration: 1000,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+      Animated.timing(property, {
+        toValue: 1,
+        duration: 1000,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+    ])
+  );

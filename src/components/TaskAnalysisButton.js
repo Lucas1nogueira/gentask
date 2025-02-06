@@ -67,7 +67,7 @@ function TaskAnalysisButton(props) {
           ]}
         >
           <View style={styles.taskAnalysisFloatingMenuBox}>
-            <TouchableHighlight>
+            <TouchableHighlight onPress={() => props.openWeeklyTaskAnalysis()}>
               <View style={styles.taskAnalysisMenuOption}>
                 <MaterialIcons name="view-week" size={20} color="white" />
                 <Text style={[styles.text, { paddingLeft: 3 }]}>
@@ -75,7 +75,7 @@ function TaskAnalysisButton(props) {
                 </Text>
               </View>
             </TouchableHighlight>
-            <TouchableHighlight>
+            <TouchableHighlight onPress={() => props.openMonthlyTaskAnalysis()}>
               <View style={styles.taskAnalysisMenuOption}>
                 <MaterialIcons name="calendar-month" size={20} color="white" />
                 <Text style={[styles.text, { paddingLeft: 3 }]}>
@@ -88,15 +88,20 @@ function TaskAnalysisButton(props) {
         </Animated.View>
       )}
       <TouchableOpacity
-        style={styles.taskAnalysisButton}
+        style={[
+          styles.taskAnalysisButton,
+          { opacity: props.isActive ? 1 : 0.5 },
+        ]}
         onPress={() => {
-          if (!isTaskAnalysisMenuOpen) {
-            setTaskAnalysisMenuOpen(true);
-            animateOpeningUp(opacityAnimation, topAnimation);
-          } else {
-            animateClosingDown(opacityAnimation, topAnimation, () =>
-              setTaskAnalysisMenuOpen(false)
-            );
+          if (props.isActive) {
+            if (!isTaskAnalysisMenuOpen) {
+              setTaskAnalysisMenuOpen(true);
+              animateOpeningUp(opacityAnimation, topAnimation);
+            } else {
+              animateClosingDown(opacityAnimation, topAnimation, () =>
+                setTaskAnalysisMenuOpen(false)
+              );
+            }
           }
         }}
       >

@@ -26,7 +26,7 @@ function Task(props) {
   }, [scrollRef]);
 
   return (
-    <View style={styles.taskContainer}>
+    <View style={styles.taskControl}>
       <ScrollView
         ref={scrollRef}
         contentContainerStyle={{
@@ -104,7 +104,13 @@ function Task(props) {
                 )}
               </View>
               {props.dueDate && (
-                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <View
+                  style={{
+                    marginRight: 3,
+                    flexDirection: "row",
+                    alignItems: "center",
+                  }}
+                >
                   <MaterialIcons
                     name="calendar-today"
                     size={16}

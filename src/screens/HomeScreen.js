@@ -4,11 +4,12 @@ import { StatusBar } from "expo-status-bar";
 import Menu from "../components/Menu";
 import TopBar from "../components/TopBar";
 import FilteringBar from "../components/FilteringBar";
-import TasksContainer from "../components/TasksContainer";
+import TaskContainer from "../components/TaskContainer";
 import CategoryPickerPopup from "../components/CategoryPickerPopup";
 import SortPickerPopup from "../components/SortPickerPopup";
 import TaskViewPopup from "../components/TaskViewPopup";
-import CreateTaskPopup from "../components/CreateTaskPopup";
+import TaskCreationPopup from "../components/TaskCreationPopup";
+import TaskAnalysisPopup from "../components/TaskAnalysisPopup";
 import MessagePopup from "../components/MessagePopup";
 import MinimalPopup from "../components/MinimalPopup";
 import SettingsPopup from "../components/SettingsPopup";
@@ -37,6 +38,7 @@ function HomeScreen() {
   const [completedTasksFirst, setCompletedTasksFirst] = useState(false);
   const [urgentTasksFirst, setUrgentTasksFirst] = useState(true);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [taskAnalysisMode, setTaskAnalysisMode] = useState(null);
 
   const [openMenu, setOpenMenu] = useState(false);
   const [menuAnimation] = useState(new Animated.Value(0));
@@ -46,11 +48,12 @@ function HomeScreen() {
   const [popups, setPopups] = useState({
     categoryPicker: false,
     sortPicker: false,
-    view: false,
-    create: false,
+    taskAnalysis: false,
+    taskView: false,
+    taskCreation: false,
+    taskRemoval: false,
+    taskDiscard: false,
     exit: false,
-    delete: false,
-    discard: false,
     loading: false,
     success: false,
     noText: false,
@@ -61,11 +64,12 @@ function HomeScreen() {
   const [popupAnimations] = useState({
     categoryPicker: new Animated.Value(0),
     sortPicker: new Animated.Value(0),
-    view: new Animated.Value(0),
-    create: new Animated.Value(0),
+    taskAnalysis: new Animated.Value(0),
+    taskView: new Animated.Value(0),
+    taskCreation: new Animated.Value(0),
+    taskRemoval: new Animated.Value(0),
+    taskDiscard: new Animated.Value(0),
     exit: new Animated.Value(0),
-    delete: new Animated.Value(0),
-    discard: new Animated.Value(0),
     loading: new Animated.Value(0),
     loadingRight: new Animated.Value(0),
     success: new Animated.Value(0),
@@ -175,25 +179,46 @@ function HomeScreen() {
           />
         </Animated.View>
       )}
-      {popups.view && (
+      {popups.taskAnalysis && (
         <Animated.View
-          style={[styles.fullscreenArea, { opacity: popupAnimations.view }]}
+          style={[
+            styles.fullscreenArea,
+            { opacity: popupAnimations.taskAnalysis },
+          ]}
+        >
+          <TaskAnalysisPopup
+            close={() => {
+              animateClosing(popupAnimations["taskAnalysis"], () =>
+                setPopups((prevState) => ({
+                  ...prevState,
+                  taskAnalysis: false,
+                }))
+              );
+            }}
+            tasks={tasks}
+            taskAnalysisMode={taskAnalysisMode}
+          />
+        </Animated.View>
+      )}
+      {popups.taskView && (
+        <Animated.View
+          style={[styles.fullscreenArea, { opacity: popupAnimations.taskView }]}
         >
           <TaskViewPopup
             close={() => {
-              animateClosing(popupAnimations["view"], () =>
+              animateClosing(popupAnimations["taskView"], () =>
                 setPopups((prevState) => ({
                   ...prevState,
-                  view: false,
+                  taskView: false,
                 }))
               );
             }}
             openDiscardPopup={() => {
               setPopups((prevState) => ({
                 ...prevState,
-                discard: true,
+                taskDiscard: true,
               }));
-              animateOpening(popupAnimations["discard"]);
+              animateOpening(popupAnimations["taskDiscard"]);
             }}
             openLoadingPopup={() => {
               setPopups((prevState) => ({
@@ -237,25 +262,28 @@ function HomeScreen() {
           />
         </Animated.View>
       )}
-      {popups.create && (
+      {popups.taskCreation && (
         <Animated.View
-          style={[styles.fullscreenArea, { opacity: popupAnimations.create }]}
+          style={[
+            styles.fullscreenArea,
+            { opacity: popupAnimations.taskCreation },
+          ]}
         >
-          <CreateTaskPopup
+          <TaskCreationPopup
             close={() => {
-              animateClosing(popupAnimations["create"], () =>
+              animateClosing(popupAnimations["taskCreation"], () =>
                 setPopups((prevState) => ({
                   ...prevState,
-                  create: false,
+                  taskCreation: false,
                 }))
               );
             }}
             openDiscardPopup={() => {
               setPopups((prevState) => ({
                 ...prevState,
-                discard: true,
+                taskDiscard: true,
               }));
-              animateOpening(popupAnimations["discard"]);
+              animateOpening(popupAnimations["taskDiscard"]);
             }}
             openLoadingPopup={() => {
               setPopups((prevState) => ({
@@ -317,16 +345,19 @@ function HomeScreen() {
           />
         </Animated.View>
       )}
-      {popups.delete && (
+      {popups.taskRemoval && (
         <Animated.View
-          style={[styles.fullscreenArea, { opacity: popupAnimations.delete }]}
+          style={[
+            styles.fullscreenArea,
+            { opacity: popupAnimations.taskRemoval },
+          ]}
         >
           <MessagePopup
             close={() => {
-              animateClosing(popupAnimations["delete"], () =>
+              animateClosing(popupAnimations["taskRemoval"], () =>
                 setPopups((prevState) => ({
                   ...prevState,
-                  delete: false,
+                  taskRemoval: false,
                 }))
               );
             }}
@@ -350,16 +381,19 @@ function HomeScreen() {
           />
         </Animated.View>
       )}
-      {popups.discard && (
+      {popups.taskDiscard && (
         <Animated.View
-          style={[styles.fullscreenArea, { opacity: popupAnimations.discard }]}
+          style={[
+            styles.fullscreenArea,
+            { opacity: popupAnimations.taskDiscard },
+          ]}
         >
           <MessagePopup
             close={() => {
-              animateClosing(popupAnimations["discard"], () =>
+              animateClosing(popupAnimations["taskDiscard"], () =>
                 setPopups((prevState) => ({
                   ...prevState,
-                  discard: false,
+                  taskDiscard: false,
                 }))
               );
             }}
@@ -368,16 +402,16 @@ function HomeScreen() {
             actionName={"Sim"}
             actionButtonColor={"#470c0c"}
             action={() => {
-              animateClosing(popupAnimations["view"], () =>
+              animateClosing(popupAnimations["taskView"], () =>
                 setPopups((prevState) => ({
                   ...prevState,
-                  view: false,
+                  taskView: false,
                 }))
               );
-              animateClosing(popupAnimations["create"], () =>
+              animateClosing(popupAnimations["taskCreation"], () =>
                 setPopups((prevState) => ({
                   ...prevState,
-                  create: false,
+                  taskCreation: false,
                 }))
               );
             }}
@@ -444,7 +478,9 @@ function HomeScreen() {
               );
             }}
             title={"Erro"}
-            description={"Ocorreu um erro!"}
+            description={
+              "Nenhuma tarefa encontrada para o período selecionado!"
+            }
             actionName={"OK"}
             actionButtonColor={"#470c0c"}
             action={() => null}
@@ -499,7 +535,7 @@ function HomeScreen() {
           animateOpening(popupAnimations["sortPicker"]);
         }}
       />
-      <TasksContainer
+      <TaskContainer
         foundTasks={foundTasks}
         setTasks={setTasks}
         didTasksLoad={didTasksLoad}
@@ -513,25 +549,25 @@ function HomeScreen() {
         openCreatePopup={() => {
           setPopups((prevState) => ({
             ...prevState,
-            create: true,
+            taskCreation: true,
           }));
-          animateOpening(popupAnimations["create"]);
+          animateOpening(popupAnimations["taskCreation"]);
         }}
         taskViewPopup={(taskId) => {
           setSelectedTaskId(taskId);
           setPopups((prevState) => ({
             ...prevState,
-            view: true,
+            taskView: true,
           }));
-          animateOpening(popupAnimations["view"]);
+          animateOpening(popupAnimations["taskView"]);
         }}
         delete={(taskId) => {
           setSelectedTaskId(taskId);
           setPopups((prevState) => ({
             ...prevState,
-            delete: true,
+            taskRemoval: true,
           }));
-          animateOpening(popupAnimations["delete"]);
+          animateOpening(popupAnimations["taskRemoval"]);
         }}
         checkCompleted={(taskId) => {
           const updatedTasks = { ...tasks };
@@ -540,6 +576,23 @@ function HomeScreen() {
               !updatedTasks[taskId].isCompleted;
             setTasks(updatedTasks);
           }
+        }}
+        isTaskAnalysisButtonActive={tasks && Object.keys(tasks).length !== 0}
+        openWeeklyTaskAnalysis={() => {
+          setTaskAnalysisMode("weekly");
+          setPopups((prevState) => ({
+            ...prevState,
+            taskAnalysis: true,
+          }));
+          animateOpening(popupAnimations["taskAnalysis"]);
+        }}
+        openMonthlyTaskAnalysis={() => {
+          setTaskAnalysisMode("monthly");
+          setPopups((prevState) => ({
+            ...prevState,
+            taskAnalysis: true,
+          }));
+          animateOpening(popupAnimations["taskAnalysis"]);
         }}
       />
       <StatusBar style="light" translucent={false} />

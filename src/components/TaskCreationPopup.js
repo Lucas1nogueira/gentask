@@ -17,7 +17,7 @@ import CategoryPickerPopup from "./CategoryPickerPopup";
 import DatePickerPopup from "./DatePickerPopup";
 import styles from "../styles/styles";
 
-function CreateTaskPopup(props) {
+function TaskCreationPopup(props) {
   const [text, onChangeText] = useState("");
 
   const [selectedCategory, setSelectedCategory] = useState({
@@ -241,4 +241,4 @@ function CreateTaskPopup(props) {
   );
 }
 
-export default CreateTaskPopup;
+export default TaskCreationPopup;

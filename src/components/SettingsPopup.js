@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Text, View, TouchableHighlight, BackHandler } from "react-native";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons/";
 import styles from "../styles/styles";
 
 function SettingsPopup(props) {
@@ -27,7 +27,16 @@ function SettingsPopup(props) {
       ]}
     >
       <View style={styles.settingsPopup}>
-        <Text style={styles.text}>Configurações</Text>
+        <View
+          style={{
+            marginBottom: 10,
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <Ionicons name="settings-sharp" size={18} color="white" />
+          <Text style={[styles.header, { paddingLeft: 5 }]}>Configurações</Text>
+        </View>
         <View
           style={{
             width: "100%",

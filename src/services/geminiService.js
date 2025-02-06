@@ -19,6 +19,8 @@ const dueDatePromptTemplate = `Analyze the task and timestamp. If a time-related
 
 const insightsPromptTemplate = `Considering the following text as a personal task, provide actionable insights and step-by-step guidance on how to efficiently complete it. Focus on practical tips, prioritization, and time management strategies. Answer in Brazilian Portuguese and limit the response to 80 characters. The text is: `;
 
+const analysisPromptTemplate = `Considering the following text as personal tasks, provide an useful analysis following the best productivity techniques and a helpful summarization. Answer in brazilian portuguese and in plain text, no markdown or formatted text, but you can use emojis. The text is:`;
+
 async function queryGemini(prePrompt, userInput) {
   const fullPrompt = `${prePrompt} ${userInput}`;
 
@@ -149,4 +151,69 @@ async function categorizeTask(text, categoryName, isUrgent, dueDate) {
   }
 }
 
-export { categorizeTask };
+function isDateInCurrentWeek(timestamp) {
+  if (!timestamp) return false;
+
+  const now = new Date();
+  const taskDate = new Date(timestamp);
+
+  // Get week's first day
+  const startOfWeek = new Date(now);
+  startOfWeek.setHours(0, 0, 0, 0);
+  startOfWeek.setDate(now.getDate() - now.getDay());
+
+  // Get week's last day
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 6);
+  endOfWeek.setHours(23, 59, 59, 999);
+
+  return taskDate >= startOfWeek && taskDate <= endOfWeek;
+}
+
+function isDateInCurrentMonth(timestamp) {
+  if (!timestamp) return false;
+
+  const now = new Date();
+  const taskDate = new Date(timestamp);
+
+  // Verifica se é o mesmo mês e ano
+  return (
+    taskDate.getMonth() === now.getMonth() &&
+    taskDate.getFullYear() === now.getFullYear()
+  );
+}
+
+async function getTaskAnalysis(tasks, mode) {
+  let tasksForAnalysis = {};
+  let analysisResult;
+
+  if (mode === "weekly") {
+    tasksForAnalysis = Object.values(tasks)
+      .filter((task) => !task.isCompleted && isDateInCurrentWeek(task.dueDate))
+      .map((task) => task.text)
+      .join("\n");
+  } else if (mode === "monthly") {
+    tasksForAnalysis = Object.values(tasks)
+      .filter((task) => !task.isCompleted && isDateInCurrentMonth(task.dueDate))
+      .map((task) => task.text)
+      .join("\n");
+  }
+
+  if (!tasksForAnalysis) {
+    return null;
+  }
+
+  try {
+    analysisResult = await queryGemini(
+      analysisPromptTemplate,
+      tasksForAnalysis
+    );
+  } catch (error) {
+    console.warn("Error obtaining tasks analysis:", error);
+    analysisResult = false;
+  }
+
+  return analysisResult;
+}
+
+export { categorizeTask, getTaskAnalysis };

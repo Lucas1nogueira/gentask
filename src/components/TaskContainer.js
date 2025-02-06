@@ -11,7 +11,7 @@ import Task from "./Task";
 import styles from "../styles/styles";
 import TaskAnalysisButton from "./TaskAnalysisButton";
 
-function TasksContainer(props) {
+function TaskContainer(props) {
   const [showTasks, setShowTasks] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [isAddTaskPressed, setAddTaskPressed] = useState(false);
@@ -41,7 +41,7 @@ function TasksContainer(props) {
   };
 
   return (
-    <View style={styles.tasksContainer}>
+    <View style={styles.taskContainer}>
       <View
         style={{
           width: "100%",
@@ -101,7 +101,11 @@ function TasksContainer(props) {
           justifyContent: "flex-end",
         }}
       >
-        <TaskAnalysisButton />
+        <TaskAnalysisButton
+          isActive={props.isTaskAnalysisButtonActive}
+          openWeeklyTaskAnalysis={() => props.openWeeklyTaskAnalysis()}
+          openMonthlyTaskAnalysis={() => props.openMonthlyTaskAnalysis()}
+        />
         <Pressable
           style={[
             styles.addTaskButton,
@@ -119,4 +123,4 @@ function TasksContainer(props) {
   );
 }
 
-export default TasksContainer;
+export default TaskContainer;
