@@ -3,6 +3,7 @@ import { View, Animated, BackHandler, Alert } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { eraseData, getData, storeData } from "../services/storage";
 import { ThemeContext } from "../contexts/ThemeContext";
+import { AuthConfirmMessagesContext } from "../contexts/AuthConfirmMessagesContext";
 import Menu from "../components/Menu";
 import TopBar from "../components/TopBar";
 import FilteringBar from "../components/FilteringBar";
@@ -21,9 +22,18 @@ import {
   animateSlideIn,
   animateSlideOut,
 } from "../utils/animationUtils";
+import { logout } from "../services/firebase/auth";
 
 function HomeScreen() {
   const { styles } = useContext(ThemeContext);
+  const {
+    authConfirmMessage,
+    setAuthConfirmMessage,
+    authConfirmPopups,
+    setAuthConfirmPopups,
+    authConfirmPopupAnimations,
+  } = useContext(AuthConfirmMessagesContext);
+
   const didFetch = useRef(false);
 
   const [tasks, setTasks] = useState(null);
@@ -45,6 +55,7 @@ function HomeScreen() {
   const [menuAnimation] = useState(new Animated.Value(0));
   const [menuLeftAnimation] = useState(new Animated.Value(0));
   const [minimalPopupMessage, setMinimalPopupMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [popups, setPopups] = useState({
     categoryPicker: false,
@@ -61,6 +72,7 @@ function HomeScreen() {
     noText: false,
     error: false,
     settings: false,
+    logout: false,
   });
 
   const [popupAnimations] = useState({
@@ -81,6 +93,7 @@ function HomeScreen() {
     noTextRight: new Animated.Value(0),
     error: new Animated.Value(0),
     settings: new Animated.Value(0),
+    logout: new Animated.Value(0),
   });
 
   useEffect(() => {
@@ -507,7 +520,7 @@ function HomeScreen() {
         <MinimalPopup
           opacityAnimation={popupAnimations.noText}
           rightAnimation={popupAnimations.noTextRight}
-          color={styles.minimalPopupNoText.backgroundColor}
+          color="#bc0000"
           close={() => {
             animateClosing(popupAnimations["noText"], () =>
               setPopups((prevState) => ({
@@ -520,7 +533,6 @@ function HomeScreen() {
           message={"Por favor, insira algum texto!"}
         />
       )}
-      {/* Ainda não usado */}
       {popups.error && (
         <Animated.View
           style={[styles.fullscreenArea, { opacity: popupAnimations.error }]}
@@ -535,9 +547,10 @@ function HomeScreen() {
               );
             }}
             title={"Erro"}
-            description={"Ocorreu um erro!"}
+            description={errorMessage}
             actionName={"OK"}
             action={() => null}
+            error={true}
           />
         </Animated.View>
       )}
@@ -561,8 +574,90 @@ function HomeScreen() {
               }));
               animateOpening(popupAnimations["taskClear"]);
             }}
+            openLogoutPopup={() => {
+              setPopups((prevState) => ({
+                ...prevState,
+                logout: true,
+              }));
+              animateOpening(popupAnimations["logout"]);
+            }}
           />
         </Animated.View>
+      )}
+      {popups.logout && (
+        <Animated.View
+          style={[styles.fullscreenArea, { opacity: popupAnimations.logout }]}
+        >
+          <MessagePopup
+            close={() => {
+              animateClosing(popupAnimations["logout"], () =>
+                setPopups((prevState) => ({
+                  ...prevState,
+                  logout: false,
+                }))
+              );
+            }}
+            title={"Fazer logout"}
+            description={"Você será desconectado. Tem certeza?"}
+            actionName={"Logout"}
+            action={() => {
+              logout()
+                .then(() => {
+                  setAuthConfirmMessage("Deslogado com sucesso!");
+                  setAuthConfirmPopups((prevState) => ({
+                    ...prevState,
+                    logout: true,
+                  }));
+                  animateOpening(authConfirmPopupAnimations["logout"]);
+                  animateSlideIn(authConfirmPopupAnimations["logoutRight"]);
+                })
+                .catch((error) => {
+                  setErrorMessage(
+                    `Não foi possível fazer logout!\n${error.message}`
+                  );
+                  setPopups((prevState) => ({
+                    ...prevState,
+                    error: true,
+                  }));
+                  animateOpening(popupAnimations["error"]);
+                });
+            }}
+          />
+        </Animated.View>
+      )}
+      {authConfirmPopups.signIn && (
+        <MinimalPopup
+          opacityAnimation={authConfirmPopupAnimations.signIn}
+          rightAnimation={authConfirmPopupAnimations.signInRight}
+          color={styles.minimalPopupSuccess.backgroundColor}
+          close={() => {
+            animateClosing(authConfirmPopupAnimations["signIn"], () => {
+              setAuthConfirmPopups((prevState) => ({
+                ...prevState,
+                signIn: false,
+              }));
+            });
+            animateSlideOut(authConfirmPopupAnimations["signInRight"]);
+          }}
+          message={authConfirmMessage}
+        />
+      )}
+      {authConfirmPopups.signUp && (
+        <MinimalPopup
+          opacityAnimation={authConfirmPopupAnimations.signUp}
+          rightAnimation={authConfirmPopupAnimations.signUpRight}
+          color={styles.minimalPopupSuccess.backgroundColor}
+          close={() => {
+            animateClosing(authConfirmPopupAnimations["signUp"], () => {
+              setAuthConfirmPopups((prevState) => ({
+                ...prevState,
+                signUp: false,
+              }));
+            });
+            animateSlideOut(authConfirmPopupAnimations["signUpRight"]);
+          }}
+          message={authConfirmMessage}
+        />
       )}
       <TopBar
         openMenu={() => {

@@ -33,7 +33,12 @@ function MessagePopup(props) {
         <Text style={[styles.text, { marginTop: 10 }]}>
           {props.description}
         </Text>
-        <View style={styles.popupButtonRow}>
+        <View
+          style={[
+            styles.popupButtonRow,
+            props.error && { justifyContent: "flex-end" },
+          ]}
+        >
           <TouchableOpacity
             style={[styles.commonButton, styles.cancelButton]}
             onPress={() => props.close()}
@@ -50,35 +55,37 @@ function MessagePopup(props) {
               <Text style={styles.text}>Voltar</Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.commonButton, styles.confirmButton]}
-            onPress={() => {
-              props.action();
-              props.close();
-            }}
-          >
-            <View
-              style={{
-                width: "100%",
-                flexDirection: "row",
-                justifyContent: "space-evenly",
-                alignItems: "center",
+          {!props.error && (
+            <TouchableOpacity
+              style={[styles.commonButton, styles.confirmButton]}
+              onPress={() => {
+                props.action();
+                props.close();
               }}
             >
-              <Ionicons
-                name={
-                  props.actionName == "Exit"
-                    ? "close"
-                    : props.actionName == "Delete"
-                    ? "trash"
-                    : "checkmark"
-                }
-                size={20}
-                color={styles.icon.color}
-              />
-              <Text style={styles.text}>{props.actionName}</Text>
-            </View>
-          </TouchableOpacity>
+              <View
+                style={{
+                  width: "100%",
+                  flexDirection: "row",
+                  justifyContent: "space-evenly",
+                  alignItems: "center",
+                }}
+              >
+                <Ionicons
+                  name={
+                    props.actionName == "Exit"
+                      ? "close"
+                      : props.actionName == "Delete"
+                      ? "trash"
+                      : "checkmark"
+                  }
+                  size={20}
+                  color={styles.icon.color}
+                />
+                <Text style={styles.text}>{props.actionName}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     </View>

@@ -113,7 +113,13 @@ function SettingsPopup(props) {
               Limpar tarefas
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.settingsButton}>
+          <TouchableOpacity
+            style={styles.settingsButton}
+            onPress={() => {
+              props.close();
+              props.openLogoutPopup();
+            }}
+          >
             <MaterialIcons name="logout" size={24} color={styles.icon.color} />
             <Text style={[styles.text, { paddingLeft: 3 }]}>Desconectar</Text>
           </TouchableOpacity>

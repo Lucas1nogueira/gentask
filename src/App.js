@@ -1,8 +1,12 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import * as NavigationBar from "expo-navigation-bar";
 import { ThemeContext, ThemeProvider } from "./contexts/ThemeContext";
+import { AuthConfirmMessagesProvider } from "./contexts/AuthConfirmMessagesContext";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "./services/firebase/firebaseConfig";
+import AuthScreen from "./screens/AuthScreen";
 import HomeScreen from "./screens/HomeScreen";
 
 SplashScreen.preventAutoHideAsync();
@@ -17,6 +21,8 @@ function AppPreConfig() {
 
   const { isLoading, styles } = useContext(ThemeContext);
 
+  const [user, setUser] = useState(false);
+
   useEffect(() => {
     if ((loaded || error) && !isLoading) {
       SplashScreen.hideAsync();
@@ -30,11 +36,23 @@ function AppPreConfig() {
     }
   }, [styles]);
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   if (!loaded && !error) {
     return null;
   }
 
-  return <HomeScreen />;
+  return (
+    <AuthConfirmMessagesProvider>
+      {!user ? <AuthScreen /> : <HomeScreen />}
+    </AuthConfirmMessagesProvider>
+  );
 }
 
 export default function App() {
