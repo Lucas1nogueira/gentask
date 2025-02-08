@@ -21,13 +21,7 @@ function AppPreConfig() {
 
   const { isLoading, styles } = useContext(ThemeContext);
 
-  const [user, setUser] = useState(false);
-
-  useEffect(() => {
-    if ((loaded || error) && !isLoading) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded, error, isLoading]);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     if (styles) {
@@ -38,11 +32,19 @@ function AppPreConfig() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+      if (!user) {
+        setUser(false);
+      }
     });
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if ((loaded || error) && !isLoading && user !== null) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded, error, isLoading, user]);
 
   if (!loaded && !error) {
     return null;

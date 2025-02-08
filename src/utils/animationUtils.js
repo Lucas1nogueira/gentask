@@ -49,20 +49,28 @@ export function animateRotation(property) {
   ).start();
 }
 
-export function animateExpanding(property) {
+export function animateExpanding(property, callbackFunction) {
   Animated.timing(property, {
     toValue: 1,
     duration: 150,
     useNativeDriver: false,
-  }).start();
+  }).start(() => {
+    if (callbackFunction) {
+      callbackFunction();
+    }
+  });
 }
 
-export function animateCollapsing(property) {
+export function animateCollapsing(property, callbackFunction) {
   Animated.timing(property, {
     toValue: 0,
     duration: 100,
     useNativeDriver: false,
-  }).start();
+  }).start(() => {
+    if (callbackFunction) {
+      callbackFunction();
+    }
+  });
 }
 
 export function animateToggleSwitch(property, toValue, callbackFunction) {

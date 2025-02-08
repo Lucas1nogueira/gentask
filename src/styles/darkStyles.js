@@ -18,9 +18,9 @@ const darkStyles = StyleSheet.create({
   },
   authContainer: {
     width: 350,
-    minHeight: 545,
     maxHeight: "auto",
     flexDirection: "column",
+    justifyContent: "space-between",
     alignItems: "center",
     borderWidth: 1,
     borderRadius: 20,
