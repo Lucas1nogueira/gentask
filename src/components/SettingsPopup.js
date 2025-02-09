@@ -5,7 +5,7 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons/";
 import { ThemeContext } from "../contexts/ThemeContext";
 
 function SettingsPopup(props) {
-  const { styles, toggleTheme } = useContext(ThemeContext);
+  const { styles, toggleTheme, isDarkThemeActive } = useContext(ThemeContext);
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
@@ -82,11 +82,13 @@ function SettingsPopup(props) {
             onPress={() => toggleTheme()}
           >
             <MaterialIcons
-              name="mode-night"
+              name={isDarkThemeActive ? "wb-sunny" : "mode-night"}
               size={24}
               color={styles.icon.color}
             />
-            <Text style={[styles.text, { paddingLeft: 3 }]}>Modo noturno</Text>
+            <Text style={[styles.text, { paddingLeft: 3 }]}>
+              {isDarkThemeActive ? "Tema claro" : "Tema escuro"}
+            </Text>
           </TouchableOpacity>
         </View>
         <View

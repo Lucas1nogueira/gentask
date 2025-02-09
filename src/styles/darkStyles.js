@@ -485,10 +485,11 @@ const darkStyles = StyleSheet.create({
     calendarBackground: "#121212",
     textSectionTitleColor: "#b6c1cd",
     selectedDayBackgroundColor: "#00adf5",
-    selectedDayTextColor: "#ffffff",
+    selectedDayTextColor: "#fff",
     todayTextColor: "#00adf5",
-    dayTextColor: "#ffffff",
+    dayTextColor: "#fff",
     textDisabledColor: "#666666",
+    monthTextColor: "#fff",
   },
   taskControlScroll: {
     justifyContent: "center",

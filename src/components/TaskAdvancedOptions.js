@@ -116,9 +116,7 @@ function TaskAdvancedOptions(props) {
                     if (props.isTaskUrgent === null) {
                       props.setTaskUrgent(false);
                     } else {
-                      animateToggleSwitch(
-                        toggleSwitchAnimation,
-                        0,
+                      animateToggleSwitch(toggleSwitchAnimation, 0, () =>
                         props.setTaskUrgent(null)
                       );
                     }
@@ -139,21 +137,16 @@ function TaskAdvancedOptions(props) {
                       props.isTaskUrgent === null ||
                       props.isTaskUrgent === false
                     ) {
-                      animateToggleSwitch(
-                        toggleSwitchAnimation,
-                        1,
+                      animateToggleSwitch(toggleSwitchAnimation, 1, () =>
                         props.setTaskUrgent(true)
                       );
                     } else if (props.isTaskUrgent === true) {
-                      animateToggleSwitch(
-                        toggleSwitchAnimation,
-                        0,
+                      animateToggleSwitch(toggleSwitchAnimation, 0, () =>
                         props.setTaskUrgent(false)
                       );
                     }
                   }}
                 >
-                  {/* Bug conhecido: background do switch com mal-funcionamento */}
                   <Animated.View
                     style={[
                       styles.toggleSwitchContainer,

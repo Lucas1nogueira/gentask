@@ -488,6 +488,7 @@ const lightStyles = StyleSheet.create({
     todayTextColor: "#01597f",
     dayTextColor: "#000",
     textDisabledColor: "#8e8d8d",
+    monthTextColor: "#000",
   },
   taskControlScroll: {
     justifyContent: "center",
