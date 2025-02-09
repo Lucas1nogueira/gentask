@@ -22,6 +22,7 @@ function AppPreConfig() {
   const { isLoading, styles } = useContext(ThemeContext);
 
   const [user, setUser] = useState(null);
+  const [didAuthLoad, setAuthLoad] = useState(false);
 
   useEffect(() => {
     if (styles) {
@@ -32,19 +33,18 @@ function AppPreConfig() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        setUser(false);
-      }
+      setUser(user);
+      setAuthLoad(true);
     });
 
     return () => unsubscribe();
   }, []);
 
   useEffect(() => {
-    if ((loaded || error) && !isLoading && user !== null) {
+    if ((loaded || error) && !isLoading && didAuthLoad) {
       SplashScreen.hideAsync();
     }
-  }, [loaded, error, isLoading, user]);
+  }, [loaded, error, isLoading, didAuthLoad]);
 
   if (!loaded && !error) {
     return null;

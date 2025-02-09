@@ -1,5 +1,6 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Animated,
   Image,
   KeyboardAvoidingView,
@@ -50,36 +51,20 @@ function AuthScreen() {
   const [email, onChangeEmail] = useState("");
   const [password, onChangePassword] = useState("");
   const [confirmPassword, onChangeConfirmPassword] = useState("");
+  const [isLoading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [warningMessage, setWarningMessage] = useState("");
 
   const [popups, setPopups] = useState({
     error: false,
-    loading: false,
     warning: false,
   });
 
   const [popupAnimations] = useState({
     error: new Animated.Value(0),
-    loading: new Animated.Value(0),
-    loadingRight: new Animated.Value(0),
     warning: new Animated.Value(0),
     warningRight: new Animated.Value(0),
   });
-
-  useEffect(() => {
-    if (popups.loading === true) {
-      setTimeout(() => {
-        animateClosing(popupAnimations["loading"], () =>
-          setPopups((prevState) => ({
-            ...prevState,
-            loading: false,
-          }))
-        );
-        animateSlideOut(popupAnimations["loadingRight"]);
-      }, 500);
-    }
-  }, [popups.loading]);
 
   return (
     <View style={styles.container}>
@@ -98,14 +83,6 @@ function AuthScreen() {
             animateSlideOut(authConfirmPopupAnimations["logoutRight"]);
           }}
           message={authConfirmMessage}
-        />
-      )}
-      {popups.loading && (
-        <MinimalPopup
-          loading={true}
-          opacityAnimation={popupAnimations.loading}
-          rightAnimation={popupAnimations.loadingRight}
-          message="Por favor, aguarde..."
         />
       )}
       {popups.error && (
@@ -266,7 +243,7 @@ function AuthScreen() {
               />
             </Animated.View>
           )}
-          <Animated.View
+          <View
             style={{
               width: "100%",
               flexDirection: "column",
@@ -274,7 +251,11 @@ function AuthScreen() {
             }}
           >
             <TouchableOpacity
-              style={styles.authConfirmButton}
+              style={[
+                styles.authConfirmButton,
+                isLoading && styles.authConfirmButtonLoading,
+              ]}
+              disabled={isLoading}
               onPress={() => {
                 if (authMode === "signIn") {
                   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -282,12 +263,7 @@ function AuthScreen() {
                   } else if (password.length === 0) {
                     setWarningMessage("Por favor, insira a senha!");
                   } else {
-                    setPopups((prevState) => ({
-                      ...prevState,
-                      loading: true,
-                    }));
-                    animateOpening(popupAnimations["loading"]);
-                    animateSlideIn(popupAnimations["loadingRight"]);
+                    setLoading(true);
                     signIn(email, password)
                       .then(() => {
                         setAuthConfirmMessage("Logado com sucesso!");
@@ -301,6 +277,7 @@ function AuthScreen() {
                         );
                       })
                       .catch((error) => {
+                        setLoading(false);
                         setErrorMessage(
                           `Não foi possível fazer login!\n${error.message}`
                         );
@@ -318,7 +295,7 @@ function AuthScreen() {
                   }));
                   animateOpening(popupAnimations["warning"]);
                   animateSlideIn(popupAnimations["warningRight"]);
-                } else {
+                } else if (authMode === "signUp") {
                   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
                     setWarningMessage("Por favor, digite um e-mail válido!");
                   } else if (password.length < 6) {
@@ -326,6 +303,7 @@ function AuthScreen() {
                   } else if (password !== confirmPassword) {
                     setWarningMessage("As senhas não correspondem!");
                   } else {
+                    setLoading(true);
                     signUp(email, password)
                       .then(() => {
                         setAuthConfirmMessage("Cadastrado com sucesso!");
@@ -339,6 +317,7 @@ function AuthScreen() {
                         );
                       })
                       .catch((error) => {
+                        setLoading(false);
                         setErrorMessage(
                           `Não foi possível fazer o cadastro!\n${error.message}`
                         );
@@ -359,9 +338,15 @@ function AuthScreen() {
                 }
               }}
             >
-              <Entypo name="login" size={24} color="white" />
+              {!isLoading ? (
+                <Entypo name="login" size={24} color="white" />
+              ) : (
+                <ActivityIndicator color="white" />
+              )}
               <Text style={[styles.text, { color: "white", paddingLeft: 7 }]}>
-                {authMode === "signIn"
+                {isLoading
+                  ? "Carregando..."
+                  : authMode === "signIn"
                   ? "Entrar"
                   : authMode === "signUp" && "Cadastrar"}
               </Text>
@@ -388,7 +373,7 @@ function AuthScreen() {
                   : authMode === "signUp" && "Já possui acesso? Faça login."}
               </Text>
             </TouchableOpacity>
-          </Animated.View>
+          </View>
         </Animated.View>
       </KeyboardAvoidingView>
       <StatusBar

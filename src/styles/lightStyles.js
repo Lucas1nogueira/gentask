@@ -65,6 +65,9 @@ const lightStyles = StyleSheet.create({
     backgroundColor: "#34A853",
     paddingHorizontal: 10,
   },
+  authConfirmButtonLoading: {
+    backgroundColor: "#777",
+  },
   authTipText: {
     fontFamily: "ReadexPro-Regular",
     color: "#111",

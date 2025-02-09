@@ -65,6 +65,9 @@ const darkStyles = StyleSheet.create({
     backgroundColor: "#34A853",
     paddingHorizontal: 10,
   },
+  authConfirmButtonLoading: {
+    backgroundColor: "#444",
+  },
   authTipText: {
     fontFamily: "ReadexPro-Regular",
     color: "#fff",
