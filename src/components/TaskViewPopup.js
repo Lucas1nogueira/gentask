@@ -107,7 +107,7 @@ function TaskViewPopup(props) {
           }, 500);
           modifyTask(taskId, task).catch(() => {
             props.setErrorMessage(
-              "Não foi possível salvar a tarefa na nuvem!\nA tarefa foi salva localmente."
+              "Não foi possível atualizar a tarefa na nuvem!\nA tarefa foi modificada localmente."
             );
             props.openErrorPopup();
           });

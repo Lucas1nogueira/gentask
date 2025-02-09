@@ -10,7 +10,7 @@ import { AntDesign, MaterialIcons, Octicons } from "@expo/vector-icons";
 import { ThemeContext } from "../contexts/ThemeContext";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
-const SCROLL_INITIAL_POSITION = SCREEN_WIDTH / 6 + 2;
+const SCROLL_INITIAL_POSITION = SCREEN_WIDTH / 6 + 2.5;
 
 function Task(props) {
   const { styles } = useContext(ThemeContext);

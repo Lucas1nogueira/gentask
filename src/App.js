@@ -32,12 +32,24 @@ function AppPreConfig() {
   }, [styles]);
 
   useEffect(() => {
+    let isMounted = true;
+    let initialCheck = false;
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+      if (isMounted) {
+        setUser(user);
+        if (!initialCheck) {
+          setAuthLoad(true);
+          initialCheck = true;
+        }
+      }
       setAuthLoad(true);
     });
 
-    return () => unsubscribe();
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -52,7 +64,7 @@ function AppPreConfig() {
 
   return (
     <AuthConfirmMessagesProvider>
-      {!user ? <AuthScreen /> : <HomeScreen />}
+      {!didAuthLoad ? <AuthScreen /> : <HomeScreen />}
     </AuthConfirmMessagesProvider>
   );
 }

@@ -29,7 +29,7 @@ export async function modifyTask(id, task) {
   }
 }
 
-export async function getTasks() {
+export async function fetchTasks() {
   try {
     const user = getCurrentUser();
     const tasksRef = collection(db, "users", user.uid, "tasks");
@@ -44,24 +44,22 @@ export async function getTasks() {
   }
 }
 
-export async function deleteTask(taskId) {
+export async function deleteTask(id) {
   try {
     const user = getCurrentUser();
-    const taskRef = doc(db, "users", user.uid, "tasks", taskId);
+    const taskRef = doc(db, "users", user.uid, "tasks", id);
     await deleteDoc(taskRef);
   } catch (error) {
     throw new Error(`Error deleting task: ${error.message}`);
   }
 }
 
-export async function eraseTasks() {
+export async function purgeTasks() {
   try {
     const user = getCurrentUser();
     const tasksRef = collection(db, "users", user.uid, "tasks");
     const querySnapshot = await getDocs(tasksRef);
-    const deletions = querySnapshot.docs.map((doc) =>
-      deleteDoc(doc(db, "users", user.uid, "tasks", doc.id))
-    );
+    const deletions = querySnapshot.docs.map((doc) => deleteDoc(doc.ref));
     await Promise.all(deletions);
   } catch (error) {
     throw new Error(`Error erasing tasks: ${error.message}`);

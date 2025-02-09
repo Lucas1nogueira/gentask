@@ -1,7 +1,14 @@
 import { useRef, useState, useEffect, useContext } from "react";
-import { View, Animated, BackHandler, Alert } from "react-native";
+import { View, Animated, BackHandler } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { eraseData, getData, storeData } from "../services/storage";
+import { eraseTasks, getTasks, storeTasks } from "../services/storage";
+import { logout } from "../services/firebase/auth";
+import {
+  deleteTask,
+  fetchTasks,
+  modifyTask,
+  purgeTasks,
+} from "../services/firebase/firestore";
 import { ThemeContext } from "../contexts/ThemeContext";
 import { AuthConfirmMessagesContext } from "../contexts/AuthConfirmMessagesContext";
 import Menu from "../components/Menu";
@@ -22,7 +29,6 @@ import {
   animateSlideIn,
   animateSlideOut,
 } from "../utils/animationUtils";
-import { logout } from "../services/firebase/auth";
 
 function HomeScreen() {
   const { styles } = useContext(ThemeContext);
@@ -112,16 +118,28 @@ function HomeScreen() {
   }, []);
 
   useEffect(() => {
-    getData().then((data) => {
-      if (data) setTasks(data);
-      didFetch.current = true;
-      setTasksLoad(true);
-    });
+    fetchTasks()
+      .then((data) => {
+        eraseTasks().then(() => {
+          if (data) {
+            setTasks(data);
+            didFetch.current = true;
+            setTasksLoad(true);
+          }
+        });
+      })
+      .catch(() => {
+        getTasks().then((data) => {
+          if (data) setTasks(data);
+          didFetch.current = true;
+          setTasksLoad(true);
+        });
+      });
   }, []);
 
   useEffect(() => {
     if (didFetch.current) {
-      storeData(tasks);
+      storeTasks(tasks);
     }
   }, [tasks]);
 
@@ -386,6 +404,16 @@ function HomeScreen() {
               }));
               animateOpening(popupAnimations["success"]);
               animateSlideIn(popupAnimations["successRight"]);
+              deleteTask(selectedTaskId).catch(() => {
+                setErrorMessage(
+                  "Não foi possível atualizar a tarefa na nuvem!\nA tarefa foi modificada localmente."
+                );
+                setPopups((prevState) => ({
+                  ...prevState,
+                  error: true,
+                }));
+                animateOpening(popupAnimations["error"]);
+              });
             }}
           />
         </Animated.View>
@@ -454,15 +482,15 @@ function HomeScreen() {
               }));
               animateOpening(popupAnimations["loading"]);
               animateSlideIn(popupAnimations["loadingRight"]);
-              eraseData().then((wasDataErased) => {
-                animateClosing(popupAnimations["loading"], () =>
-                  setPopups((prevState) => ({
-                    ...prevState,
-                    loading: false,
-                  }))
-                );
-                animateSlideOut(popupAnimations["loadingRight"]);
-                if (wasDataErased) {
+              eraseTasks()
+                .then(() => {
+                  animateClosing(popupAnimations["loading"], () =>
+                    setPopups((prevState) => ({
+                      ...prevState,
+                      loading: false,
+                    }))
+                  );
+                  animateSlideOut(popupAnimations["loadingRight"]);
                   setTasks(null);
                   setSortedTasks(null);
                   setFoundTasks(null);
@@ -474,13 +502,27 @@ function HomeScreen() {
                   }));
                   animateOpening(popupAnimations["success"]);
                   animateSlideIn(popupAnimations["successRight"]);
-                } else {
-                  Alert.alert(
-                    "Erro",
-                    "Ocorreu um erro ao limpar tarefas. Por favor, contate o desenvolvedor!"
+                  purgeTasks().catch(() => {
+                    setErrorMessage(
+                      "Não foi possível limpar as tarefas na nuvem!\nPor favor, contate o desenvolvedor."
+                    );
+                    setPopups((prevState) => ({
+                      ...prevState,
+                      error: true,
+                    }));
+                    animateOpening(popupAnimations["error"]);
+                  });
+                })
+                .catch(() => {
+                  setErrorMessage(
+                    "Não foi possível limpar as tarefas no dispositivo!\nPor favor, contate o desenvolvedor."
                   );
-                }
-              });
+                  setPopups((prevState) => ({
+                    ...prevState,
+                    error: true,
+                  }));
+                  animateOpening(popupAnimations["error"]);
+                });
             }}
           />
         </Animated.View>
@@ -747,6 +789,17 @@ function HomeScreen() {
             updatedTasks[taskId].isCompleted =
               !updatedTasks[taskId].isCompleted;
             setTasks(updatedTasks);
+            const updatedTask = updatedTasks[taskId];
+            modifyTask(taskId, updatedTask).catch(() => {
+              setErrorMessage(
+                "Não foi possível atualizar a tarefa na nuvem!\nA tarefa foi modificada localmente."
+              );
+              setPopups((prevState) => ({
+                ...prevState,
+                error: true,
+              }));
+              animateOpening(popupAnimations["error"]);
+            });
           }
         }}
         isTaskAnalysisButtonActive={tasks && Object.keys(tasks).length !== 0}
