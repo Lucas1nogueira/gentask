@@ -10,6 +10,7 @@ import {
 import "react-native-get-random-values";
 import { v4 as uuidv4 } from "uuid";
 import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { addTask } from "../services/firebase/firestore";
 import { categorizeTask } from "../services/geminiService";
 import { animateClosing, animateOpening } from "../utils/animationUtils";
 import { ThemeContext } from "../contexts/ThemeContext";
@@ -88,6 +89,12 @@ function TaskCreationPopup(props) {
         setTimeout(() => {
           props.openSuccessPopup();
         }, 500);
+        addTask(id, task).catch(() => {
+          props.setErrorMessage(
+            "Não foi possível salvar a tarefa na nuvem!\nA tarefa foi salva localmente."
+          );
+          props.openErrorPopup();
+        });
       }
     );
     props.close();

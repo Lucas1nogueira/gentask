@@ -1,28 +1,28 @@
 import { db } from "./firebaseConfig";
 import {
   collection,
-  addDoc,
   getDocs,
   updateDoc,
   deleteDoc,
   doc,
+  setDoc,
 } from "firebase/firestore";
 import { getCurrentUser } from "./auth";
 
-export async function addTask(task) {
+export async function addTask(id, task) {
   try {
     const user = getCurrentUser();
-    const tasksRef = collection(db, "users", user.uid, "tasks");
-    await addDoc(tasksRef, task);
+    const tasksRef = doc(db, "users", user.uid, "tasks", id);
+    await setDoc(tasksRef, task);
   } catch (error) {
     throw new Error(`Error adding task: ${error.message}`);
   }
 }
 
-export async function updateTask(taskId, task) {
+export async function modifyTask(id, task) {
   try {
     const user = getCurrentUser();
-    const taskRef = doc(db, "users", user.uid, "tasks", taskId);
+    const taskRef = doc(db, "users", user.uid, "tasks", id);
     await updateDoc(taskRef, task);
   } catch (error) {
     throw new Error(`Error updating task: ${error.message}`);

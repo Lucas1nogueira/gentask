@@ -270,6 +270,14 @@ function HomeScreen() {
               animateOpening(popupAnimations["noText"]);
               animateSlideIn(popupAnimations["noTextRight"]);
             }}
+            setErrorMessage={setErrorMessage}
+            openErrorPopup={() => {
+              setPopups((prevState) => ({
+                ...prevState,
+                error: true,
+              }));
+              animateOpening(popupAnimations["error"]);
+            }}
             tasks={tasks}
             selectedTaskId={selectedTaskId}
             selectedTask={tasks[selectedTaskId]}
@@ -333,6 +341,14 @@ function HomeScreen() {
               }));
               animateOpening(popupAnimations["noText"]);
               animateSlideIn(popupAnimations["noTextRight"]);
+            }}
+            setErrorMessage={setErrorMessage}
+            openErrorPopup={() => {
+              setPopups((prevState) => ({
+                ...prevState,
+                error: true,
+              }));
+              animateOpening(popupAnimations["error"]);
             }}
             isAnyTaskCreated={tasks != null}
             setTasks={setTasks}

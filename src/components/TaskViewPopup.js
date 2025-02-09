@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { modifyTask } from "../services/firebase/firestore";
 import { categorizeTask } from "../services/geminiService";
 import { animateClosing, animateOpening } from "../utils/animationUtils";
 import { ThemeContext } from "../contexts/ThemeContext";
@@ -104,6 +105,12 @@ function TaskViewPopup(props) {
           setTimeout(() => {
             props.openSuccessPopup();
           }, 500);
+          modifyTask(taskId, task).catch(() => {
+            props.setErrorMessage(
+              "Não foi possível salvar a tarefa na nuvem!\nA tarefa foi salva localmente."
+            );
+            props.openErrorPopup();
+          });
         }
       );
     }
