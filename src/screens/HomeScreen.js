@@ -120,20 +120,30 @@ function HomeScreen() {
   useEffect(() => {
     fetchTasks()
       .then((data) => {
-        eraseTasks().then(() => {
-          if (data) {
-            setTasks(data);
-            didFetch.current = true;
-            setTasksLoad(true);
-          }
-        });
+        if (data && Object.keys(data).length !== 0) {
+          eraseTasks().then(() => {
+            if (data) {
+              setTasks(data);
+            }
+          });
+        }
       })
       .catch(() => {
-        getTasks().then((data) => {
-          if (data) setTasks(data);
-          didFetch.current = true;
-          setTasksLoad(true);
-        });
+        setErrorMessage("Não foi possível carregar as tarefas da nuvem!");
+        setPopups((prevState) => ({
+          ...prevState,
+          error: true,
+        }));
+        animateOpening(popupAnimations["error"]);
+      })
+      .finally(() => {
+        if (!tasks) {
+          getTasks().then((data) => {
+            if (data) setTasks(data);
+          });
+        }
+        didFetch.current = true;
+        setTasksLoad(true);
       });
   }, []);
 

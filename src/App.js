@@ -64,7 +64,7 @@ function AppPreConfig() {
 
   return (
     <AuthConfirmMessagesProvider>
-      {!didAuthLoad ? <AuthScreen /> : <HomeScreen />}
+      {!user ? <AuthScreen /> : <HomeScreen />}
     </AuthConfirmMessagesProvider>
   );
 }
