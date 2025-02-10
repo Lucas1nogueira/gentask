@@ -6,6 +6,7 @@ import {
   getTask,
   modifyTask,
 } from "./firebase/firestore";
+import NetInfo from "@react-native-community/netinfo";
 
 const TASKS_STORAGE_KEY = "@myTasks:tasks";
 const OFFLINE_TASKS_STORAGE_KEY = "@myTasks:offlineTasks";
@@ -96,7 +97,7 @@ export async function storeOfflineTask(id, task) {
       JSON.stringify(offlineTasksObject)
     );
   } catch (error) {
-    console.error(`Error saving data: ${error}`);
+    console.error(`Error storing offline task ${id}: ${error}`);
   }
 }
 
@@ -115,7 +116,7 @@ export async function storeDeletedOfflineTask(id, task) {
       JSON.stringify(deletedOfflineTasksObject)
     );
   } catch (error) {
-    console.error(`Error saving data: ${error}`);
+    console.error(`Error storing offline deleted task ${id}: ${error}`);
   }
 }
 
@@ -142,7 +143,22 @@ export async function getTasks() {
 }
 
 export async function eraseTasks() {
+  const netState = await NetInfo.fetch();
+  const tasks = await getTasks();
+
   try {
+    if (!netState.isConnected && tasks && Object.keys(tasks).length > 0) {
+      for (const [id, task] of Object.entries(tasks)) {
+        try {
+          await storeDeletedOfflineTask(id, task);
+        } catch (error) {
+          console.error(
+            `Error preparing to store offline deleted task ${id}: ${error}`
+          );
+        }
+      }
+    }
+
     await AsyncStorage.removeItem(TASKS_STORAGE_KEY);
   } catch (error) {
     console.error(`Error erasing data ${error}`);
