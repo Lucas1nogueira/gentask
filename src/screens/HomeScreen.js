@@ -1,7 +1,13 @@
 import { useRef, useState, useEffect, useContext } from "react";
 import { View, Animated, BackHandler } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { eraseTasks, getTasks, storeTasks } from "../services/storage";
+import NetInfo from "@react-native-community/netinfo";
+import {
+  eraseTasks,
+  getTasks,
+  storeTasks,
+  syncOfflineTasks,
+} from "../services/storage";
 import { logout } from "../services/firebase/auth";
 import {
   deleteTask,
@@ -117,34 +123,40 @@ function HomeScreen() {
     return () => backHandler.remove();
   }, []);
 
+  async function checkConnection() {
+    const netState = await NetInfo.fetch();
+    return netState.isConnected;
+  }
+
   useEffect(() => {
-    fetchTasks()
-      .then((data) => {
-        if (data && Object.keys(data).length !== 0) {
-          eraseTasks().then(() => {
+    checkConnection().then(async (isConnected) => {
+      if (isConnected) {
+        await syncOfflineTasks();
+      }
+      fetchTasks()
+        .then(async (data) => {
+          if (isConnected) {
+            await eraseTasks();
             if (data) {
               setTasks(data);
             }
-          });
-        }
-      })
-      .catch(() => {
-        setErrorMessage("Não foi possível carregar as tarefas da nuvem!");
-        setPopups((prevState) => ({
-          ...prevState,
-          error: true,
-        }));
-        animateOpening(popupAnimations["error"]);
-      })
-      .finally(() => {
-        if (!tasks) {
-          getTasks().then((data) => {
-            if (data) setTasks(data);
-          });
-        }
-        didFetch.current = true;
-        setTasksLoad(true);
-      });
+          }
+        })
+        .catch(() => {
+          setErrorMessage("Não foi possível carregar as tarefas da nuvem!");
+          setPopups((prevState) => ({
+            ...prevState,
+            error: true,
+          }));
+          animateOpening(popupAnimations["error"]);
+        })
+        .finally(async () => {
+          const localData = await getTasks();
+          if (localData) setTasks(localData);
+          didFetch.current = true;
+          setTasksLoad(true);
+        });
+    });
   }, []);
 
   useEffect(() => {
@@ -404,6 +416,7 @@ function HomeScreen() {
             actionName={"Deletar"}
             action={() => {
               const updatedTasks = { ...tasks };
+              const deletedTask = updatedTasks[selectedTaskId];
               delete updatedTasks[selectedTaskId];
               setTasks(updatedTasks);
               setSelectedTaskId(null);
@@ -414,7 +427,7 @@ function HomeScreen() {
               }));
               animateOpening(popupAnimations["success"]);
               animateSlideIn(popupAnimations["successRight"]);
-              deleteTask(selectedTaskId).catch(() => {
+              deleteTask(selectedTaskId, deletedTask).catch(() => {
                 setErrorMessage(
                   "Não foi possível atualizar a tarefa na nuvem!\nA tarefa foi modificada localmente."
                 );
@@ -795,11 +808,12 @@ function HomeScreen() {
         }}
         checkCompleted={(taskId) => {
           const updatedTasks = { ...tasks };
-          if (updatedTasks[taskId]) {
-            updatedTasks[taskId].isCompleted =
-              !updatedTasks[taskId].isCompleted;
+          const updatedTask = updatedTasks[taskId];
+          if (updatedTask) {
+            updatedTask.isCompleted = !updatedTask.isCompleted;
+            updatedTask.updatedAt = Date.now();
+            updatedTasks[taskId] = updatedTask;
             setTasks(updatedTasks);
-            const updatedTask = updatedTasks[taskId];
             modifyTask(taskId, updatedTask).catch(() => {
               setErrorMessage(
                 "Não foi possível atualizar a tarefa na nuvem!\nA tarefa foi modificada localmente."

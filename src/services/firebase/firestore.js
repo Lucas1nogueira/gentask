@@ -6,21 +6,71 @@ import {
   deleteDoc,
   doc,
   setDoc,
+  getDoc,
 } from "firebase/firestore";
+import NetInfo from "@react-native-community/netinfo";
 import { getCurrentUser } from "./auth";
+import { storeDeletedOfflineTask, storeOfflineTask } from "../storage";
 
-export async function addTask(id, task) {
+async function handleOfflineData(id, task, wasDeleted) {
+  const netState = await NetInfo.fetch();
+  if (!netState.isConnected) {
+    try {
+      if (!wasDeleted) {
+        storeOfflineTask(id, task);
+      } else {
+        storeDeletedOfflineTask(id, task);
+      }
+    } catch (error) {
+      throw new Error(`Error handling offline task: ${error.message}`);
+    }
+  }
+}
+
+export async function getTask(id) {
   try {
     const user = getCurrentUser();
-    const tasksRef = doc(db, "users", user.uid, "tasks", id);
-    await setDoc(tasksRef, task);
+    const taskRef = doc(db, "users", user.uid, "tasks", id);
+    const docSnapshot = await getDoc(taskRef);
+    return docSnapshot.exists()
+      ? { id: docSnapshot.id, ...docSnapshot.data() }
+      : null;
+  } catch (error) {
+    throw new Error(`Error getting task: ${error.message}`);
+  }
+}
+
+export async function getDeletedTask(id) {
+  try {
+    const user = getCurrentUser();
+    const taskRef = doc(db, "users", user.uid, "deletedTasks", id);
+    const docSnapshot = await getDoc(taskRef);
+    return docSnapshot.exists()
+      ? { id: docSnapshot.id, ...docSnapshot.data() }
+      : null;
+  } catch (error) {
+    throw new Error(`Error getting deleted task: ${error.message}`);
+  }
+}
+
+export async function addTask(id, task, disableHandleOffline) {
+  try {
+    if (!disableHandleOffline) {
+      handleOfflineData(id, task, false);
+    }
+    const user = getCurrentUser();
+    const taskRef = doc(db, "users", user.uid, "tasks", id);
+    await setDoc(taskRef, task);
   } catch (error) {
     throw new Error(`Error adding task: ${error.message}`);
   }
 }
 
-export async function modifyTask(id, task) {
+export async function modifyTask(id, task, disableHandleOffline) {
   try {
+    if (!disableHandleOffline) {
+      handleOfflineData(id, task, false);
+    }
     const user = getCurrentUser();
     const taskRef = doc(db, "users", user.uid, "tasks", id);
     await updateDoc(taskRef, task);
@@ -44,11 +94,16 @@ export async function fetchTasks() {
   }
 }
 
-export async function deleteTask(id) {
+export async function deleteTask(id, task, disableHandleOffline) {
   try {
+    if (!disableHandleOffline) {
+      handleOfflineData(id, task, true);
+    }
     const user = getCurrentUser();
     const taskRef = doc(db, "users", user.uid, "tasks", id);
+    const deletedTaskRef = doc(db, "users", user.uid, "deletedTasks", id);
     await deleteDoc(taskRef);
+    await setDoc(deletedTaskRef, task);
   } catch (error) {
     throw new Error(`Error deleting task: ${error.message}`);
   }
