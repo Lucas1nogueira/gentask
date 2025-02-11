@@ -53,7 +53,7 @@ function TaskAnalysisPopup(props) {
           setAnalysisLoad(true);
         } else if (result === null) {
           setErrorMessage(
-            "Não foram encontradas mensagens com data prevista para o período selecionado!"
+            "Não foram encontradas tarefas pendentes com data prevista para o período selecionado!"
           );
           setAnalysisLoad(false);
         } else if (result === false) {

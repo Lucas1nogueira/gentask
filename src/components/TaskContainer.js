@@ -5,6 +5,7 @@ import {
   Platform,
   Pressable,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -49,6 +50,7 @@ function TaskContainer(props) {
         <View
           style={{
             width: "100%",
+            height: Platform.OS === "web" ? "86%" : "89.5%",
             maxHeight: Platform.OS === "web" ? "86%" : "89.5%",
             borderRadius: 15,
             overflow: "hidden",
@@ -58,8 +60,8 @@ function TaskContainer(props) {
           {!showTasks ? (
             <View
               style={{
-                width: "100%",
-                height: "100%",
+                minWidth: "100%",
+                minHeight: "100%",
                 flexDirection: "row",
                 justifyContent: "center",
                 alignItems: "center",
@@ -95,7 +97,17 @@ function TaskContainer(props) {
               )}
             />
           ) : (
-            <Text style={styles.text}>{props.emptyMessage}</Text>
+            <View
+              style={{
+                minWidth: "100%",
+                minHeight: "100%",
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text style={styles.text}>{props.emptyMessage}</Text>
+            </View>
           )}
         </View>
         <View
@@ -106,11 +118,46 @@ function TaskContainer(props) {
             justifyContent: "flex-end",
           }}
         >
-          <TaskAnalysisButton
-            isActive={props.isTaskAnalysisButtonActive}
-            openWeeklyTaskAnalysis={() => props.openWeeklyTaskAnalysis()}
-            openMonthlyTaskAnalysis={() => props.openMonthlyTaskAnalysis()}
-          />
+          {Platform.OS === "web" ? (
+            props.isTaskAnalysisButtonActive && (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <TouchableOpacity
+                  onPress={() => props.openWeeklyTaskAnalysis()}
+                >
+                  <View style={styles.webTaskAnalysisButton}>
+                    <MaterialIcons
+                      name="view-week"
+                      size={20}
+                      color={styles.icon.color}
+                    />
+                    <Text style={[styles.text, { paddingLeft: 3 }]}>
+                      Ajuda para a semana
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => props.openMonthlyTaskAnalysis()}
+                >
+                  <View style={styles.webTaskAnalysisButton}>
+                    <MaterialIcons
+                      name="calendar-month"
+                      size={20}
+                      color={styles.icon.color}
+                    />
+                    <Text style={[styles.text, { paddingLeft: 3 }]}>
+                      Ajuda para o mês
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            )
+          ) : (
+            <TaskAnalysisButton
+              isActive={props.isTaskAnalysisButtonActive}
+              openWeeklyTaskAnalysis={() => props.openWeeklyTaskAnalysis()}
+              openMonthlyTaskAnalysis={() => props.openMonthlyTaskAnalysis()}
+            />
+          )}
           <Pressable
             style={[
               styles.addTaskButton,

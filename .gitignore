@@ -37,8 +37,5 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-# app
-app.json
-
 # eas
 eas.json
