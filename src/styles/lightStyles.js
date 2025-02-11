@@ -82,8 +82,8 @@ const lightStyles = StyleSheet.create({
     zIndex: 1,
   },
   menuLeft: {
-    width: "60%",
-    height: "100%",
+    width: 250,
+    height: screenHeight,
     backgroundColor: "#eaeaea",
     borderRightWidth: 1,
     borderRightColor: "#555",
@@ -118,7 +118,7 @@ const lightStyles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     alignSelf: "center",
-    paddingHorizontal: 22,
+    paddingHorizontal: 17,
   },
   categorySelectionButton: {
     height: 40,
@@ -135,7 +135,7 @@ const lightStyles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 15,
   },
   searchbar: {
     width: "100%",
@@ -147,7 +147,7 @@ const lightStyles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   taskContainer: {
-    width: "92%",
+    width: "100%",
     height: screenHeight - 143,
     marginTop: 10,
     alignSelf: "center",
@@ -361,10 +361,10 @@ const lightStyles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   cancelButton: {
-    backgroundColor: "#fc6c6c",
+    backgroundColor: "#d83636",
   },
   confirmButton: {
-    backgroundColor: "#60cfff",
+    backgroundColor: "#38ade0",
   },
   confirmBigButton: {
     width: "100%",
@@ -377,7 +377,7 @@ const lightStyles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     borderColor: "#d6d6d6",
-    backgroundColor: "#60cfff",
+    backgroundColor: "#38ade0",
     paddingHorizontal: 10,
   },
   messagePopup: {
@@ -452,6 +452,28 @@ const lightStyles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: "#ededed",
     paddingHorizontal: 15,
+  },
+  pickerRoundOptionsRow: {
+    width: "100%",
+    marginTop: 20,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+  },
+  pickerRoundOption: {
+    width: 80,
+    height: 80,
+    marginRight: 10,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#d1d1d1",
+    padding: 5,
+  },
+  selectedPickerRoundOption: {
+    backgroundColor: "#bfbfbf",
+    borderWidth: 1,
+    borderColor: "#777",
   },
   expandableSelection: {
     width: "100%",

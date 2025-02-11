@@ -51,8 +51,8 @@ function MessagePopup(props) {
                 alignItems: "center",
               }}
             >
-              <AntDesign name="back" size={20} color={styles.icon.color} />
-              <Text style={styles.text}>Voltar</Text>
+              <AntDesign name="back" size={20} color="white" />
+              <Text style={[styles.text, { color: "white" }]}>Voltar</Text>
             </View>
           </TouchableOpacity>
           {!props.error && (
@@ -80,9 +80,11 @@ function MessagePopup(props) {
                       : "checkmark"
                   }
                   size={20}
-                  color={styles.icon.color}
+                  color="white"
                 />
-                <Text style={styles.text}>{props.actionName}</Text>
+                <Text style={[styles.text, { color: "white" }]}>
+                  {props.actionName}
+                </Text>
               </View>
             </TouchableOpacity>
           )}

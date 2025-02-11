@@ -1,5 +1,10 @@
-import { initializeApp } from "firebase/app";
-import { initializeAuth, getReactNativePersistence } from "firebase/auth";
+import { Platform } from "react-native";
+import { getApp, getApps, initializeApp } from "firebase/app";
+import {
+  initializeAuth,
+  getReactNativePersistence,
+  browserLocalPersistence,
+} from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -22,10 +27,20 @@ const firebaseConfig = {
   measurementId: MEASUREMENT_ID,
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(ReactNativeAsyncStorage),
-});
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+
+let auth;
+
+if (Platform.OS === "web") {
+  auth = initializeAuth(app, {
+    persistence: browserLocalPersistence,
+  });
+} else {
+  auth = initializeAuth(app, {
+    persistence: getReactNativePersistence(ReactNativeAsyncStorage),
+  });
+}
+
 const db = getFirestore(app);
 
 export { app, auth, db };

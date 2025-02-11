@@ -158,8 +158,8 @@ function TaskAnalysisPopup(props) {
               onPress={() => props.close()}
             >
               <>
-                <Feather name="check" size={24} color={styles.icon.color} />
-                <Text style={styles.text}>OK</Text>
+                <Feather name="check" size={24} color="white" />
+                <Text style={[styles.text, { color: "white" }]}>OK</Text>
               </>
             </TouchableOpacity>
           </View>

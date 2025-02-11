@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { BackHandler, Text, TouchableOpacity, View } from "react-native";
 import { AntDesign, FontAwesome } from "@expo/vector-icons/";
 import { ThemeContext } from "../contexts/ThemeContext";
-import PickerOption from "./PickerOption";
+import PickerRoundOption from "./PickerRoundOption";
 
 function SortPickerPopup(props) {
   const { styles } = useContext(ThemeContext);
@@ -46,27 +46,27 @@ function SortPickerPopup(props) {
           <FontAwesome name="sort" size={18} color={styles.icon.color} />
           <Text style={[styles.header, { paddingLeft: 5 }]}>Ordenar por</Text>
         </View>
-        <View style={styles.pickerOptionsList}>
-          <PickerOption
-            title="Data de criação (recentes)"
+        <View style={styles.pickerRoundOptionsRow}>
+          <PickerRoundOption
+            title="Criação (recentes)"
             iconName="sort-calendar-descending"
             action={() => setSelectedSort("created_desc")}
             selected={selectedSort === "created_desc"}
           />
-          <PickerOption
-            title="Data de criação (antigas)"
+          <PickerRoundOption
+            title="Criação (antigas)"
             iconName="sort-calendar-ascending"
             action={() => setSelectedSort("created_asc")}
             selected={selectedSort === "created_asc"}
           />
-          <PickerOption
-            title="Data de atualização (recentes)"
+          <PickerRoundOption
+            title="Mudança (recentes)"
             iconName="sort-calendar-descending"
             action={() => setSelectedSort("updated_desc")}
             selected={selectedSort === "updated_desc"}
           />
-          <PickerOption
-            title="Data de atualização (antigas)"
+          <PickerRoundOption
+            title="Mudança (antigas)"
             iconName="sort-calendar-ascending"
             action={() => setSelectedSort("updated_asc")}
             selected={selectedSort === "updated_asc"}
@@ -75,15 +75,15 @@ function SortPickerPopup(props) {
         <Text style={[styles.header, { marginTop: 20 }]}>
           Prioridade de urgência
         </Text>
-        <View style={styles.pickerOptionsList}>
-          <PickerOption
+        <View style={styles.pickerRoundOptionsRow}>
+          <PickerRoundOption
             title="Padrão"
             iconName="format-list-bulleted"
             action={() => setUrgentTasksFirst(false)}
             selected={urgentTasksFirst === false}
           />
-          <PickerOption
-            title="Urgentes primeiro"
+          <PickerRoundOption
+            title="Urgentes"
             iconName="alert"
             action={() => setUrgentTasksFirst(true)}
             selected={urgentTasksFirst === true}
@@ -92,8 +92,8 @@ function SortPickerPopup(props) {
         <Text style={[styles.header, { marginTop: 20 }]}>
           Prioridade de conclusão
         </Text>
-        <View style={styles.pickerOptionsList}>
-          <PickerOption
+        <View style={styles.pickerRoundOptionsRow}>
+          <PickerRoundOption
             title="Padrão"
             iconName="format-list-bulleted"
             action={() => {
@@ -104,8 +104,8 @@ function SortPickerPopup(props) {
               pendingTasksFirst === false && completedTasksFirst === false
             }
           />
-          <PickerOption
-            title="Pendentes primeiro"
+          <PickerRoundOption
+            title="Pendentes"
             iconName="checkbox-blank-badge-outline"
             action={() => {
               setPendingTasksFirst(true);
@@ -113,8 +113,8 @@ function SortPickerPopup(props) {
             }}
             selected={pendingTasksFirst === true}
           />
-          <PickerOption
-            title="Concluídas primeiro"
+          <PickerRoundOption
+            title="Concluídas"
             iconName="checkbox-marked-outline"
             action={() => {
               setPendingTasksFirst(false);
@@ -149,8 +149,8 @@ function SortPickerPopup(props) {
             props.close();
           }}
         >
-          <AntDesign name="check" size={24} color={styles.icon.color} />
-          <Text style={styles.text}>OK</Text>
+          <AntDesign name="check" size={24} color="white" />
+          <Text style={[styles.text, { color: "white" }]}>OK</Text>
         </TouchableOpacity>
       </View>
     </View>

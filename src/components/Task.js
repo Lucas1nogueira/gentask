@@ -1,16 +1,9 @@
 import { useContext, useEffect, useRef } from "react";
-import {
-  Dimensions,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { AntDesign, MaterialIcons, Octicons } from "@expo/vector-icons";
 import { ThemeContext } from "../contexts/ThemeContext";
 
-const SCREEN_WIDTH = Dimensions.get("window").width;
-const SCROLL_INITIAL_POSITION = SCREEN_WIDTH / 6 + 2.5;
+const SCROLL_INITIAL_POSITION = 72;
 
 function Task(props) {
   const { styles } = useContext(ThemeContext);

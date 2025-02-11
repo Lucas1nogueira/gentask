@@ -38,7 +38,15 @@ function FilteringBar(props) {
   useEffect(() => {
     if (tasksFilteredByCategory) {
       if (props.selectedSort == "created_asc") {
-        setTasksSortedByTime(tasksFilteredByCategory);
+        const sortedTasks = Object.entries(tasksFilteredByCategory)
+          .sort(([, taskA], [, taskB]) => {
+            return new Date(taskA.createdAt) - new Date(taskB.createdAt);
+          })
+          .reduce((accumulator, [taskId, task]) => {
+            accumulator[taskId] = task;
+            return accumulator;
+          }, {});
+        setTasksSortedByTime(sortedTasks);
       } else if (props.selectedSort == "created_desc") {
         const sortedTasks = Object.entries(tasksFilteredByCategory)
           .sort(([, taskA], [, taskB]) => {

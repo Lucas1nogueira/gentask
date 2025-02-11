@@ -35,6 +35,7 @@ import {
   animateSlideIn,
   animateSlideOut,
 } from "../utils/animationUtils";
+import "../styles/global.css";
 
 function HomeScreen() {
   const { styles } = useContext(ThemeContext);

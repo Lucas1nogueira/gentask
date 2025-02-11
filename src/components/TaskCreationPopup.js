@@ -222,8 +222,8 @@ function TaskCreationPopup(props) {
                 alignItems: "center",
               }}
             >
-              <AntDesign name="back" size={20} color={styles.icon.color} />
-              <Text style={styles.text}>Voltar</Text>
+              <AntDesign name="back" size={20} color="white" />
+              <Text style={[styles.text, { color: "white" }]}>Voltar</Text>
             </View>
           </TouchableOpacity>
           <TouchableOpacity
@@ -240,12 +240,8 @@ function TaskCreationPopup(props) {
                 alignItems: "center",
               }}
             >
-              <Ionicons
-                name="save-outline"
-                size={20}
-                color={styles.icon.color}
-              />
-              <Text style={styles.text}>Salvar</Text>
+              <Ionicons name="save-outline" size={20} color="white" />
+              <Text style={[styles.text, { color: "white" }]}>Salvar</Text>
             </View>
           </TouchableOpacity>
         </View>

@@ -82,8 +82,8 @@ const darkStyles = StyleSheet.create({
     zIndex: 1,
   },
   menuLeft: {
-    width: "60%",
-    height: "100%",
+    width: 250,
+    height: screenHeight,
     backgroundColor: "#000",
     borderRightWidth: 1,
     borderRightColor: "#555",
@@ -118,7 +118,7 @@ const darkStyles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     alignSelf: "center",
-    paddingHorizontal: 22,
+    paddingHorizontal: 17,
   },
   categorySelectionButton: {
     height: 40,
@@ -135,7 +135,7 @@ const darkStyles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
+    paddingHorizontal: 15,
   },
   searchbar: {
     width: "100%",
@@ -147,7 +147,7 @@ const darkStyles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   taskContainer: {
-    width: "92%",
+    width: "100%",
     height: screenHeight - 143,
     marginTop: 10,
     alignSelf: "center",
@@ -453,6 +453,28 @@ const darkStyles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: "#050505",
     paddingHorizontal: 15,
+  },
+  pickerRoundOptionsRow: {
+    width: "100%",
+    marginTop: 20,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+  },
+  pickerRoundOption: {
+    width: 80,
+    height: 80,
+    marginRight: 10,
+    borderRadius: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#333",
+    padding: 5,
+  },
+  selectedPickerRoundOption: {
+    backgroundColor: "#111",
+    borderWidth: 1,
+    borderColor: "#777",
   },
   expandableSelection: {
     width: "100%",

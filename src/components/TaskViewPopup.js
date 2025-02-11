@@ -6,6 +6,7 @@ import {
   TextInput,
   BackHandler,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { modifyTask } from "../services/firebase/firestore";
@@ -184,7 +185,10 @@ function TaskViewPopup(props) {
           <Text style={styles.header}>Visualização da tarefa</Text>
         </View>
         <TextInput
-          style={styles.taskInput}
+          style={[
+            styles.taskInput,
+            { height: Platform.OS === "web" ? 180 : 250 },
+          ]}
           multiline={true}
           textAlignVertical="top"
           defaultValue={props.selectedTask.text}
@@ -242,8 +246,8 @@ function TaskViewPopup(props) {
                 alignItems: "center",
               }}
             >
-              <AntDesign name="back" size={20} color={styles.icon.color} />
-              <Text style={styles.text}>Voltar</Text>
+              <AntDesign name="back" size={20} color="white" />
+              <Text style={[styles.text, { color: "white" }]}>Voltar</Text>
             </View>
           </TouchableOpacity>
           <TouchableOpacity
@@ -260,12 +264,8 @@ function TaskViewPopup(props) {
                 alignItems: "center",
               }}
             >
-              <Ionicons
-                name="save-outline"
-                size={20}
-                color={styles.icon.color}
-              />
-              <Text style={styles.text}>Salvar</Text>
+              <Ionicons name="save-outline" size={20} color="white" />
+              <Text style={[styles.text, { color: "white" }]}>Salvar</Text>
             </View>
           </TouchableOpacity>
         </View>
