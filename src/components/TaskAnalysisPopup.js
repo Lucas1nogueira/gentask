@@ -15,12 +15,14 @@ import {
 import { getTaskAnalysis } from "../services/geminiService";
 import { animateBlinking } from "../utils/animationUtils";
 import { ThemeContext } from "../contexts/ThemeContext";
+import Chart from "./Chart";
 
 function TaskAnalysisPopup(props) {
   const { styles } = useContext(ThemeContext);
 
   const opacityAnimation = useRef(new Animated.Value(1)).current;
 
+  const [chartData, setChartData] = useState(null);
   const [didAnalysisLoad, setAnalysisLoad] = useState(null);
   const [analysisResult, setAnalysisResult] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -47,22 +49,25 @@ function TaskAnalysisPopup(props) {
 
   useEffect(() => {
     if (props.tasks && props.taskAnalysisMode) {
-      getTaskAnalysis(props.tasks, props.taskAnalysisMode).then((result) => {
-        if (result) {
-          setAnalysisResult(result);
-          setAnalysisLoad(true);
-        } else if (result === null) {
-          setErrorMessage(
-            "Não foram encontradas tarefas pendentes com data prevista para o período selecionado!"
-          );
-          setAnalysisLoad(false);
-        } else if (result === false) {
-          setErrorMessage(
-            "Não foi possível conectar com o servidor! Por favor, verifique sua conexão e tente novamente mais tarde."
-          );
-          setAnalysisLoad(false);
+      getTaskAnalysis(props.tasks, props.taskAnalysisMode).then(
+        (analysisObject) => {
+          if (analysisObject) {
+            setChartData(analysisObject.categories);
+            setAnalysisResult(analysisObject.result);
+            setAnalysisLoad(true);
+          } else if (analysisObject === null) {
+            setErrorMessage(
+              "Não foram encontradas tarefas pendentes com data prevista para o período selecionado!"
+            );
+            setAnalysisLoad(false);
+          } else if (analysisObject === false) {
+            setErrorMessage(
+              "Não foi possível conectar com o servidor no momento! Por favor, verifique sua conexão e tente novamente mais tarde."
+            );
+            setAnalysisLoad(false);
+          }
         }
-      });
+      );
     }
   }, []);
 
@@ -77,7 +82,7 @@ function TaskAnalysisPopup(props) {
         },
       ]}
     >
-      <View style={[styles.taskPopup, { height: 500 }]}>
+      <View style={[styles.taskPopup, { height: 550 }]}>
         <View
           style={{
             marginBottom: 20,
@@ -125,17 +130,30 @@ function TaskAnalysisPopup(props) {
             }}
           >
             {didAnalysisLoad === true ? (
-              <ScrollView style={{ marginTop: 20, minHeight: "90%" }}>
-                <Text style={[styles.text, { textAlign: "justify" }]}>
-                  {analysisResult}
-                </Text>
-              </ScrollView>
+              <View
+                style={{
+                  width: "100%",
+                  height: 390,
+                  marginTop: 30,
+                  borderRadius: 20,
+                  backgroundColor: styles.taskInput.backgroundColor,
+                  padding: 15,
+                }}
+              >
+                <ScrollView style={{ minHeight: "100%" }}>
+                  <Chart data={chartData} />
+                  <Text style={[styles.text, { textAlign: "justify" }]}>
+                    {analysisResult}
+                  </Text>
+                </ScrollView>
+              </View>
             ) : (
               didAnalysisLoad === false && (
                 <View
                   style={{
                     width: "100%",
-                    height: "94%",
+                    height: 390,
+                    marginTop: 30,
                     justifyContent: "center",
                     alignItems: "center",
                   }}

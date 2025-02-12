@@ -570,6 +570,17 @@ const darkStyles = StyleSheet.create({
   switch: {
     backgroundColor: "#333",
   },
+  chartCaptionLabel: {
+    margin: 5,
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderRadius: 15,
+    borderColor: "#555",
+    backgroundColor: "#000",
+    paddingVertical: 7,
+    paddingHorizontal: 10,
+  },
   icon: {
     color: "white",
   },

@@ -24,6 +24,10 @@ const analysisPromptTemplate = `Considering the following text as personal tasks
 async function queryGemini(prePrompt, userInput) {
   const fullPrompt = `${prePrompt} ${userInput}`;
 
+  const TIMEOUT_DURATION = 15000;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_DURATION);
+
   try {
     const response = await fetch(`${API_URL}?key=${API_KEY}`, {
       method: "POST",
@@ -31,34 +35,59 @@ async function queryGemini(prePrompt, userInput) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              {
-                text: fullPrompt,
-              },
-            ],
-          },
-        ],
+        contents: [{ parts: [{ text: fullPrompt }] }],
       }),
+      signal: controller.signal,
     });
 
-    if (!response.ok) {
-      throw new Error(`Gemini error: ${response.statusText}`);
+    clearTimeout(timeoutId);
+
+    if (response.status === 204) {
+      throw new Error("No content received from API");
     }
 
-    const responseData = await response.json();
+    const textResponse = await response.text();
+    let responseData;
 
-    // Extract response content
+    try {
+      responseData = JSON.parse(textResponse);
+    } catch (error) {
+      throw new Error(
+        `Invalid JSON response: ${textResponse.slice(0, 100)}...`
+      );
+    }
+
+    if (!response.ok) {
+      const errorDetails =
+        responseData?.error?.details ||
+        responseData?.error?.message ||
+        textResponse ||
+        response.statusText;
+
+      throw new Error(`Gemini Error (${response.status}): ${errorDetails}`);
+    }
+
     const responseText =
-      responseData.candidates[0]?.content?.parts[0]?.text || "";
+      responseData.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
     if (!responseText) {
-      throw new Error("Unexpected response format from Gemini API.");
+      throw new Error("Unexpected response format from Gemini API");
     }
 
     return responseText;
   } catch (error) {
+    clearTimeout(timeoutId);
+
+    if (error.name === "AbortError") {
+      throw new Error(
+        `Timeout: Request exceeded ${TIMEOUT_DURATION / 1000} seconds`
+      );
+    }
+
+    if (error instanceof TypeError) {
+      throw new Error("Network error: Failed to connect to API");
+    }
+
     throw error;
   }
 }
@@ -73,7 +102,7 @@ async function categorizeTask(text, categoryName, isUrgent, dueDate) {
     try {
       taskCategoryName = await queryGemini(categorizingPromptTemplate, text);
     } catch (error) {
-      console.warn("Error categorizing task:", error);
+      console.error("Error categorizing task:", error);
       taskCategoryName = "Outros";
     }
   } else {
@@ -89,7 +118,7 @@ async function categorizeTask(text, categoryName, isUrgent, dueDate) {
         isTaskUrgent = isTaskUrgent.toLowerCase().trim() === "yes";
       }
     } catch (error) {
-      console.warn("Error checking task urgency:", error);
+      console.error("Error checking task urgency:", error);
       isTaskUrgent = false;
     }
   } else {
@@ -104,7 +133,7 @@ async function categorizeTask(text, categoryName, isUrgent, dueDate) {
         text
       );
     } catch (error) {
-      console.warn("Error obtaining task due date:", error);
+      console.error("Error obtaining task due date:", error);
       taskDueDate = null;
     }
   } else {
@@ -114,7 +143,7 @@ async function categorizeTask(text, categoryName, isUrgent, dueDate) {
   try {
     taskInsights = await queryGemini(insightsPromptTemplate, text);
   } catch (error) {
-    console.warn("Error obtaining task insights:", error);
+    console.error("Error obtaining task insights:", error);
     taskInsights = null;
   }
 
@@ -184,36 +213,50 @@ function isDateInCurrentMonth(timestamp) {
 }
 
 async function getTaskAnalysis(tasks, mode) {
-  let tasksForAnalysis = {};
-  let analysisResult;
+  let tasksForAnalysis = "";
+  let taskCategories = {};
 
-  if (mode === "weekly") {
-    tasksForAnalysis = Object.values(tasks)
-      .filter((task) => !task.isCompleted && isDateInCurrentWeek(task.dueDate))
-      .map((task) => task.text)
-      .join("\n");
-  } else if (mode === "monthly") {
-    tasksForAnalysis = Object.values(tasks)
-      .filter((task) => !task.isCompleted && isDateInCurrentMonth(task.dueDate))
-      .map((task) => task.text)
-      .join("\n");
-  }
+  const processCategories = (task) => {
+    const categoryName = task.categoryName;
 
-  if (!tasksForAnalysis) {
+    if (taskCategories[categoryName]) {
+      taskCategories[categoryName].count += 1;
+    } else {
+      taskCategories[categoryName] = {
+        name: categoryName,
+        color: task.categoryColor,
+        count: 1,
+      };
+    }
+  };
+
+  const filteredTasks = Object.values(tasks).filter((task) => {
+    if (task.isCompleted) return false;
+    return mode === "weekly"
+      ? isDateInCurrentWeek(task.dueDate)
+      : isDateInCurrentMonth(task.dueDate);
+  });
+
+  if (filteredTasks.length === 0) {
     return null;
   }
 
+  tasksForAnalysis = filteredTasks.map((task) => task.text).join("\n");
+  filteredTasks.forEach(processCategories);
+
   try {
-    analysisResult = await queryGemini(
+    const analysisResult = await queryGemini(
       analysisPromptTemplate,
       tasksForAnalysis
     );
+    return {
+      result: analysisResult,
+      categories: taskCategories,
+    };
   } catch (error) {
-    console.warn("Error obtaining tasks analysis:", error);
-    analysisResult = false;
+    console.error("Error obtaining tasks analysis:", error);
+    return false;
   }
-
-  return analysisResult;
 }
 
 export { categorizeTask, getTaskAnalysis };
