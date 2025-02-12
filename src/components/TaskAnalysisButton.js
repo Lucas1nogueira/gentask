@@ -36,17 +36,21 @@ function TaskAnalysisButton(props) {
 
   const top = topAnimation.interpolate({
     inputRange: [0, 1],
-    outputRange: [-120, -145],
+    outputRange: [-180, -215],
   });
+
+  function close() {
+    animateClosingDown(opacityAnimation, topAnimation, () =>
+      setTaskAnalysisMenuOpen(false)
+    );
+  }
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       () => {
         if (isTaskAnalysisMenuOpen) {
-          animateClosingDown(opacityAnimation, topAnimation, () =>
-            setTaskAnalysisMenuOpen(false)
-          );
+          close();
           return true;
         }
       }
@@ -68,7 +72,29 @@ function TaskAnalysisButton(props) {
           ]}
         >
           <View style={styles.taskAnalysisFloatingMenuBox}>
-            <TouchableOpacity onPress={() => props.openWeeklyTaskAnalysis()}>
+            <TouchableOpacity
+              onPress={() => {
+                props.openChatbot();
+                close();
+              }}
+            >
+              <View style={styles.taskAnalysisMenuOption}>
+                <MaterialIcons
+                  name="message"
+                  size={20}
+                  color={styles.icon.color}
+                />
+                <Text style={[styles.text, { paddingLeft: 3 }]}>
+                  Abrir chatbot
+                </Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                props.openWeeklyTaskAnalysis();
+                close();
+              }}
+            >
               <View style={styles.taskAnalysisMenuOption}>
                 <MaterialIcons
                   name="view-week"
@@ -80,7 +106,12 @@ function TaskAnalysisButton(props) {
                 </Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => props.openMonthlyTaskAnalysis()}>
+            <TouchableOpacity
+              onPress={() => {
+                props.openMonthlyTaskAnalysis();
+                close();
+              }}
+            >
               <View style={styles.taskAnalysisMenuOption}>
                 <MaterialIcons
                   name="calendar-month"

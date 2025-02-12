@@ -51,7 +51,7 @@ function MessagePopup(props) {
                 alignItems: "center",
               }}
             >
-              <AntDesign name="back" size={20} color="white" />
+              <AntDesign name="arrowleft" size={20} color="white" />
               <Text style={[styles.text, { color: "white" }]}>Voltar</Text>
             </View>
           </TouchableOpacity>

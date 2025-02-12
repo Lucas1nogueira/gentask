@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   FlatList,
   Platform,
-  Pressable,
   Text,
   TouchableOpacity,
   View,
@@ -12,13 +11,13 @@ import { MaterialIcons } from "@expo/vector-icons";
 import Task from "./Task";
 import { ThemeContext } from "../contexts/ThemeContext";
 import TaskAnalysisButton from "./TaskAnalysisButton";
+import { LinearGradient } from "expo-linear-gradient";
 
 function TaskContainer(props) {
   const { styles } = useContext(ThemeContext);
 
   const [showTasks, setShowTasks] = useState(false);
   const [tasks, setTasks] = useState([]);
-  const [isAddTaskPressed, setAddTaskPressed] = useState(false);
   const [taskWidth, setTaskWidth] = useState(null);
 
   useEffect(() => {
@@ -121,6 +120,18 @@ function TaskContainer(props) {
           {Platform.OS === "web" ? (
             props.isTaskAnalysisButtonActive && (
               <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <TouchableOpacity onPress={() => props.openChatbot()}>
+                  <View style={styles.webTaskAnalysisButton}>
+                    <MaterialIcons
+                      name="message"
+                      size={20}
+                      color={styles.icon.color}
+                    />
+                    <Text style={[styles.text, { paddingLeft: 3 }]}>
+                      Chatbot
+                    </Text>
+                  </View>
+                </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => props.openWeeklyTaskAnalysis()}
                 >
@@ -154,22 +165,23 @@ function TaskContainer(props) {
           ) : (
             <TaskAnalysisButton
               isActive={props.isTaskAnalysisButtonActive}
+              openChatbot={() => props.openChatbot()}
               openWeeklyTaskAnalysis={() => props.openWeeklyTaskAnalysis()}
               openMonthlyTaskAnalysis={() => props.openMonthlyTaskAnalysis()}
             />
           )}
-          <Pressable
-            style={[
-              styles.addTaskButton,
-              isAddTaskPressed ? { opacity: 0.5 } : { opacity: 1 },
-            ]}
+          <TouchableOpacity
+            style={{ marginLeft: 17 }}
             onPress={() => props.openCreatePopup()}
-            onPressIn={() => setAddTaskPressed(true)}
-            onPressOut={() => setAddTaskPressed(false)}
           >
-            <Text style={styles.text}>Nova tarefa</Text>
-            <MaterialIcons name="add" size={35} color={styles.icon.color} />
-          </Pressable>
+            <LinearGradient
+              colors={styles.taskAnalysisButtonGradient.colors}
+              style={styles.addTaskButton}
+            >
+              <Text style={styles.text}>Nova tarefa</Text>
+              <MaterialIcons name="add" size={35} color={styles.icon.color} />
+            </LinearGradient>
+          </TouchableOpacity>
         </View>
       </View>
     </View>

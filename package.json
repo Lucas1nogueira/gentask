@@ -9,7 +9,11 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo/metro-runtime": "~4.0.1",
+    "@google/generative-ai": "^0.21.0",
     "@react-native-async-storage/async-storage": "1.23.1",
+    "@react-native-community/netinfo": "11.4.1",
+    "@react-native-masked-view/masked-view": "0.3.2",
     "expo": "~52.0.11",
     "expo-font": "~13.0.2",
     "expo-linear-gradient": "~14.0.1",
@@ -19,16 +23,13 @@
     "expo-status-bar": "~2.0.0",
     "firebase": "^11.3.0",
     "react": "18.3.1",
+    "react-dom": "18.3.1",
     "react-native": "0.76.3",
     "react-native-calendars": "^1.1308.1",
     "react-native-get-random-values": "^1.11.0",
-    "uuid": "^11.0.5",
-    "@react-native-masked-view/masked-view": "0.3.2",
-    "@react-native-community/netinfo": "11.4.1",
-    "react-dom": "18.3.1",
+    "react-native-svg": "15.8.0",
     "react-native-web": "~0.19.13",
-    "@expo/metro-runtime": "~4.0.1",
-    "react-native-svg": "15.8.0"
+    "uuid": "^11.0.5"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

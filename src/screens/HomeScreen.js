@@ -26,6 +26,7 @@ import SortPickerPopup from "../components/SortPickerPopup";
 import TaskViewPopup from "../components/TaskViewPopup";
 import TaskCreationPopup from "../components/TaskCreationPopup";
 import TaskAnalysisPopup from "../components/TaskAnalysisPopup";
+import ChatbotPopup from "../components/ChatbotPopup";
 import MessagePopup from "../components/MessagePopup";
 import MinimalPopup from "../components/MinimalPopup";
 import SettingsPopup from "../components/SettingsPopup";
@@ -73,6 +74,7 @@ function HomeScreen() {
   const [popups, setPopups] = useState({
     categoryPicker: false,
     sortPicker: false,
+    chatbot: false,
     taskAnalysis: false,
     taskView: false,
     taskCreation: false,
@@ -91,6 +93,7 @@ function HomeScreen() {
   const [popupAnimations] = useState({
     categoryPicker: new Animated.Value(0),
     sortPicker: new Animated.Value(0),
+    chatbot: new Animated.Value(0),
     taskAnalysis: new Animated.Value(0),
     taskView: new Animated.Value(0),
     taskCreation: new Animated.Value(0),
@@ -233,6 +236,22 @@ function HomeScreen() {
             setPendingTasksFirst={setPendingTasksFirst}
             setCompletedTasksFirst={setCompletedTasksFirst}
             setUrgentTasksFirst={setUrgentTasksFirst}
+          />
+        </Animated.View>
+      )}
+      {popups.chatbot && (
+        <Animated.View
+          style={[styles.fullscreenArea, { opacity: popupAnimations.chatbot }]}
+        >
+          <ChatbotPopup
+            close={() => {
+              animateClosing(popupAnimations["chatbot"], () =>
+                setPopups((prevState) => ({
+                  ...prevState,
+                  chatbot: false,
+                }))
+              );
+            }}
           />
         </Animated.View>
       )}
@@ -828,6 +847,13 @@ function HomeScreen() {
           }
         }}
         isTaskAnalysisButtonActive={tasks && Object.keys(tasks).length !== 0}
+        openChatbot={() => {
+          setPopups((prevState) => ({
+            ...prevState,
+            chatbot: true,
+          }));
+          animateOpening(popupAnimations["chatbot"]);
+        }}
         openWeeklyTaskAnalysis={() => {
           setTaskAnalysisMode("weekly");
           setPopups((prevState) => ({

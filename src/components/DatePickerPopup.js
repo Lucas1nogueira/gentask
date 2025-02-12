@@ -102,7 +102,7 @@ function DatePickerPopup(props) {
                 alignItems: "center",
               }}
             >
-              <AntDesign name="back" size={20} color={styles.icon.color} />
+              <AntDesign name="arrowleft" size={20} color={styles.icon.color} />
               <Text style={styles.text}>Voltar</Text>
             </View>
           </TouchableOpacity>
