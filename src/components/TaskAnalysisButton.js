@@ -154,6 +154,7 @@ function TaskAnalysisButton(props) {
           />
         </Animated.View>
         <MaterialCommunityIcons
+          style={{ paddingLeft: 2 }}
           name="robot-happy-outline"
           size={25}
           color={styles.icon.color}

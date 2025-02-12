@@ -252,6 +252,7 @@ function HomeScreen() {
                 }))
               );
             }}
+            data={tasks}
           />
         </Animated.View>
       )}

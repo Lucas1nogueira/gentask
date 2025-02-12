@@ -29,21 +29,57 @@ function ChatbotPopup(props) {
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   const startNewChat = useCallback(() => {
-    const newChat = model.startChat({
-      history: [],
-      generationConfig: {
-        maxOutputTokens: 1000,
-        temperature: 0.7,
-      },
-    });
-    setChat(newChat);
-
     const initialMessage = {
       id: (Date.now() + 1).toString(),
       text: "Olá! Como posso te ajudar hoje?",
       sender: "bot",
       timestamp: new Date(),
     };
+
+    const tasks = props.data
+      ? Object.values(props.data)
+          .filter((task) => task.isCompleted === false)
+          .map((task) => ({
+            text: task.text,
+            dueDate: task.dueDate,
+          }))
+      : [];
+
+    const taskContext =
+      tasks.length > 0
+        ? `These are the user's personal tasks: ${JSON.stringify(
+            tasks
+          )}. Use them to answer the next questions.`
+        : "";
+
+    const initialHistory = [];
+
+    if (taskContext) {
+      initialHistory.push(
+        {
+          role: "user",
+          parts: [{ text: taskContext }],
+        },
+        {
+          role: "model",
+          parts: [
+            {
+              text: "Got the user`s tasks. I will answer in brazilian portuguese with that context.",
+            },
+          ],
+        }
+      );
+    }
+
+    const newChat = model.startChat({
+      history: initialHistory,
+      generationConfig: {
+        maxOutputTokens: 200,
+        temperature: 0.7,
+      },
+    });
+
+    setChat(newChat);
     setMessages([initialMessage]);
   });
 
@@ -178,12 +214,17 @@ function ChatbotPopup(props) {
                       />
                     </View>
                   )}
-                  <Text style={styles.text}>{item.text}</Text>
+                  <Text
+                    style={[styles.text, item.isError && { color: "white" }]}
+                  >
+                    {item.text}
+                  </Text>
                   <Text
                     style={[
                       styles.text,
                       { fontSize: 10 },
                       item.sender === "user" && { alignSelf: "flex-end" },
+                      item.isError && { color: "white" },
                     ]}
                   >
                     {item.timestamp.toLocaleTimeString([], {
@@ -211,7 +252,10 @@ function ChatbotPopup(props) {
               placeholderTextColor="#666"
             />
             <TouchableOpacity
-              style={styles.chatInputSendButton}
+              style={[
+                styles.chatInputSendButton,
+                isLoading && styles.authConfirmButtonLoading,
+              ]}
               disabled={isLoading}
               onPress={sendMessage}
             >
