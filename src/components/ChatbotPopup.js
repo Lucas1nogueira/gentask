@@ -41,7 +41,13 @@ function ChatbotPopup(props) {
           .filter((task) => task.isCompleted === false)
           .map((task) => ({
             text: task.text,
-            dueDate: task.dueDate,
+            dueDate: task.dueDate
+              ? new Date(task.dueDate).toLocaleDateString("pt-BR", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })
+              : "N/A",
           }))
       : [];
 

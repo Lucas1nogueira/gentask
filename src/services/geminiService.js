@@ -15,7 +15,7 @@ const categorizingPromptTemplate = `Classify the following text as a task into e
 
 const isUrgentPromptTemplate = `Considering the following text as a personal task, can this task be labeled as urgent? Consider just if the text is clearly talking about an urgent activity, and respond strictly and only with yes or no, without any additional comments or explanations. The text is: `;
 
-const dueDatePromptTemplate = `Analyze the task and timestamp. If a time-related hint is found (e.g., "tomorrow," "next week," "in X days," "amanhã," "semana que vem"), calculate the due date using: "Tomorrow" or "amanhã" = +1 day. "Next week" or "semana que vem" = +7 days. "In X days" or "daqui a X dias" = +X days. Return only the due date timestamp (in ms) or only "no" if no hint is found. No explanations.`;
+const dueDatePromptTemplate = `Analyze the task and date. If a time-related hint is found (e.g., "tomorrow," "next week," "in X days," "amanhã," "semana que vem"), try to calculate the due date using concepts like: "Tomorrow" or "amanhã" = +1 day. "Next week" or "semana que vem" = +7 days. "In X days" or "daqui a X dias" = +X days. Return only the due date (in DD/MM/AAAA) or only "no" if no hint is found. No explanations.`;
 
 const insightsPromptTemplate = `Considering the following text as a personal task, provide actionable insights and step-by-step guidance on how to efficiently complete it. Focus on practical tips, prioritization, and time management strategies. Answer in Brazilian Portuguese and limit the response to 80 characters. The text is: `;
 
@@ -126,12 +126,20 @@ async function categorizeTask(text, categoryName, isUrgent, dueDate) {
   }
 
   if (!dueDate) {
-    const additionalPromptInfo = `The current timestamp is ${Date.now()} and the text is: `;
+    const currentTimestamp = Date.now();
+    const currentDate = new Date(currentTimestamp).toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+    const additionalPromptInfo = `The current date is ${currentDate} and the text is: `;
+
     try {
-      taskDueDate = await queryGemini(
+      const date = await queryGemini(
         `${dueDatePromptTemplate} ${additionalPromptInfo}`,
         text
       );
+      taskDueDate = date;
     } catch (error) {
       console.error("Error obtaining task due date:", error);
       taskDueDate = null;
@@ -152,10 +160,17 @@ async function categorizeTask(text, categoryName, isUrgent, dueDate) {
   );
 
   if (taskDueDate && typeof taskDueDate === "string") {
-    const timestampString = taskDueDate.trim();
-    if (/^\d+$/.test(timestampString)) {
-      const timestamp = Number(timestampString);
-      taskDueDate = timestamp;
+    const dateString = taskDueDate.trim();
+
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) {
+      const [day, month, year] = dateString.split("/");
+      const date = new Date(year, month - 1, day);
+
+      if (!isNaN(date.getTime())) {
+        taskDueDate = date.getTime();
+      } else {
+        taskDueDate = null;
+      }
     } else {
       taskDueDate = null;
     }
