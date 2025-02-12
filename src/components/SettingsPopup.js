@@ -62,7 +62,7 @@ function SettingsPopup(props) {
                 }
                 await MailComposer.composeAsync({
                   recipients: ["lucasbastos@programmer.net"],
-                  subject: "Contato | MyTasks",
+                  subject: "Contato | Gentask",
                   body: "(Dúvidas, sugestões, reports de erros...)",
                 });
               } catch (error) {

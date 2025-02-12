@@ -1,4 +1,4 @@
-# MyTasks
+# Gentask
 
 Um gerenciador de tarefas inteligente desenvolvido com React Native e Expo, potencializado por IA através do Gemini e com persistência de dados no Firebase.
 

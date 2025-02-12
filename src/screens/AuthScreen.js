@@ -152,7 +152,7 @@ function AuthScreen() {
                 />
                 <MaskedView
                   style={{ flexDirection: "row" }}
-                  maskElement={<Text style={styles.authAppTitle}>MyTasks</Text>}
+                  maskElement={<Text style={styles.authAppTitle}>Gentask</Text>}
                 >
                   <LinearGradient
                     colors={styles.authAppTitleGradient.colors}

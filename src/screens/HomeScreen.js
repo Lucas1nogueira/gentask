@@ -564,7 +564,7 @@ function HomeScreen() {
                 }))
               );
             }}
-            title={"Sair do MyTasks"}
+            title={"Sair do Gentask"}
             description={"Isso fechará o app. Tem certeza?"}
             actionName={"Sair"}
             action={() => BackHandler.exitApp()}

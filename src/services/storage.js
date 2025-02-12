@@ -8,10 +8,10 @@ import {
 } from "./firebase/firestore";
 import NetInfo from "@react-native-community/netinfo";
 
-const TASKS_STORAGE_KEY = "@myTasks:tasks";
-const OFFLINE_TASKS_STORAGE_KEY = "@myTasks:offlineTasks";
-const DELETED_OFFLINE_TASKS_STORAGE_KEY = "@myTasks:deletedOfflineTasks";
-const THEME_STORAGE_KEY = "@myTasks:darkMode";
+const TASKS_STORAGE_KEY = "@gentask:tasks";
+const OFFLINE_TASKS_STORAGE_KEY = "@gentask:offlineTasks";
+const DELETED_OFFLINE_TASKS_STORAGE_KEY = "@gentask:deletedOfflineTasks";
+const THEME_STORAGE_KEY = "@gentask:darkMode";
 
 export async function syncOfflineTasks() {
   try {
