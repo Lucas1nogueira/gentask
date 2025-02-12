@@ -1,5 +1,12 @@
 import React, { useContext, useEffect } from "react";
-import { Text, View, TouchableOpacity, BackHandler, Alert } from "react-native";
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  BackHandler,
+  Alert,
+  Pressable,
+} from "react-native";
 import * as MailComposer from "expo-mail-composer";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons/";
 import { ThemeContext } from "../contexts/ThemeContext";
@@ -19,7 +26,7 @@ function SettingsPopup(props) {
   }, []);
 
   return (
-    <View
+    <Pressable
       style={[
         styles.fullscreenArea,
         {
@@ -28,8 +35,9 @@ function SettingsPopup(props) {
           backgroundColor: "rgba(0,0,0,0.5)",
         },
       ]}
+      onPress={() => props.close()}
     >
-      <View style={styles.settingsPopup}>
+      <Pressable style={styles.settingsPopup}>
         <View
           style={{
             marginBottom: 10,
@@ -126,8 +134,8 @@ function SettingsPopup(props) {
             <Text style={[styles.text, { paddingLeft: 3 }]}>Desconectar</Text>
           </TouchableOpacity>
         </View>
-      </View>
-    </View>
+      </Pressable>
+    </Pressable>
   );
 }
 

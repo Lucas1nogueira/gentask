@@ -49,7 +49,7 @@ function Menu(props) {
             style={{ width: 80, height: 80, marginLeft: -15, marginRight: -10 }}
           />
           <View>
-            <Text style={styles.text}>Gentask</Text>
+            <Text style={styles.header}>Gentask</Text>
             <Text style={styles.text}>Task Manager + AI</Text>
           </View>
         </View>

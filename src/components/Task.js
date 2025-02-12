@@ -43,7 +43,7 @@ function Task(props) {
               {
                 width: "90%",
                 justifyContent: "space-between",
-                borderRadius: 20,
+                borderRadius: 15,
               },
               props.isUrgent && {
                 backgroundColor: styles.urgentTask.backgroundColor,
