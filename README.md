@@ -9,8 +9,8 @@ Um gerenciador de tarefas inteligente desenvolvido com React Native e Expo, pote
 - Previsão inteligente de urgência
 - Sugestão de datas de conclusão
 - Geração de insights personalizados
-- Interface moderna e responsiva
-- Sincronização em tempo real
+- Interface moderna e intuitiva
+- Sincronização de tarefas
 
 ## 🚀 Tecnologias
 
@@ -47,7 +47,6 @@ EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=seu_storage_bucket
 EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=seu_sender_id
 EXPO_PUBLIC_FIREBASE_APP_ID=seu_app_id
 EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=seu_measurement_id
-EXPO_PUBLIC_GEMINI_API_URL=sua_gemini_url
 EXPO_PUBLIC_GEMINI_API_KEY=sua_gemini_key
 ```
 

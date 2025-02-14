@@ -442,12 +442,17 @@ function HomeScreen() {
               setTasks(updatedTasks);
               setSelectedTaskId(null);
               setMinimalPopupMessage("Tarefa removida!");
-              setPopups((prevState) => ({
-                ...prevState,
-                success: true,
-              }));
-              animateOpening(popupAnimations["success"]);
-              animateSlideIn(popupAnimations["successRight"]);
+              setTimeout(
+                () => {
+                  setPopups((prevState) => ({
+                    ...prevState,
+                    success: true,
+                  }));
+                  animateOpening(popupAnimations["success"]);
+                  animateSlideIn(popupAnimations["successRight"]);
+                },
+                popups.taskRemoval ? 500 : 0
+              );
               deleteTask(selectedTaskId, deletedTask).catch(() => {
                 setErrorMessage(
                   "Não foi possível atualizar a tarefa na nuvem!\nA tarefa foi modificada localmente."

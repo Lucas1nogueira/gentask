@@ -1,11 +1,11 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import categories from "../data/categories";
 
-const API_URL = process.env.EXPO_PUBLIC_GEMINI_API_URL;
 const API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
 
-if (!API_URL || !API_KEY) {
+if (!API_KEY) {
   throw new Error(
-    "API_URL or API_KEY is not defined. Please check environment variables."
+    "API_KEY is not defined. Please check environment variables."
   );
 }
 
@@ -15,80 +15,56 @@ const categorizingPromptTemplate = `Classify the following text as a task into e
 
 const isUrgentPromptTemplate = `Considering the following text as a personal task, can this task be labeled as urgent? Consider just if the text is clearly talking about an urgent activity, and respond strictly and only with yes or no, without any additional comments or explanations. The text is: `;
 
-const dueDatePromptTemplate = `Analyze the task and date. If a time-related hint is found (e.g., "tomorrow," "next week," "in X days," "amanhã," "semana que vem"), try to calculate the due date using concepts like: "Tomorrow" or "amanhã" = +1 day. "Next week" or "semana que vem" = +7 days. "In X days" or "daqui a X dias" = +X days. Return only the due date (in DD/MM/AAAA) or only "no" if no hint is found. No explanations.`;
+const dueDatePromptTemplate = `Analyze the task and date. If a time-related hint is found (e.g., "today", "in X days", "amanhã", "semana que vem") or any other time related hints, try to calculate the due date using concepts like: "Tomorrow" or "amanhã" = +1 day. "Next week" or "semana que vem" = +7 days. "In X days" or "daqui a X dias" = +X days. And so on. Return only the due date (in DD/MM/AAAA) or only "no" if no hint is found. No explanations.`;
 
 const insightsPromptTemplate = `Considering the following text as a personal task, provide actionable insights and step-by-step guidance on how to efficiently complete it. Focus on practical tips, prioritization, and time management strategies. Answer in Brazilian Portuguese and limit the response to 80 characters. The text is: `;
 
 const analysisPromptTemplate = `Considering the following text as personal tasks, provide an useful analysis following the best productivity techniques and a helpful summarization. Answer in brazilian portuguese and in plain text, no markdown or formatted text, but you can use emojis. The text is:`;
 
-async function queryGemini(prePrompt, userInput) {
+async function queryGemini(prePrompt, userInput, tokens, temp) {
   const fullPrompt = `${prePrompt} ${userInput}`;
-
   const TIMEOUT_DURATION = 15000;
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_DURATION);
 
   try {
-    const response = await fetch(`${API_URL}?key=${API_KEY}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const genAI = new GoogleGenerativeAI(API_KEY);
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      generationConfig: {
+        maxOutputTokens: tokens,
+        temperature: temp,
       },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: fullPrompt }] }],
-      }),
-      signal: controller.signal,
     });
 
-    clearTimeout(timeoutId);
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => {
+        reject(
+          new Error(
+            `Timeout: Request exceeded ${TIMEOUT_DURATION / 1000} seconds.`
+          )
+        );
+      }, TIMEOUT_DURATION);
+    });
 
-    if (response.status === 204) {
-      throw new Error("No content received from API");
+    const generateContentPromise = model.generateContent(fullPrompt);
+    const result = await Promise.race([generateContentPromise, timeoutPromise]);
+    const response = await result.response;
+    const text = response.text();
+
+    if (!text) {
+      throw new Error("Empty API response.");
     }
 
-    const textResponse = await response.text();
-    let responseData;
-
-    try {
-      responseData = JSON.parse(textResponse);
-    } catch (error) {
-      throw new Error(
-        `Invalid JSON response: ${textResponse.slice(0, 100)}...`
-      );
-    }
-
-    if (!response.ok) {
-      const errorDetails =
-        responseData?.error?.details ||
-        responseData?.error?.message ||
-        textResponse ||
-        response.statusText;
-
-      throw new Error(`Gemini Error (${response.status}): ${errorDetails}`);
-    }
-
-    const responseText =
-      responseData.candidates?.[0]?.content?.parts?.[0]?.text || "";
-
-    if (!responseText) {
-      throw new Error("Unexpected response format from Gemini API");
-    }
-
-    return responseText;
+    return text;
   } catch (error) {
-    clearTimeout(timeoutId);
-
-    if (error.name === "AbortError") {
-      throw new Error(
-        `Timeout: Request exceeded ${TIMEOUT_DURATION / 1000} seconds`
-      );
+    if (error.message.startsWith("Timeout")) {
+      throw error;
+    } else if (error.message.includes("API_KEY")) {
+      throw new Error("API key error.");
+    } else if (error.message.includes("network")) {
+      throw new Error("Network error.");
+    } else {
+      throw new Error(`Gemini error: ${error.message}`);
     }
-
-    if (error instanceof TypeError) {
-      throw new Error("Network error: Failed to connect to API");
-    }
-
-    throw error;
   }
 }
 
@@ -100,7 +76,12 @@ async function categorizeTask(text, categoryName, isUrgent, dueDate) {
 
   if (!categoryName) {
     try {
-      taskCategoryName = await queryGemini(categorizingPromptTemplate, text);
+      taskCategoryName = await queryGemini(
+        categorizingPromptTemplate,
+        text,
+        10,
+        0.3
+      );
     } catch (error) {
       console.error("Error categorizing task:", error);
       taskCategoryName = "Outros";
@@ -111,7 +92,7 @@ async function categorizeTask(text, categoryName, isUrgent, dueDate) {
 
   if (isUrgent === null) {
     try {
-      isTaskUrgent = await queryGemini(isUrgentPromptTemplate, text);
+      isTaskUrgent = await queryGemini(isUrgentPromptTemplate, text, 3, 0.3);
       if (!isTaskUrgent) {
         isTaskUrgent = false;
       } else {
@@ -137,7 +118,9 @@ async function categorizeTask(text, categoryName, isUrgent, dueDate) {
     try {
       const date = await queryGemini(
         `${dueDatePromptTemplate} ${additionalPromptInfo}`,
-        text
+        text,
+        50,
+        0.5
       );
       taskDueDate = date;
     } catch (error) {
@@ -149,7 +132,7 @@ async function categorizeTask(text, categoryName, isUrgent, dueDate) {
   }
 
   try {
-    taskInsights = await queryGemini(insightsPromptTemplate, text);
+    taskInsights = await queryGemini(insightsPromptTemplate, text, 50, 0.7);
   } catch (error) {
     console.error("Error obtaining task insights:", error);
     taskInsights = null;
@@ -262,7 +245,9 @@ async function getTaskAnalysis(tasks, mode) {
   try {
     const analysisResult = await queryGemini(
       analysisPromptTemplate,
-      tasksForAnalysis
+      tasksForAnalysis,
+      300,
+      0.7
     );
     return {
       result: analysisResult,
