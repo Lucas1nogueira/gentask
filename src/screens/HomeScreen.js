@@ -15,6 +15,7 @@ import {
   modifyTask,
   purgeTasks,
 } from "../services/firebase/firestore";
+import { getTaskSuggestion } from "../services/aiService";
 import { ThemeContext } from "../contexts/ThemeContext";
 import { AuthConfirmMessagesContext } from "../contexts/AuthConfirmMessagesContext";
 import Menu from "../components/Menu";
@@ -26,6 +27,7 @@ import SortPickerPopup from "../components/SortPickerPopup";
 import TaskViewPopup from "../components/TaskViewPopup";
 import TaskCreationPopup from "../components/TaskCreationPopup";
 import TaskAnalysisPopup from "../components/TaskAnalysisPopup";
+import TaskSuggestionPopup from "../components/TaskSuggestionPopup";
 import ChatbotPopup from "../components/ChatbotPopup";
 import MessagePopup from "../components/MessagePopup";
 import MinimalPopup from "../components/MinimalPopup";
@@ -54,6 +56,7 @@ function HomeScreen() {
   const [didTasksLoad, setTasksLoad] = useState(false);
   const [sortedTasks, setSortedTasks] = useState(null);
   const [foundTasks, setFoundTasks] = useState(null);
+
   const [selectedCategory, setSelectedCategory] = useState({
     name: "Tudo",
     color: "grey",
@@ -62,12 +65,19 @@ function HomeScreen() {
   const [pendingTasksFirst, setPendingTasksFirst] = useState(false);
   const [completedTasksFirst, setCompletedTasksFirst] = useState(false);
   const [urgentTasksFirst, setUrgentTasksFirst] = useState(true);
+
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [taskAnalysisMode, setTaskAnalysisMode] = useState(null);
 
   const [openMenu, setOpenMenu] = useState(false);
   const [menuAnimation] = useState(new Animated.Value(0));
   const [menuLeftAnimation] = useState(new Animated.Value(0));
+
+  const [didTaskSuggestionPopupJustOpen, setTaskSuggestionPopupJustOpen] =
+    useState(false);
+  const [didUserAcceptTaskSuggestion, setUserAcceptTaskSuggestion] =
+    useState(false);
+  const [taskSuggestionText, setTaskSuggestionText] = useState("");
   const [minimalPopupMessage, setMinimalPopupMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -81,6 +91,7 @@ function HomeScreen() {
     taskRemoval: false,
     taskDiscard: false,
     taskClear: false,
+    taskSuggestion: false,
     exit: false,
     loading: false,
     success: false,
@@ -100,6 +111,8 @@ function HomeScreen() {
     taskRemoval: new Animated.Value(0),
     taskDiscard: new Animated.Value(0),
     taskClear: new Animated.Value(0),
+    taskSuggestion: new Animated.Value(0),
+    taskSuggestionRight: new Animated.Value(0),
     exit: new Animated.Value(0),
     loading: new Animated.Value(0),
     loadingRight: new Animated.Value(0),
@@ -111,6 +124,11 @@ function HomeScreen() {
     settings: new Animated.Value(0),
     logout: new Animated.Value(0),
   });
+
+  async function checkConnection() {
+    const netState = await NetInfo.fetch();
+    return netState.isConnected;
+  }
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
@@ -126,11 +144,6 @@ function HomeScreen() {
     );
     return () => backHandler.remove();
   }, []);
-
-  async function checkConnection() {
-    const netState = await NetInfo.fetch();
-    return netState.isConnected;
-  }
 
   useEffect(() => {
     checkConnection().then(async (isConnected) => {
@@ -168,6 +181,37 @@ function HomeScreen() {
       storeTasks(tasks);
     }
   }, [tasks]);
+
+  useEffect(() => {
+    if (popups.taskSuggestion && didTaskSuggestionPopupJustOpen) {
+      setTaskSuggestionPopupJustOpen(false);
+    } else if (popups.taskSuggestion) {
+      animateClosing(popupAnimations["taskSuggestion"], () =>
+        setPopups((prevState) => ({
+          ...prevState,
+          taskSuggestion: false,
+        }))
+      );
+      animateSlideOut(popupAnimations["taskSuggestionRight"]);
+    }
+  }, [popups, openMenu]);
+
+  useEffect(() => {
+    if (didTasksLoad && Object.keys(tasks).length !== 0) {
+      getTaskSuggestion(tasks).then((suggestion) => {
+        if (suggestion) {
+          setTaskSuggestionText(suggestion);
+          setPopups((prevState) => ({
+            ...prevState,
+            taskSuggestion: true,
+          }));
+          animateOpening(popupAnimations["taskSuggestion"]);
+          animateSlideIn(popupAnimations["taskSuggestionRight"]);
+          setTaskSuggestionPopupJustOpen(true);
+        }
+      });
+    }
+  }, [didTasksLoad]);
 
   return (
     <View style={styles.container}>
@@ -413,6 +457,9 @@ function HomeScreen() {
             }}
             isAnyTaskCreated={tasks != null}
             setTasks={setTasks}
+            taskSuggestion={
+              didUserAcceptTaskSuggestion ? taskSuggestionText : null
+            }
           />
         </Animated.View>
       )}
@@ -432,6 +479,7 @@ function HomeScreen() {
                 }))
               );
             }}
+            iconName={"trash"}
             title={"Deletar tarefa"}
             description={"Isso apagará a tarefa selecionada. Tem certeza?"}
             actionName={"Deletar"}
@@ -483,6 +531,7 @@ function HomeScreen() {
                 }))
               );
             }}
+            iconName={"close"}
             title={"Descartar tarefa"}
             description={"Todo o conteúdo inserido será perdido. Tem certeza?"}
             actionName={"Sim"}
@@ -519,6 +568,7 @@ function HomeScreen() {
                 }))
               );
             }}
+            iconName={"fire"}
             title={"Limpar tarefas"}
             description={
               "Isso apagará todas as tarefas cadastradas. Tem certeza?"
@@ -576,6 +626,30 @@ function HomeScreen() {
           />
         </Animated.View>
       )}
+      {popups.taskSuggestion && (
+        <TaskSuggestionPopup
+          opacityAnimation={popupAnimations.taskSuggestion}
+          rightAnimation={popupAnimations.taskSuggestionRight}
+          close={() => {
+            animateClosing(popupAnimations["taskSuggestion"], () =>
+              setPopups((prevState) => ({
+                ...prevState,
+                taskSuggestion: false,
+              }))
+            );
+            animateSlideOut(popupAnimations["taskSuggestionRight"]);
+          }}
+          action={() => {
+            setUserAcceptTaskSuggestion(true);
+            setPopups((prevState) => ({
+              ...prevState,
+              taskCreation: true,
+            }));
+            animateOpening(popupAnimations["taskCreation"]);
+          }}
+          suggestion={taskSuggestionText}
+        />
+      )}
       {popups.exit && (
         <Animated.View
           style={[styles.fullscreenArea, { opacity: popupAnimations.exit }]}
@@ -589,6 +663,7 @@ function HomeScreen() {
                 }))
               );
             }}
+            iconName={"question"}
             title={"Sair do Gentask"}
             description={"Isso fechará o app. Tem certeza?"}
             actionName={"Sair"}
@@ -653,6 +728,7 @@ function HomeScreen() {
                 }))
               );
             }}
+            iconName={"info"}
             title={"Erro"}
             description={errorMessage}
             actionName={"OK"}
@@ -704,6 +780,7 @@ function HomeScreen() {
                 }))
               );
             }}
+            iconName={"logout"}
             title={"Fazer logout"}
             description={"Você será desconectado. Tem certeza?"}
             actionName={"Logout"}

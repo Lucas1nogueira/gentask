@@ -5,6 +5,7 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -13,11 +14,13 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { LinearGradient } from "expo-linear-gradient";
 import MaskedView from "@react-native-masked-view/masked-view";
-import { Entypo, MaterialIcons } from "@expo/vector-icons/";
+import { Entypo, Feather, MaterialIcons } from "@expo/vector-icons/";
 import MessagePopup from "../components/MessagePopup";
 import MinimalPopup from "../components/MinimalPopup";
 import { ThemeContext } from "../contexts/ThemeContext";
+import { AuthConfirmMessagesContext } from "../contexts/AuthConfirmMessagesContext";
 import { signIn, signUp } from "../services/firebase/auth";
+import { getFirstUse, handleFirstUse } from "../services/storage";
 import {
   animateClosing,
   animateCollapsing,
@@ -26,7 +29,6 @@ import {
   animateSlideIn,
   animateSlideOut,
 } from "../utils/animationUtils";
-import { AuthConfirmMessagesContext } from "../contexts/AuthConfirmMessagesContext";
 
 function AuthScreen() {
   const { styles } = useContext(ThemeContext);
@@ -56,18 +58,111 @@ function AuthScreen() {
   const [warningMessage, setWarningMessage] = useState("");
 
   const [popups, setPopups] = useState({
+    firstUse: false,
     error: false,
     warning: false,
   });
 
   const [popupAnimations] = useState({
+    firstUse: new Animated.Value(0),
     error: new Animated.Value(0),
     warning: new Animated.Value(0),
     warningRight: new Animated.Value(0),
   });
 
+  useEffect(() => {
+    getFirstUse().then((firstUse) => {
+      if (firstUse) {
+        setPopups((prevState) => ({
+          ...prevState,
+          firstUse: true,
+        }));
+        animateOpening(popupAnimations["firstUse"]);
+      }
+    });
+  }, []);
+
   return (
     <View style={styles.container}>
+      {popups.firstUse && (
+        <Animated.View
+          style={[styles.fullscreenArea, { opacity: popupAnimations.firstUse }]}
+        >
+          <View
+            style={[
+              styles.fullscreenArea,
+              {
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "rgba(0,0,0,0.5)",
+              },
+            ]}
+          >
+            <View style={[styles.taskPopup, { height: 550 }]}>
+              <View
+                style={{
+                  marginBottom: 20,
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                <MaterialIcons
+                  name="info"
+                  size={20}
+                  color={styles.icon.color}
+                />
+                <Text style={[styles.header, { paddingLeft: 5 }]}>
+                  Aviso de privacidade
+                </Text>
+              </View>
+              <View
+                style={{
+                  width: "100%",
+                  height: "85%",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                }}
+              >
+                <View
+                  style={{
+                    width: "100%",
+                    height: 390,
+                    marginTop: 30,
+                    borderRadius: 20,
+                    backgroundColor: styles.taskInput.backgroundColor,
+                    padding: 15,
+                  }}
+                >
+                  <ScrollView style={{ minHeight: "100%" }}>
+                    <Text style={[styles.text, { textAlign: "justify" }]}>
+                      {
+                        "O Gentask valoriza a sua privacidade. Este aviso explica como suas informações são coletadas e usadas ao utilizar o aplicativo.\n\n1. Coleta de Dados:\nAs informações que você fornece diretamente são armazenadas na base de dados do desenvolvedor, incluindo seu e-mail e dados inseridos no app.\n\n2. Uso dos Dados:\nO desenvolvedor e mantenedor do Gentask não vende ou expõe seus dados. Entretanto, é importante notar que os prestadores de serviço da base de dados e da Inteligência Artificial podem processar suas informações, o que NÃO fica a critério do desenvolvedor. Portanto, ao usar o app, você concorda que está ciente disso, e que aceita o processamento dos seus dados.\n\n3. Compartilhamento de Dados:\nNão compartilhamos suas informações pessoais com terceiros, exceto quando necessário para fornecer serviços, cumprir leis ou proteger direitos.\n\n4. Segurança dos Dados:\nSuas informações são guardadas em um serviço na nuvem de modo seguro, bem como no seu dispositivo para acesso offline. Entretanto, o desenvolvedor NÃO garante proteção contra ataques hackers nem contra mal uso do app.\n\n5. Seus Direitos:\nVocê tem o direito de acessar, editar ou excluir seus dados pessoais. Para exercer esses direitos, entre em contato com o desenvolvedor através do e-mail: (lucasbastos@programmer.net).\n\n6. Alterações na Política:\nPodemos atualizar esta política de privacidade.\n\nAo continuar utilizando o Gentask, você concorda com os termos descritos neste aviso de privacidade."
+                      }
+                    </Text>
+                  </ScrollView>
+                </View>
+                <TouchableOpacity
+                  style={styles.confirmBigButton}
+                  onPress={() => {
+                    handleFirstUse();
+                    animateClosing(popupAnimations["firstUse"], () =>
+                      setPopups((prevState) => ({
+                        ...prevState,
+                        firstUse: false,
+                      }))
+                    );
+                  }}
+                >
+                  <>
+                    <Feather name="check" size={24} color="white" />
+                    <Text style={[styles.text, { color: "white" }]}>OK</Text>
+                  </>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Animated.View>
+      )}
       {authConfirmPopups.logout && (
         <MinimalPopup
           opacityAnimation={authConfirmPopupAnimations.logout}
@@ -98,6 +193,7 @@ function AuthScreen() {
                 }))
               );
             }}
+            iconName={"info"}
             title={"Erro"}
             description={errorMessage}
             actionName={"OK"}

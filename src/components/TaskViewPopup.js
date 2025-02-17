@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { modifyTask } from "../services/firebase/firestore";
-import { categorizeTask } from "../services/geminiService";
+import { categorizeTask } from "../services/aiService";
 import { animateClosing, animateOpening } from "../utils/animationUtils";
 import { ThemeContext } from "../contexts/ThemeContext";
 import TaskInsights from "./TaskInsights";

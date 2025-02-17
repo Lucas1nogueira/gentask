@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   BackHandler,
@@ -11,33 +11,23 @@ import {
   View,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { ThemeContext } from "../contexts/ThemeContext";
+import { query } from "../services/aiService";
 import ChatRoundedArrow from "./ChatRoundedArrow";
 
 function ChatbotPopup(props) {
   const { styles } = useContext(ThemeContext);
 
+  const scrollRef = useRef(null);
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [chat, setChat] = useState(null);
-
-  const API_KEY = process.env.EXPO_PUBLIC_GEMINI_API_KEY;
-  const genAI = new GoogleGenerativeAI(API_KEY);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const [systemPrompt, setSystemPrompt] = useState("");
 
   const startNewChat = useCallback(() => {
-    const initialMessage = {
-      id: (Date.now() + 1).toString(),
-      text: "Olá! Como posso te ajudar hoje?",
-      sender: "bot",
-      timestamp: new Date(),
-    };
-
     const tasks = props.data
       ? Object.values(props.data)
-          .filter((task) => task.isCompleted === false)
+          .filter((task) => !task.isCompleted)
           .map((task) => ({
             text: task.text,
             dueDate: task.dueDate
@@ -50,43 +40,75 @@ function ChatbotPopup(props) {
           }))
       : [];
 
-    const taskContext =
+    const newSystemPrompt =
       tasks.length > 0
-        ? `These are the user's personal tasks: ${JSON.stringify(
+        ? `You are a helpful assistant. The user's current tasks are: ${JSON.stringify(
             tasks
-          )}. Use them to answer the next questions.`
-        : "";
+          )}. 
+         Answer what he asks you in brazilian portuguese (limit to 50 words).`
+        : "You are a helpful assistant. Answer in brazilian portuguese (limit to 50 words).";
 
-    const initialHistory = [];
+    setSystemPrompt(newSystemPrompt);
+    setMessages([
+      {
+        id: Date.now().toString(),
+        text: "Olá! Como posso te ajudar hoje?",
+        sender: "bot",
+        timestamp: new Date(),
+      },
+    ]);
+  }, [props.data]);
 
-    if (taskContext) {
-      initialHistory.push(
+  async function handleSend() {
+    if (!inputText.trim() || isLoading) return;
+
+    const userMessage = {
+      id: Date.now().toString(),
+      text: inputText,
+      sender: "user",
+      timestamp: new Date(),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setInputText("");
+    setIsLoading(true);
+    setTimeout(() => {
+      scrollRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+
+    try {
+      const botResponse = await query(systemPrompt, inputText, 200, 0.7);
+
+      setMessages((prev) => [
+        ...prev,
         {
-          role: "user",
-          parts: [{ text: taskContext }],
+          id: Date.now().toString(),
+          text: botResponse,
+          sender: "bot",
+          timestamp: new Date(),
         },
+      ]);
+    } catch (error) {
+      setMessages((prev) => [
+        ...prev,
         {
-          role: "model",
-          parts: [
-            {
-              text: "Got the user`s tasks. I will answer in brazilian portuguese with that context.",
-            },
-          ],
-        }
-      );
+          id: Date.now().toString(),
+          text: error.message.includes("exceed")
+            ? "Limite de contexto excedido. Nova conversa iniciada."
+            : "Erro ao processar resposta.",
+          sender: "bot",
+          timestamp: new Date(),
+          isError: true,
+        },
+      ]);
     }
 
-    const newChat = model.startChat({
-      history: initialHistory,
-      generationConfig: {
-        maxOutputTokens: 200,
-        temperature: 0.7,
-      },
-    });
+    setIsLoading(false);
 
-    setChat(newChat);
-    setMessages([initialMessage]);
-  });
+    setTimeout(() => {
+      scrollRef.current?.scrollToEnd({ animated: true });
+    }, 500);
+  }
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
@@ -102,62 +124,6 @@ function ChatbotPopup(props) {
   useEffect(() => {
     startNewChat();
   }, []);
-
-  async function sendMessage() {
-    if (inputText.trim().toLocaleLowerCase() === "sair") {
-      props.close();
-    }
-
-    if (!inputText.trim() || !chat) return;
-
-    const userMessage = {
-      id: Date.now().toString(),
-      text: inputText,
-      sender: "user",
-      timestamp: new Date(),
-    };
-
-    setMessages((prevMessages) => [...prevMessages, userMessage]);
-    setInputText("");
-    setIsLoading(true);
-
-    try {
-      const result = await chat.sendMessage(inputText);
-      const response = await result.response;
-
-      const botMessage = {
-        id: (Date.now() + 1).toString(),
-        text: response.text(),
-        sender: "bot",
-        timestamp: new Date(),
-      };
-
-      setMessages((prevMessages) => [...prevMessages, botMessage]);
-    } catch (error) {
-      console.error("Error processing message:", error);
-
-      let errorMessage = "Desculpe, ocorreu um erro ao processar sua mensagem.";
-
-      if (error.message.includes("context length exceeded")) {
-        errorMessage =
-          "O histórico da conversa excedeu o limite. Iniciando nova conversa...";
-        startNewChat();
-      }
-
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        {
-          id: (Date.now() + 1).toString(),
-          text: errorMessage,
-          sender: "bot",
-          timestamp: new Date(),
-          isError: true,
-        },
-      ]);
-    }
-
-    setIsLoading(false);
-  }
 
   return (
     <View
@@ -185,6 +151,7 @@ function ChatbotPopup(props) {
           </View>
           <View style={[styles.taskInput, { height: 450 }]}>
             <FlatList
+              ref={scrollRef}
               data={messages}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
@@ -262,7 +229,7 @@ function ChatbotPopup(props) {
                 isLoading && styles.authConfirmButtonLoading,
               ]}
               disabled={isLoading}
-              onPress={sendMessage}
+              onPress={handleSend}
             >
               {isLoading ? (
                 <ActivityIndicator size="small" color="white" />

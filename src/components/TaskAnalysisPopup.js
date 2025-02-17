@@ -12,7 +12,7 @@ import {
   MaterialCommunityIcons,
   MaterialIcons,
 } from "@expo/vector-icons/";
-import { getTaskAnalysis } from "../services/geminiService";
+import { getTaskAnalysis } from "../services/aiService";
 import { animateBlinking } from "../utils/animationUtils";
 import { ThemeContext } from "../contexts/ThemeContext";
 import Chart from "./Chart";

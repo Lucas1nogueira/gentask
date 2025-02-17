@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import { Text, View, BackHandler, TouchableOpacity } from "react-native";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
+import { AntDesign, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
 import { ThemeContext } from "../contexts/ThemeContext";
 
 function MessagePopup(props) {
@@ -29,7 +29,14 @@ function MessagePopup(props) {
       ]}
     >
       <View style={styles.messagePopup}>
-        <Text style={styles.header}>{props.title}</Text>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <SimpleLineIcons
+            name={props.iconName}
+            size={16}
+            color={styles.icon.color}
+          />
+          <Text style={[styles.header, { paddingLeft: 7 }]}>{props.title}</Text>
+        </View>
         <Text style={[styles.text, { marginTop: 10 }]}>
           {props.description}
         </Text>

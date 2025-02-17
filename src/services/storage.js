@@ -12,6 +12,7 @@ const TASKS_STORAGE_KEY = "@gentask:tasks";
 const OFFLINE_TASKS_STORAGE_KEY = "@gentask:offlineTasks";
 const DELETED_OFFLINE_TASKS_STORAGE_KEY = "@gentask:deletedOfflineTasks";
 const THEME_STORAGE_KEY = "@gentask:darkMode";
+const FIRST_USE_STORAGE_KEY = "@gentask:firstUse";
 
 export async function syncOfflineTasks() {
   try {
@@ -184,5 +185,27 @@ export async function getTheme() {
     }
   } catch (error) {
     console.error(`Error retrieving theme ${error}`);
+  }
+}
+
+export async function handleFirstUse() {
+  try {
+    const jsonValue = JSON.stringify(false);
+    await AsyncStorage.setItem(FIRST_USE_STORAGE_KEY, jsonValue);
+  } catch (error) {
+    console.error(`Error handling first use: ${error}`);
+  }
+}
+
+export async function getFirstUse() {
+  try {
+    const jsonValue = await AsyncStorage.getItem(FIRST_USE_STORAGE_KEY);
+    if (jsonValue !== null) {
+      return JSON.parse(jsonValue);
+    } else {
+      return true;
+    }
+  } catch (error) {
+    console.error(`Error retrieving first use ${error}`);
   }
 }

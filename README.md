@@ -1,6 +1,6 @@
 # Gentask
 
-Um gerenciador de tarefas inteligente desenvolvido com React Native e Expo, potencializado por IA através do Gemini e com persistência de dados no Firebase.
+Um gerenciador de tarefas inteligente desenvolvido com React Native e Expo, potencializado por IA e com persistência de dados no Firebase.
 
 ## ✨ Principais funcionalidades
 
@@ -9,6 +9,7 @@ Um gerenciador de tarefas inteligente desenvolvido com React Native e Expo, pote
 - Previsão inteligente de urgência
 - Sugestão de datas de conclusão
 - Geração de insights personalizados
+- Sugestão de tarefas
 - Interface moderna e intuitiva
 - Sincronização de tarefas
 
@@ -17,14 +18,14 @@ Um gerenciador de tarefas inteligente desenvolvido com React Native e Expo, pote
 - React Native
 - Expo
 - Firebase (Authentication e Firestore)
-- Google Gemini AI
+- OpenRouter API
 
 ## 📋 Pré-requisitos
 
 - Node.js instalado
 - Expo CLI
-- Conta no Firebase
-- Chave de API do Gemini
+- Conta e projeto no Firebase
+- Conta no OpenRouter e chave API
 - Expo Go instalado no dispositivo móvel (para desenvolvimento)
 
 ## ⚙️ Configuração
@@ -47,7 +48,8 @@ EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=seu_storage_bucket
 EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=seu_sender_id
 EXPO_PUBLIC_FIREBASE_APP_ID=seu_app_id
 EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=seu_measurement_id
-EXPO_PUBLIC_GEMINI_API_KEY=sua_gemini_key
+EXPO_PUBLIC_OPENROUTER_AI_API_URL=api_url
+EXPO_PUBLIC_OPENROUTER_AI_API_KEY=sua_api_key
 ```
 
 ## 🚀 Executando o projeto

@@ -11,7 +11,7 @@ import "react-native-get-random-values";
 import { v4 as uuidv4 } from "uuid";
 import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { addTask } from "../services/firebase/firestore";
-import { categorizeTask } from "../services/geminiService";
+import { categorizeTask } from "../services/aiService";
 import { animateClosing, animateOpening } from "../utils/animationUtils";
 import { ThemeContext } from "../contexts/ThemeContext";
 import TaskAdvancedOptions from "./TaskAdvancedOptions";
@@ -59,6 +59,12 @@ function TaskCreationPopup(props) {
     );
     return () => backHandler.remove();
   }, [text, selectedCategory, isTaskUrgent, selectedDate]);
+
+  useEffect(() => {
+    if (props.taskSuggestion) {
+      onChangeText(props.taskSuggestion);
+    }
+  }, []);
 
   function saveTask() {
     props.openLoadingPopup();
@@ -172,6 +178,7 @@ function TaskCreationPopup(props) {
           style={styles.taskInput}
           multiline={true}
           textAlignVertical="top"
+          value={text}
           onChangeText={onChangeText}
           cursorColor={"#efdb00"}
           placeholder="Digite aqui..."
