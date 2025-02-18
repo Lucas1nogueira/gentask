@@ -78,7 +78,7 @@ function TaskAnalysisPopup(props) {
         {
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "rgba(0,0,0,0.5)",
+          backgroundColor: "rgba(0,0,0,0.3)",
         },
       ]}
     >

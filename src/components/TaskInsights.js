@@ -1,5 +1,11 @@
 import { useContext, useRef, useState } from "react";
-import { Animated, Text, TouchableOpacity, View } from "react-native";
+import {
+  Animated,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Entypo, MaterialIcons } from "@expo/vector-icons/";
 import { animateCollapsing, animateExpanding } from "../utils/animationUtils";
 import { ThemeContext } from "../contexts/ThemeContext";
@@ -13,7 +19,7 @@ function TaskInsights(props) {
 
   const heightInterpolate = expandAnimation.interpolate({
     inputRange: [0, 1],
-    outputRange: [25, 95],
+    outputRange: [25, 115],
   });
 
   return (
@@ -45,9 +51,9 @@ function TaskInsights(props) {
           </View>
           <Entypo name="select-arrows" size={20} color={styles.icon.color} />
         </TouchableOpacity>
-        <View style={styles.taskInsight}>
+        <ScrollView style={styles.taskInsight}>
           <Text style={styles.text}>{props.insights}</Text>
-        </View>
+        </ScrollView>
       </Animated.View>
     </View>
   );

@@ -1,5 +1,12 @@
 import { useRef, useState, useEffect, useContext } from "react";
-import { View, Animated, BackHandler } from "react-native";
+import {
+  View,
+  Animated,
+  BackHandler,
+  Dimensions,
+  PanResponder,
+  TouchableWithoutFeedback,
+} from "react-native";
 import { StatusBar } from "expo-status-bar";
 import NetInfo from "@react-native-community/netinfo";
 import {
@@ -40,6 +47,8 @@ import {
 } from "../utils/animationUtils";
 import "../styles/global.css";
 
+const MENU_DRAWER_WIDTH = 280;
+
 function HomeScreen() {
   const { styles } = useContext(ThemeContext);
   const {
@@ -69,9 +78,8 @@ function HomeScreen() {
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [taskAnalysisMode, setTaskAnalysisMode] = useState(null);
 
-  const [openMenu, setOpenMenu] = useState(false);
-  const [menuAnimation] = useState(new Animated.Value(0));
-  const [menuLeftAnimation] = useState(new Animated.Value(0));
+  const [isMenuOpen, setMenuOpen] = useState(false);
+  const menuAnimation = useRef(new Animated.Value(-MENU_DRAWER_WIDTH)).current;
 
   const [didTaskSuggestionPopupJustOpen, setTaskSuggestionPopupJustOpen] =
     useState(false);
@@ -125,6 +133,71 @@ function HomeScreen() {
     logout: new Animated.Value(0),
   });
 
+  const panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: (evt) => {
+      return (
+        evt.nativeEvent.pageX < 30 &&
+        !isMenuOpen &&
+        !Object.values(popups).some((v) => v)
+      );
+    },
+
+    onPanResponderMove: (_, gesture) => {
+      const newX = gesture.dx - MENU_DRAWER_WIDTH;
+      if (newX <= 0 && newX >= -MENU_DRAWER_WIDTH) {
+        menuAnimation.setValue(newX);
+      }
+    },
+
+    onPanResponderRelease: (_, gesture) => {
+      const shouldOpen =
+        gesture.dx > MENU_DRAWER_WIDTH * 0.3 || gesture.vx > 0.3;
+      const shouldClose =
+        gesture.dx < -MENU_DRAWER_WIDTH / 0.3 || gesture.vx < -0.3;
+
+      if (shouldOpen) {
+        openMenu();
+      } else if (shouldClose) {
+        closeMenu();
+      } else {
+        Animated.spring(menuAnimation, {
+          toValue: isMenuOpen ? 0 : -MENU_DRAWER_WIDTH,
+          useNativeDriver: true,
+        }).start();
+      }
+    },
+  });
+
+  const openMenu = () => {
+    if (!isMenuOpen) {
+      setMenuOpen(true);
+      Animated.spring(menuAnimation, {
+        toValue: 0,
+        useNativeDriver: true,
+        tension: 30,
+        friction: 10,
+        overshootClamping: true,
+      }).start();
+    }
+  };
+
+  const closeMenu = () => {
+    setMenuOpen(false);
+    Animated.spring(menuAnimation, {
+      toValue: -MENU_DRAWER_WIDTH,
+      useNativeDriver: true,
+      tension: 30,
+      friction: 10,
+      overshootClamping: true,
+    }).start();
+  };
+
+  const menuOverlayOpacity = menuAnimation.interpolate({
+    inputRange: [-MENU_DRAWER_WIDTH, 0],
+    outputRange: [0, 1],
+    extrapolate: "clamp",
+  });
+
   async function checkConnection() {
     const netState = await NetInfo.fetch();
     return netState.isConnected;
@@ -134,16 +207,20 @@ function HomeScreen() {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       () => {
-        setPopups((prevState) => ({
-          ...prevState,
-          exit: true,
-        }));
-        animateOpening(popupAnimations["exit"]);
+        if (!isMenuOpen) {
+          setPopups((prevState) => ({
+            ...prevState,
+            exit: true,
+          }));
+          animateOpening(popupAnimations["exit"]);
+        } else {
+          closeMenu();
+        }
         return true;
       }
     );
     return () => backHandler.remove();
-  }, []);
+  }, [isMenuOpen]);
 
   useEffect(() => {
     checkConnection().then(async (isConnected) => {
@@ -194,7 +271,7 @@ function HomeScreen() {
       );
       animateSlideOut(popupAnimations["taskSuggestionRight"]);
     }
-  }, [popups, openMenu]);
+  }, [popups, isMenuOpen]);
 
   useEffect(() => {
     if (didTasksLoad && Object.keys(tasks).length !== 0) {
@@ -214,25 +291,141 @@ function HomeScreen() {
   }, [didTasksLoad]);
 
   return (
-    <View style={styles.container}>
-      {openMenu && (
-        <Animated.View
-          style={[styles.fullscreenArea, { opacity: menuAnimation }]}
-        >
-          <Menu
-            animation={menuLeftAnimation}
-            close={() => {
-              animateClosing(menuAnimation, () => setOpenMenu(false));
-              animateSlideOut(menuLeftAnimation);
-            }}
-            openSettingsPopup={() => {
+    <View style={styles.container} {...panResponder.panHandlers}>
+      <TopBar
+        openMenu={openMenu}
+        sortedTasks={sortedTasks}
+        setFoundTasks={setFoundTasks}
+      />
+      <FilteringBar
+        tasks={tasks}
+        setSortedTasks={setSortedTasks}
+        selectedCategory={selectedCategory}
+        selectedSort={selectedSort}
+        pendingTasksFirst={pendingTasksFirst}
+        completedTasksFirst={completedTasksFirst}
+        urgentTasksFirst={urgentTasksFirst}
+        openCategoryPickerPopup={() => {
+          setPopups((prevState) => ({
+            ...prevState,
+            categoryPicker: true,
+          }));
+          animateOpening(popupAnimations["categoryPicker"]);
+        }}
+        openSortPickerPopup={() => {
+          setPopups((prevState) => ({
+            ...prevState,
+            sortPicker: true,
+          }));
+          animateOpening(popupAnimations["sortPicker"]);
+        }}
+      />
+      <TaskContainer
+        foundTasks={foundTasks}
+        setTasks={setTasks}
+        didTasksLoad={didTasksLoad}
+        emptyMessage={
+          !tasks || Object.keys(tasks).length === 0
+            ? "Nenhuma tarefa cadastrada!"
+            : foundTasks &&
+              Object.keys(foundTasks).length === 0 &&
+              "Nenhuma tarefa encontrada!"
+        }
+        openCreatePopup={() => {
+          setPopups((prevState) => ({
+            ...prevState,
+            taskCreation: true,
+          }));
+          animateOpening(popupAnimations["taskCreation"]);
+        }}
+        taskViewPopup={(taskId) => {
+          setSelectedTaskId(taskId);
+          setPopups((prevState) => ({
+            ...prevState,
+            taskView: true,
+          }));
+          animateOpening(popupAnimations["taskView"]);
+        }}
+        delete={(taskId) => {
+          setSelectedTaskId(taskId);
+          setPopups((prevState) => ({
+            ...prevState,
+            taskRemoval: true,
+          }));
+          animateOpening(popupAnimations["taskRemoval"]);
+        }}
+        checkCompleted={(taskId) => {
+          const updatedTasks = { ...tasks };
+          const updatedTask = updatedTasks[taskId];
+          if (updatedTask) {
+            updatedTask.isCompleted = !updatedTask.isCompleted;
+            updatedTask.updatedAt = Date.now();
+            updatedTasks[taskId] = updatedTask;
+            setTasks(updatedTasks);
+            modifyTask(taskId, updatedTask).catch(() => {
+              setErrorMessage(
+                "Não foi possível atualizar a tarefa na nuvem!\nA tarefa foi modificada localmente."
+              );
               setPopups((prevState) => ({
                 ...prevState,
-                settings: true,
+                error: true,
               }));
-              animateOpening(popupAnimations["settings"]);
-            }}
-          />
+              animateOpening(popupAnimations["error"]);
+            });
+          }
+        }}
+        isTaskAnalysisButtonActive={tasks && Object.keys(tasks).length !== 0}
+        openChatbot={() => {
+          setPopups((prevState) => ({
+            ...prevState,
+            chatbot: true,
+          }));
+          animateOpening(popupAnimations["chatbot"]);
+        }}
+        openWeeklyTaskAnalysis={() => {
+          setTaskAnalysisMode("weekly");
+          setPopups((prevState) => ({
+            ...prevState,
+            taskAnalysis: true,
+          }));
+          animateOpening(popupAnimations["taskAnalysis"]);
+        }}
+        openMonthlyTaskAnalysis={() => {
+          setTaskAnalysisMode("monthly");
+          setPopups((prevState) => ({
+            ...prevState,
+            taskAnalysis: true,
+          }));
+          animateOpening(popupAnimations["taskAnalysis"]);
+        }}
+      />
+      <Menu
+        animation={menuAnimation}
+        close={closeMenu}
+        openSettingsPopup={() => {
+          setPopups((prevState) => ({
+            ...prevState,
+            settings: true,
+          }));
+          animateOpening(popupAnimations["settings"]);
+        }}
+      />
+      {isMenuOpen && (
+        <Animated.View
+          style={[
+            styles.fullscreenArea,
+            {
+              width: "100%",
+              height: "100%",
+              backgroundColor: "rgba(0,0,0,0.3)",
+              opacity: menuOverlayOpacity,
+              zIndex: 1,
+            },
+          ]}
+        >
+          <TouchableWithoutFeedback onPress={closeMenu}>
+            <View style={{ flex: 1 }} />
+          </TouchableWithoutFeedback>
         </Animated.View>
       )}
       {popups.categoryPicker && (
@@ -843,117 +1036,6 @@ function HomeScreen() {
           message={authConfirmMessage}
         />
       )}
-      <TopBar
-        openMenu={() => {
-          setOpenMenu(true);
-          animateOpening(menuAnimation);
-          animateSlideIn(menuLeftAnimation);
-        }}
-        sortedTasks={sortedTasks}
-        setFoundTasks={setFoundTasks}
-      />
-      <FilteringBar
-        tasks={tasks}
-        setSortedTasks={setSortedTasks}
-        selectedCategory={selectedCategory}
-        selectedSort={selectedSort}
-        pendingTasksFirst={pendingTasksFirst}
-        completedTasksFirst={completedTasksFirst}
-        urgentTasksFirst={urgentTasksFirst}
-        openCategoryPickerPopup={() => {
-          setPopups((prevState) => ({
-            ...prevState,
-            categoryPicker: true,
-          }));
-          animateOpening(popupAnimations["categoryPicker"]);
-        }}
-        openSortPickerPopup={() => {
-          setPopups((prevState) => ({
-            ...prevState,
-            sortPicker: true,
-          }));
-          animateOpening(popupAnimations["sortPicker"]);
-        }}
-      />
-      <TaskContainer
-        foundTasks={foundTasks}
-        setTasks={setTasks}
-        didTasksLoad={didTasksLoad}
-        emptyMessage={
-          !tasks || Object.keys(tasks).length === 0
-            ? "Nenhuma tarefa cadastrada!"
-            : foundTasks &&
-              Object.keys(foundTasks).length === 0 &&
-              "Nenhuma tarefa encontrada!"
-        }
-        openCreatePopup={() => {
-          setPopups((prevState) => ({
-            ...prevState,
-            taskCreation: true,
-          }));
-          animateOpening(popupAnimations["taskCreation"]);
-        }}
-        taskViewPopup={(taskId) => {
-          setSelectedTaskId(taskId);
-          setPopups((prevState) => ({
-            ...prevState,
-            taskView: true,
-          }));
-          animateOpening(popupAnimations["taskView"]);
-        }}
-        delete={(taskId) => {
-          setSelectedTaskId(taskId);
-          setPopups((prevState) => ({
-            ...prevState,
-            taskRemoval: true,
-          }));
-          animateOpening(popupAnimations["taskRemoval"]);
-        }}
-        checkCompleted={(taskId) => {
-          const updatedTasks = { ...tasks };
-          const updatedTask = updatedTasks[taskId];
-          if (updatedTask) {
-            updatedTask.isCompleted = !updatedTask.isCompleted;
-            updatedTask.updatedAt = Date.now();
-            updatedTasks[taskId] = updatedTask;
-            setTasks(updatedTasks);
-            modifyTask(taskId, updatedTask).catch(() => {
-              setErrorMessage(
-                "Não foi possível atualizar a tarefa na nuvem!\nA tarefa foi modificada localmente."
-              );
-              setPopups((prevState) => ({
-                ...prevState,
-                error: true,
-              }));
-              animateOpening(popupAnimations["error"]);
-            });
-          }
-        }}
-        isTaskAnalysisButtonActive={tasks && Object.keys(tasks).length !== 0}
-        openChatbot={() => {
-          setPopups((prevState) => ({
-            ...prevState,
-            chatbot: true,
-          }));
-          animateOpening(popupAnimations["chatbot"]);
-        }}
-        openWeeklyTaskAnalysis={() => {
-          setTaskAnalysisMode("weekly");
-          setPopups((prevState) => ({
-            ...prevState,
-            taskAnalysis: true,
-          }));
-          animateOpening(popupAnimations["taskAnalysis"]);
-        }}
-        openMonthlyTaskAnalysis={() => {
-          setTaskAnalysisMode("monthly");
-          setPopups((prevState) => ({
-            ...prevState,
-            taskAnalysis: true,
-          }));
-          animateOpening(popupAnimations["taskAnalysis"]);
-        }}
-      />
       <StatusBar
         style={styles.statusBar.style}
         backgroundColor={styles.statusBar.backgroundColor}

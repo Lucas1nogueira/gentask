@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { Text, View, BackHandler, TouchableOpacity } from "react-native";
 import { AntDesign, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
 import { ThemeContext } from "../contexts/ThemeContext";
@@ -24,7 +24,7 @@ function MessagePopup(props) {
         {
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "rgba(0,0,0,0.5)",
+          backgroundColor: "rgba(0,0,0,0.3)",
         },
       ]}
     >

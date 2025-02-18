@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { Text, Animated, ActivityIndicator } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { ThemeContext } from "../contexts/ThemeContext";

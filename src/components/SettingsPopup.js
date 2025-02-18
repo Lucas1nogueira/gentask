@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import {
   Text,
   View,
@@ -32,7 +32,7 @@ function SettingsPopup(props) {
         {
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "rgba(0,0,0,0.5)",
+          backgroundColor: "rgba(0,0,0,0.3)",
         },
       ]}
       onPress={() => props.close()}
