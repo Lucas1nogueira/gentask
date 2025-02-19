@@ -58,7 +58,7 @@ function Task(props) {
                   </View>
                 ) : (
                   <View style={styles.completedTaskLabel}>
-                    <Text style={styles.completedTaskLabelText}>CONCLUÍDO</Text>
+                    <Text style={styles.completedTaskLabelText}>CONCLUÍDA</Text>
                   </View>
                 )}
                 {props.isUrgent && (
@@ -66,6 +66,13 @@ function Task(props) {
                     <Text style={styles.urgentTaskLabelText}>URGENTE</Text>
                   </View>
                 )}
+                {props.dueDate &&
+                  !props.isCompleted &&
+                  props.currentTime > props.dueDate && (
+                    <View style={styles.overdueTaskLabel}>
+                      <Text style={styles.overdueTaskLabelText}>ATRASADA</Text>
+                    </View>
+                  )}
               </View>
               {props.dueDate && (
                 <View
@@ -205,7 +212,7 @@ function Task(props) {
                   ) : (
                     <View style={styles.completedTaskLabel}>
                       <Text style={styles.completedTaskLabelText}>
-                        CONCLUÍDO
+                        CONCLUÍDA
                       </Text>
                     </View>
                   )}
@@ -214,6 +221,15 @@ function Task(props) {
                       <Text style={styles.urgentTaskLabelText}>URGENTE</Text>
                     </View>
                   )}
+                  {props.dueDate &&
+                    !props.isCompleted &&
+                    props.currentTime > props.dueDate && (
+                      <View style={styles.overdueTaskLabel}>
+                        <Text style={styles.overdueTaskLabelText}>
+                          ATRASADA
+                        </Text>
+                      </View>
+                    )}
                 </View>
                 {props.dueDate && (
                   <View

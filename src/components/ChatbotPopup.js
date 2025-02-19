@@ -62,6 +62,11 @@ function ChatbotPopup(props) {
   async function handleSend() {
     if (!inputText.trim() || isLoading) return;
 
+    if (inputText.trim().toLocaleLowerCase() === "sair") {
+      props.close();
+      return;
+    }
+
     const userMessage = {
       id: Date.now().toString(),
       text: inputText,

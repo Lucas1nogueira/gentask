@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet } from "react-native";
+import { Dimensions, Platform, StyleSheet } from "react-native";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
@@ -214,9 +214,16 @@ const lightStyles = StyleSheet.create({
     paddingHorizontal: 2,
   },
   urgentTaskLabel: {
+    marginRight: 5,
     borderWidth: 2,
     borderRadius: 5,
     borderColor: "#720b00",
+    paddingHorizontal: 2,
+  },
+  overdueTaskLabel: {
+    borderWidth: 2,
+    borderRadius: 5,
+    borderColor: "#8B6913",
     paddingHorizontal: 2,
   },
   pendingTaskLabelText: {
@@ -233,6 +240,11 @@ const lightStyles = StyleSheet.create({
     fontFamily: "ReadexPro-SemiBold",
     fontSize: 9,
     color: "#720b00",
+  },
+  overdueTaskLabelText: {
+    fontFamily: "ReadexPro-SemiBold",
+    fontSize: 9,
+    color: "#8B6913",
   },
   dueDateTaskLabelText: {
     fontFamily: "ReadexPro-SemiBold",
@@ -367,7 +379,7 @@ const lightStyles = StyleSheet.create({
   },
   taskInput: {
     width: "100%",
-    height: 300,
+    height: Platform.OS === "web" ? 200 : 250,
     marginTop: 20,
     backgroundColor: "#f2f2f2",
     borderRadius: 15,
@@ -406,6 +418,7 @@ const lightStyles = StyleSheet.create({
     height: 45,
     marginTop: 20,
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
     borderRadius: 10,
     backgroundColor: "#f2f2f2",
@@ -421,7 +434,6 @@ const lightStyles = StyleSheet.create({
   taskInsight: {
     width: "100%",
     marginTop: 10,
-    borderRadius: 15,
   },
   popupButtonRow: {
     width: "100%",
@@ -654,10 +666,10 @@ const lightStyles = StyleSheet.create({
     overflow: "hidden",
   },
   urgentTask: {
-    backgroundColor: "#ea9e96",
+    backgroundColor: "#f7b9b2",
   },
   urgentTaskCategoryLabel: {
-    backgroundColor: "#d8867d",
+    backgroundColor: "#e29b93",
   },
   selectedPickerOption: {
     backgroundColor: "#bfbfbf",

@@ -19,6 +19,7 @@ function TaskContainer(props) {
   const [showTasks, setShowTasks] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [taskWidth, setTaskWidth] = useState(null);
+  const [currentTime] = useState(new Date(Date.now()).setHours(0, 0, 0, 0));
 
   useEffect(() => {
     if (props.foundTasks) {
@@ -92,6 +93,7 @@ function TaskContainer(props) {
                   checkCompleted={() => {
                     props.checkCompleted(item.id);
                   }}
+                  currentTime={currentTime}
                 />
               )}
             />

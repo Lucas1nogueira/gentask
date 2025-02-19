@@ -28,6 +28,14 @@ Um gerenciador de tarefas inteligente desenvolvido com React Native e Expo, pote
 - Conta no OpenRouter e chave API
 - Expo Go instalado no dispositivo móvel (para desenvolvimento)
 
+Os dados para acesso da API do OpenRouter são obtidos do Firestore.
+Portanto, é necessário que você crie o caminho para eles na sua base de dados.
+Crie a coleção 'ai' e o documento 'config', inserindo neste último os seguintes dados:
+
+- apiUrl: A URL para a API do OpenRouter.
+- apiKey: Sua chave para acessar a API.
+- model: O modelo de IA que você tem acesso.
+
 ## ⚙️ Configuração
 
 1. Clone este repositório
@@ -48,8 +56,6 @@ EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=seu_storage_bucket
 EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=seu_sender_id
 EXPO_PUBLIC_FIREBASE_APP_ID=seu_app_id
 EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=seu_measurement_id
-EXPO_PUBLIC_OPENROUTER_AI_API_URL=api_url
-EXPO_PUBLIC_OPENROUTER_AI_API_KEY=sua_api_key
 ```
 
 ## 🚀 Executando o projeto

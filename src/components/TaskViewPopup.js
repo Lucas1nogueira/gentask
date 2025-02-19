@@ -185,10 +185,7 @@ function TaskViewPopup(props) {
           <Text style={styles.header}>Visualização da tarefa</Text>
         </View>
         <TextInput
-          style={[
-            styles.taskInput,
-            { height: Platform.OS === "web" ? 180 : 250 },
-          ]}
+          style={[styles.taskInput, Platform.OS === "web" && { height: 140 }]}
           multiline={true}
           textAlignVertical="top"
           defaultValue={props.selectedTask.text}

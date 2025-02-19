@@ -1,13 +1,9 @@
+import { getAIConfig } from "./firebase/firestore";
 import categories from "../data/categories";
 
-const API_URL = process.env.EXPO_PUBLIC_OPENROUTER_AI_API_URL;
-const API_KEY = process.env.EXPO_PUBLIC_OPENROUTER_AI_API_KEY;
-
-if (!API_URL || !API_KEY) {
-  throw new Error(
-    "API_URL or API_KEY is not defined. Please check environment variables."
-  );
-}
+let apiUrl;
+let apiKey;
+let aiModel;
 
 const categorizingPromptTemplate = `Classify the following text as a task into exactly ONE of the categories below. Respond strictly and only with the name of the category as listed, without any additional comments or explanations. The categories are: (${categories
   .map((category) => category.name)
@@ -19,11 +15,33 @@ const dueDatePromptTemplate = `Analyze the task and date. If a time-related hint
 
 const insightsPromptTemplate = `Considering the following text as a personal task, provide actionable insights. Answer only in Brazilian Portuguese and limit the response to 10 words. The text is: `;
 
-const analysisPromptTemplate = `Considering the following text as personal tasks, provide an useful analysis following the best productivity techniques and a helpful summarization. Answer in brazilian portuguese and in plain text, but you can use emojis. Limit the answer to just 50 words). The text is:`;
+const analysisPromptTemplate = `Considering the following text as personal tasks, provide an useful analysis following the best productivity techniques and a helpful summarization. Answer in brazilian portuguese and in plain text, but you can use emojis. MAX LIMIT answer of 50 words. The text is:`;
 
 const suggestionPromptTemplate = `Considering the following personal tasks, suggest a new task based on the found interests. Limit the response to 10 words, ONLY in portuguese, plain text. Tasks:`;
 
+async function configure() {
+  try {
+    const aiConfig = await getAIConfig();
+
+    if (aiConfig) {
+      apiUrl = aiConfig.apiUrl;
+      apiKey = aiConfig.apiKey;
+      aiModel = aiConfig.model;
+      return true;
+    } else {
+      console.log("Could not obtain AI configuration!");
+      return false;
+    }
+  } catch (error) {
+    console.error("Error retrieving AI configuration:", error);
+  }
+}
+
 async function query(prePrompt, userInput, maxTokens, temp) {
+  if (!apiUrl || !apiKey || !aiModel) {
+    throw new Error("API URL, API key or AI model are not defined.");
+  }
+
   const fullPrompt = `${prePrompt} ${userInput}`;
   const TIMEOUT_DURATION = 15000;
 
@@ -31,14 +49,14 @@ async function query(prePrompt, userInput, maxTokens, temp) {
   const timeout = setTimeout(() => timeoutController.abort(), TIMEOUT_DURATION);
 
   try {
-    const response = await fetch(API_URL, {
+    const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${API_KEY}`,
+        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "mistralai/mistral-7b-instruct:free",
+        model: aiModel,
         messages: [{ role: "user", content: fullPrompt }],
         max_tokens: maxTokens,
         top_k: 1,
@@ -54,7 +72,7 @@ async function query(prePrompt, userInput, maxTokens, temp) {
     }
 
     const data = await response.json();
-    console.log(JSON.stringify(data, null, 2));
+    // console.log(JSON.stringify(data, null, 2));
 
     if (!data?.choices?.[0]?.message?.content) {
       throw new Error("Incomplete API response: " + JSON.stringify(data));
@@ -276,4 +294,4 @@ async function getTaskSuggestion(tasks) {
   }
 }
 
-export { query, categorizeTask, getTaskAnalysis, getTaskSuggestion };
+export { configure, query, categorizeTask, getTaskAnalysis, getTaskSuggestion };

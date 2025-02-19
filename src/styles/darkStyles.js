@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet } from "react-native";
+import { Dimensions, Platform, StyleSheet } from "react-native";
 
 const screenWidth = Dimensions.get("window").width;
 const screenHeight = Dimensions.get("window").height;
@@ -214,9 +214,16 @@ const darkStyles = StyleSheet.create({
     paddingHorizontal: 2,
   },
   urgentTaskLabel: {
+    marginRight: 5,
     borderWidth: 2,
     borderRadius: 5,
     borderColor: "#ff503d",
+    paddingHorizontal: 2,
+  },
+  overdueTaskLabel: {
+    borderWidth: 2,
+    borderRadius: 5,
+    borderColor: "#FFDB58",
     paddingHorizontal: 2,
   },
   pendingTaskLabelText: {
@@ -233,6 +240,11 @@ const darkStyles = StyleSheet.create({
     fontFamily: "ReadexPro-SemiBold",
     fontSize: 9,
     color: "#ff503d",
+  },
+  overdueTaskLabelText: {
+    fontFamily: "ReadexPro-SemiBold",
+    fontSize: 9,
+    color: "#FFDB58",
   },
   dueDateTaskLabelText: {
     fontFamily: "ReadexPro-SemiBold",
@@ -367,7 +379,7 @@ const darkStyles = StyleSheet.create({
   },
   taskInput: {
     width: "100%",
-    height: 300,
+    height: Platform.OS === "web" ? 200 : 250,
     marginTop: 20,
     backgroundColor: "#191919",
     borderRadius: 15,
@@ -406,6 +418,7 @@ const darkStyles = StyleSheet.create({
     height: 45,
     marginTop: 20,
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
     borderRadius: 10,
     backgroundColor: "#191919",
@@ -421,7 +434,6 @@ const darkStyles = StyleSheet.create({
   taskInsight: {
     width: "100%",
     marginTop: 10,
-    borderRadius: 15,
   },
   popupButtonRow: {
     width: "100%",

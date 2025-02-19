@@ -156,3 +156,16 @@ export async function purgeTasks() {
     throw new Error(`Error erasing tasks: ${error.message}`);
   }
 }
+
+export async function getAIConfig() {
+  try {
+    const aiConfig = doc(db, "ai", "config");
+    const docSnapshot = await getDoc(aiConfig);
+
+    return docSnapshot.exists()
+      ? { id: docSnapshot.id, ...docSnapshot.data() }
+      : null;
+  } catch (error) {
+    throw new Error(`Error getting task: ${error.message}`);
+  }
+}

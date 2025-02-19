@@ -3,7 +3,6 @@ import {
   View,
   Animated,
   BackHandler,
-  Dimensions,
   PanResponder,
   TouchableWithoutFeedback,
 } from "react-native";
@@ -22,7 +21,7 @@ import {
   modifyTask,
   purgeTasks,
 } from "../services/firebase/firestore";
-import { getTaskSuggestion } from "../services/aiService";
+import { configure, getTaskSuggestion } from "../services/aiService";
 import { ThemeContext } from "../contexts/ThemeContext";
 import { AuthConfirmMessagesContext } from "../contexts/AuthConfirmMessagesContext";
 import Menu from "../components/Menu";
@@ -60,6 +59,7 @@ function HomeScreen() {
   } = useContext(AuthConfirmMessagesContext);
 
   const didFetch = useRef(false);
+  const [isAIConfigured, setAIConfigured] = useState(false);
 
   const [tasks, setTasks] = useState(null);
   const [didTasksLoad, setTasksLoad] = useState(false);
@@ -226,6 +226,10 @@ function HomeScreen() {
     checkConnection().then(async (isConnected) => {
       if (isConnected) {
         await syncOfflineTasks();
+        const aiConfig = await configure();
+        if (aiConfig) {
+          setAIConfigured(true);
+        }
       }
       fetchTasks()
         .then(async (data) => {
@@ -274,7 +278,7 @@ function HomeScreen() {
   }, [popups, isMenuOpen]);
 
   useEffect(() => {
-    if (didTasksLoad && Object.keys(tasks).length !== 0) {
+    if (didTasksLoad && Object.keys(tasks).length !== 0 && isAIConfigured) {
       getTaskSuggestion(tasks).then((suggestion) => {
         if (suggestion) {
           setTaskSuggestionText(suggestion);
@@ -288,7 +292,7 @@ function HomeScreen() {
         }
       });
     }
-  }, [didTasksLoad]);
+  }, [didTasksLoad, isAIConfigured]);
 
   return (
     <View style={styles.container} {...panResponder.panHandlers}>
@@ -729,18 +733,22 @@ function HomeScreen() {
             description={"Todo o conteúdo inserido será perdido. Tem certeza?"}
             actionName={"Sim"}
             action={() => {
-              animateClosing(popupAnimations["taskView"], () =>
-                setPopups((prevState) => ({
-                  ...prevState,
-                  taskView: false,
-                }))
-              );
-              animateClosing(popupAnimations["taskCreation"], () =>
-                setPopups((prevState) => ({
-                  ...prevState,
-                  taskCreation: false,
-                }))
-              );
+              if (popups.taskView) {
+                animateClosing(popupAnimations["taskView"], () =>
+                  setPopups((prevState) => ({
+                    ...prevState,
+                    taskView: false,
+                  }))
+                );
+              } else if (popups.taskCreation) {
+                setUserAcceptTaskSuggestion(false);
+                animateClosing(popupAnimations["taskCreation"], () =>
+                  setPopups((prevState) => ({
+                    ...prevState,
+                    taskCreation: false,
+                  }))
+                );
+              }
             }}
           />
         </Animated.View>
