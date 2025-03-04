@@ -5,19 +5,19 @@ let apiUrl;
 let apiKey;
 let aiModel;
 
-const categorizingPromptTemplate = `Classify the following text as a task into exactly ONE of the categories below. Respond strictly and only with the name of the category as listed, without any additional comments or explanations. The categories are: (${categories
+const categorizingPromptTemplate = `Classifique a tarefa a seguir em exatamente UMA das categorias seguintes. Responda UNICAMENTE com o nome da categoria. As categorias são: (${categories
   .map((category) => category.name)
   .join("), (")}). Text: `;
 
-const isUrgentPromptTemplate = `Considering the following text as a personal task, can this task be labeled as urgent? Consider only if the text is clearly talking about an urgent activity, and answer only with "yes" or "no". No explanations. The text is: `;
+const isUrgentPromptTemplate = `Considerando o texto a seguir como uma tarefa, pode essa tarefa ser considerada como urgente? Considere somente se o texto está falando claramente de uma atividade urgente, e responda UNICAMENTE com "yes" or "no". O texto é: `;
 
-const dueDatePromptTemplate = `Analyze the task and date. If a time-related hint is found (e.g., "amanhã", "semana que vem", "próximo mês" or any other hints), try to calculate the due date using concepts like: "amanhã" = +1 day. "semana que vem" = +7 days. "daqui a X dias" = +X days. And so on. Return only the due date (in DD/MM/AAAA) or just "no" if no hint is found. No explanations.`;
+const dueDatePromptTemplate = `Analise as seguintes tarefa e data. Se na tarefa for encontrado algum termo temporal, como "amanhã", "semana que vem", "próximo mês" ou qualquer outro, tente calcular a data de conclusão a partir do termo temporal, por exemplo: "amanhã" = +1 dia, "semana que vem" = +7 dias, "daqui a X dias" = +X dias, e assim por diante. Responda UNICAMENTE com a data de conclusão (formato DD/MM/AAAA) ou apenas "no" se nenhum termo temporal for encontrado. Nenhum comentário adicional!`;
 
-const insightsPromptTemplate = `Considering the following text as a personal task, provide actionable insights. Answer only in Brazilian Portuguese and limit the response to 10 words. The text is: `;
+const insightsPromptTemplate = `Considerando a tarefa a seguir, forneça um insight útil. NÃO ultrapasse 10 palavras. A tarefa é: `;
 
-const analysisPromptTemplate = `Considering the following text as personal tasks, provide an useful analysis following the best productivity techniques and a helpful summarization. Answer in brazilian portuguese and in plain text, but you can use emojis. MAX LIMIT answer of 50 words. The text is:`;
+const analysisPromptTemplate = `Considerando as tarefas a seguir, forneça uma análise produtiva. Responda sem caracteres especiais, mas use emojis. Responda com POUCAS palavras. O texto é: `;
 
-const suggestionPromptTemplate = `Considering the following personal tasks, suggest a new task based on the found interests. Limit the response to 10 words, ONLY in portuguese, plain text. Tasks:`;
+const suggestionPromptTemplate = `Considerando as tarefas a seguir, sugira uma nova tarefa baseada em interesses encontrados. Responda com, no máximo, 10 palavras. Tarefas: `;
 
 async function configure() {
   try {
@@ -85,109 +85,64 @@ async function query(prePrompt, userInput, maxTokens, temp) {
 }
 
 async function categorizeTask(text, categoryName, isUrgent, dueDate) {
-  let taskCategoryName;
-  let isTaskUrgent;
-  let taskDueDate;
-  let taskInsights;
+  const categoryPromise = !categoryName
+    ? query(categorizingPromptTemplate, text, 10, 0.3).catch(() => "Outros")
+    : Promise.resolve(categoryName);
 
-  if (!categoryName) {
-    try {
-      taskCategoryName = await query(categorizingPromptTemplate, text, 10, 0.3);
-    } catch (error) {
-      console.error("Error categorizing task:", error);
-      taskCategoryName = "Outros";
-    }
-  } else {
-    taskCategoryName = categoryName;
-  }
+  const isUrgentPromise =
+    isUrgent === null
+      ? query(isUrgentPromptTemplate, text, 3, 0.5)
+          .then((result) =>
+            result ? result.toLowerCase().trim() === "yes" : false
+          )
+          .catch(() => false)
+      : Promise.resolve(isUrgent);
 
-  if (isUrgent === null) {
-    try {
-      isTaskUrgent = await query(isUrgentPromptTemplate, text, 3, 0.3);
-      if (!isTaskUrgent) {
-        isTaskUrgent = false;
-      } else {
-        isTaskUrgent = isTaskUrgent.toLowerCase().trim() === "yes";
-      }
-    } catch (error) {
-      console.error("Error checking task urgency:", error);
-      isTaskUrgent = false;
-    }
-  } else {
-    isTaskUrgent = isUrgent;
-  }
+  const dueDatePromise = !dueDate
+    ? (() => {
+        const currentDate = new Date().toLocaleDateString("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        });
+        return query(
+          `${dueDatePromptTemplate} A data atual é ${currentDate} e a tarefa é: `,
+          text,
+          15,
+          0.2
+        ).catch(() => null);
+      })()
+    : Promise.resolve(dueDate);
 
-  if (!dueDate) {
-    const currentTimestamp = Date.now();
-    const currentDate = new Date(currentTimestamp).toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
-    const additionalPromptInfo = `The current date is ${currentDate} and the text is: `;
-
-    try {
-      const date = await query(
-        `${dueDatePromptTemplate} ${additionalPromptInfo}`,
-        text,
-        15,
-        0.5
-      );
-      taskDueDate = date;
-    } catch (error) {
-      console.error("Error obtaining task due date:", error);
-      taskDueDate = null;
-    }
-  } else {
-    taskDueDate = dueDate;
-  }
-
-  try {
-    taskInsights = await query(insightsPromptTemplate, text, 50, 0.7);
-  } catch (error) {
-    console.error("Error obtaining task insights:", error);
-    taskInsights = null;
-  }
-
-  taskCategoryName = taskCategoryName.replace(/[()]/g, "");
-  const categoryObject = categories.find(
-    (category) => category.name === taskCategoryName.trim()
+  const insightsPromise = query(insightsPromptTemplate, text, 50, 0.7).catch(
+    () => null
   );
 
+  const [taskCategoryName, isTaskUrgent, taskDueDate, taskInsights] =
+    await Promise.all([
+      categoryPromise,
+      isUrgentPromise,
+      dueDatePromise,
+      insightsPromise,
+    ]);
+
+  const processedCategory = taskCategoryName.replace(/[()]/g, "").trim();
+  const categoryObject = categories.find((c) => c.name === processedCategory);
+
+  let processedDueDate = null;
   if (taskDueDate && typeof taskDueDate === "string") {
-    const dateString = taskDueDate.trim();
-
-    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) {
-      const [day, month, year] = dateString.split("/");
-      const date = new Date(year, month - 1, day);
-
-      if (!isNaN(date.getTime())) {
-        taskDueDate = date.getTime();
-      } else {
-        taskDueDate = null;
-      }
-    } else {
-      taskDueDate = null;
-    }
+    const [day, month, year] = taskDueDate.trim().split("/");
+    const date = new Date(year, month - 1, day);
+    processedDueDate = isNaN(date.getTime()) ? null : date.getTime();
   }
 
-  if (!categoryObject) {
-    return {
-      categoryName: "Outros",
-      categoryColor: "gray",
-      dueDate: taskDueDate,
-      isUrgent: isTaskUrgent,
-      insights: taskInsights,
-    };
-  } else {
-    return {
-      categoryName: categoryObject.name,
-      categoryColor: categoryObject.color,
-      dueDate: taskDueDate,
-      isUrgent: isTaskUrgent,
-      insights: taskInsights,
-    };
-  }
+  return {
+    categoryName: categoryObject?.name || "Outros",
+    categoryColor: categoryObject?.color || "gray",
+    dueDate: processedDueDate,
+    isUrgent: isTaskUrgent,
+    insights: taskInsights,
+  };
 }
 
 function isDateInCurrentWeek(timestamp) {
@@ -279,7 +234,7 @@ async function getTaskSuggestion(tasks) {
     const taskSuggestion = await query(
       suggestionPromptTemplate,
       tasksText,
-      30,
+      50,
       0.7
     );
 

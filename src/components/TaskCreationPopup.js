@@ -6,6 +6,8 @@ import {
   View,
   TextInput,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import "react-native-get-random-values";
 import { v4 as uuidv4 } from "uuid";
@@ -167,92 +169,101 @@ function TaskCreationPopup(props) {
           />
         </Animated.View>
       )}
-      <View style={styles.taskPopup}>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <MaterialIcons name="post-add" size={20} color={styles.icon.color} />
-          <Text style={[styles.header, { paddingLeft: 3 }]}>
-            Criar nova tarefa
-          </Text>
-        </View>
-        <TextInput
-          style={styles.taskInput}
-          multiline={true}
-          textAlignVertical="top"
-          value={text}
-          onChangeText={onChangeText}
-          cursorColor={"#efdb00"}
-          placeholder="Digite aqui..."
-          placeholderTextColor={"#b5b5b5"}
-        />
-        <TaskAdvancedOptions
-          openCategoryPickerPopup={() => {
-            setPopups((prevState) => ({
-              ...prevState,
-              categoryPicker: true,
-            }));
-            animateOpening(popupAnimations["categoryPicker"]);
-          }}
-          openDatePickerPopup={() => {
-            setPopups((prevState) => ({
-              ...prevState,
-              datePicker: true,
-            }));
-            animateOpening(popupAnimations["datePicker"]);
-          }}
-          selectedCategory={selectedCategory}
-          isTaskUrgent={isTaskUrgent}
-          setTaskUrgent={setTaskUrgent}
-          selectedDate={selectedDate}
-        />
-        <View style={styles.popupButtonRow}>
-          <TouchableOpacity
-            style={[styles.commonButton, styles.cancelButton]}
-            onPress={() => {
-              if (
-                (typeof text === "string" &&
-                  text.replace(/\s/g, "").length != 0) ||
-                selectedCategory.name !== "Escolhido por IA" ||
-                isTaskUrgent !== null ||
-                selectedDate
-              ) {
-                props.openDiscardPopup();
-              } else {
-                props.close();
-              }
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "position"}
+        style={styles.keyboardAvoidingContainer}
+      >
+        <View style={styles.taskPopup}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <MaterialIcons
+              name="post-add"
+              size={20}
+              color={styles.icon.color}
+            />
+            <Text style={[styles.header, { paddingLeft: 3 }]}>
+              Criar nova tarefa
+            </Text>
+          </View>
+          <TextInput
+            style={[styles.taskInput, Platform.OS !== "web" && { height: 300 }]}
+            multiline={true}
+            textAlignVertical="top"
+            value={text}
+            onChangeText={onChangeText}
+            cursorColor={"#efdb00"}
+            placeholder="Digite aqui..."
+            placeholderTextColor={"#b5b5b5"}
+          />
+          <TaskAdvancedOptions
+            openCategoryPickerPopup={() => {
+              setPopups((prevState) => ({
+                ...prevState,
+                categoryPicker: true,
+              }));
+              animateOpening(popupAnimations["categoryPicker"]);
             }}
-          >
-            <View
-              style={{
-                width: "100%",
-                flexDirection: "row",
-                justifyContent: "space-evenly",
-                alignItems: "center",
+            openDatePickerPopup={() => {
+              setPopups((prevState) => ({
+                ...prevState,
+                datePicker: true,
+              }));
+              animateOpening(popupAnimations["datePicker"]);
+            }}
+            selectedCategory={selectedCategory}
+            isTaskUrgent={isTaskUrgent}
+            setTaskUrgent={setTaskUrgent}
+            selectedDate={selectedDate}
+          />
+          <View style={styles.popupButtonRow}>
+            <TouchableOpacity
+              style={[styles.commonButton, styles.cancelButton]}
+              onPress={() => {
+                if (
+                  (typeof text === "string" &&
+                    text.replace(/\s/g, "").length != 0) ||
+                  selectedCategory.name !== "Escolhido por IA" ||
+                  isTaskUrgent !== null ||
+                  selectedDate
+                ) {
+                  props.openDiscardPopup();
+                } else {
+                  props.close();
+                }
               }}
             >
-              <AntDesign name="arrowleft" size={20} color="white" />
-              <Text style={[styles.text, { color: "white" }]}>Voltar</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.commonButton, styles.confirmButton]}
-            onPress={() => {
-              checkText();
-            }}
-          >
-            <View
-              style={{
-                width: "100%",
-                flexDirection: "row",
-                justifyContent: "space-evenly",
-                alignItems: "center",
+              <View
+                style={{
+                  width: "100%",
+                  flexDirection: "row",
+                  justifyContent: "space-evenly",
+                  alignItems: "center",
+                }}
+              >
+                <AntDesign name="arrowleft" size={20} color="white" />
+                <Text style={[styles.text, { color: "white" }]}>Voltar</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.commonButton, styles.confirmButton]}
+              onPress={() => {
+                checkText();
               }}
             >
-              <Ionicons name="save-outline" size={20} color="white" />
-              <Text style={[styles.text, { color: "white" }]}>Salvar</Text>
-            </View>
-          </TouchableOpacity>
+              <View
+                style={{
+                  width: "100%",
+                  flexDirection: "row",
+                  justifyContent: "space-evenly",
+                  alignItems: "center",
+                }}
+              >
+                <Ionicons name="save-outline" size={20} color="white" />
+                <Text style={[styles.text, { color: "white" }]}>Salvar</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </View>
   );
 }
