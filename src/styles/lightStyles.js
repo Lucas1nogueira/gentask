@@ -101,7 +101,7 @@ const lightStyles = StyleSheet.create({
     width: "100%",
     height: "90%",
     flexDirection: "column",
-    justifyContent: "space-evenly",
+    justifyContent: "center",
   },
   menuOption: {
     width: "100%",
@@ -160,6 +160,15 @@ const lightStyles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: "#dbdbdb",
     padding: 15,
+  },
+  emptyTrashButton: {
+    width: "100%",
+    height: 55,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 10,
+    backgroundColor: "#EA4335",
   },
   text: {
     fontFamily: "ReadexPro-Regular",

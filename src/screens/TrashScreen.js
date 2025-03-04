@@ -10,32 +10,27 @@ import { StatusBar } from "expo-status-bar";
 import NetInfo from "@react-native-community/netinfo";
 import {
   eraseTasks,
-  getTasks,
-  storeTasks,
-  storeTrashedTask,
-  syncOfflineTasks,
+  eraseTrashedTasks,
+  getTrashedTasks,
+  storeTask,
+  storeTrashedTasks,
 } from "../services/storage";
 import { logout } from "../services/firebase/auth";
 import {
-  moveTaskToTrash,
-  fetchTasks,
-  modifyTask,
+  fetchTrashedTasks,
+  permanentlyDeleteTask,
   purgeTasks,
+  purgeTrashedTasks,
+  restoreTrashedTask,
 } from "../services/firebase/firestore";
-import { configure, getTaskSuggestion } from "../services/aiService";
 import { ThemeContext } from "../contexts/ThemeContext";
 import { AuthConfirmMessagesContext } from "../contexts/AuthConfirmMessagesContext";
 import Menu from "../components/Menu";
 import TopBar from "../components/TopBar";
 import FilteringBar from "../components/FilteringBar";
-import TaskContainer from "../components/TaskContainer";
+import TrashedTaskContainer from "../components/TrashedTaskContainer";
 import CategoryPickerPopup from "../components/CategoryPickerPopup";
 import SortPickerPopup from "../components/SortPickerPopup";
-import TaskViewPopup from "../components/TaskViewPopup";
-import TaskCreationPopup from "../components/TaskCreationPopup";
-import TaskAnalysisPopup from "../components/TaskAnalysisPopup";
-import TaskSuggestionPopup from "../components/TaskSuggestionPopup";
-import ChatbotPopup from "../components/ChatbotPopup";
 import MessagePopup from "../components/MessagePopup";
 import MinimalPopup from "../components/MinimalPopup";
 import SettingsPopup from "../components/SettingsPopup";
@@ -49,23 +44,20 @@ import "../styles/global.css";
 
 const MENU_DRAWER_WIDTH = 280;
 
-function HomeScreen(props) {
+function TrashScreen(props) {
   const { styles } = useContext(ThemeContext);
   const {
-    authConfirmMessage,
     setAuthConfirmMessage,
-    authConfirmPopups,
     setAuthConfirmPopups,
     authConfirmPopupAnimations,
   } = useContext(AuthConfirmMessagesContext);
 
   const didFetch = useRef(false);
-  const [isAIConfigured, setAIConfigured] = useState(false);
 
-  const [tasks, setTasks] = useState(null);
-  const [didTasksLoad, setTasksLoad] = useState(false);
-  const [sortedTasks, setSortedTasks] = useState(null);
-  const [foundTasks, setFoundTasks] = useState(null);
+  const [trashedTasks, setTrashedTasks] = useState(null);
+  const [didTrashedTasksLoad, setTrashedTasksLoad] = useState(false);
+  const [sortedTrashedTasks, setSortedTrashedTasks] = useState(null);
+  const [foundTrashedTasks, setFoundTrashedTasks] = useState(null);
 
   const [selectedCategory, setSelectedCategory] = useState({
     name: "Tudo",
@@ -77,34 +69,22 @@ function HomeScreen(props) {
   const [urgentTasksFirst, setUrgentTasksFirst] = useState(true);
 
   const [selectedTaskId, setSelectedTaskId] = useState(null);
-  const [taskAnalysisMode, setTaskAnalysisMode] = useState(null);
 
   const [isMenuOpen, setMenuOpen] = useState(false);
   const menuAnimation = useRef(new Animated.Value(-MENU_DRAWER_WIDTH)).current;
 
-  const [didTaskSuggestionPopupJustOpen, setTaskSuggestionPopupJustOpen] =
-    useState(false);
-  const [didUserAcceptTaskSuggestion, setUserAcceptTaskSuggestion] =
-    useState(false);
-  const [taskSuggestionText, setTaskSuggestionText] = useState("");
   const [minimalPopupMessage, setMinimalPopupMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
   const [popups, setPopups] = useState({
     categoryPicker: false,
     sortPicker: false,
-    chatbot: false,
-    taskAnalysis: false,
-    taskView: false,
-    taskCreation: false,
-    taskRemoval: false,
-    taskDiscard: false,
+    trashedTaskRemoval: false,
+    trashedTaskClear: false,
     taskClear: false,
-    taskSuggestion: false,
     exit: false,
     loading: false,
     success: false,
-    noText: false,
     error: false,
     settings: false,
     logout: false,
@@ -113,22 +93,14 @@ function HomeScreen(props) {
   const [popupAnimations] = useState({
     categoryPicker: new Animated.Value(0),
     sortPicker: new Animated.Value(0),
-    chatbot: new Animated.Value(0),
-    taskAnalysis: new Animated.Value(0),
-    taskView: new Animated.Value(0),
-    taskCreation: new Animated.Value(0),
-    taskRemoval: new Animated.Value(0),
-    taskDiscard: new Animated.Value(0),
+    trashedTaskRemoval: new Animated.Value(0),
+    trashedTaskClear: new Animated.Value(0),
     taskClear: new Animated.Value(0),
-    taskSuggestion: new Animated.Value(0),
-    taskSuggestionRight: new Animated.Value(0),
     exit: new Animated.Value(0),
     loading: new Animated.Value(0),
     loadingRight: new Animated.Value(0),
     success: new Animated.Value(0),
     successRight: new Animated.Value(0),
-    noText: new Animated.Value(0),
-    noTextRight: new Animated.Value(0),
     error: new Animated.Value(0),
     settings: new Animated.Value(0),
     logout: new Animated.Value(0),
@@ -225,27 +197,22 @@ function HomeScreen(props) {
 
   useEffect(() => {
     checkConnection().then(async (isConnected) => {
-      if (isConnected) {
-        await syncOfflineTasks();
-        const aiConfig = await configure();
-        if (aiConfig) {
-          setAIConfigured(true);
-        }
-      }
-      fetchTasks()
+      fetchTrashedTasks()
         .then(async (data) => {
           if (isConnected) {
-            await eraseTasks();
+            await eraseTrashedTasks();
             if (data) {
-              setTasks(data);
+              setTrashedTasks(data);
             }
           } else {
-            const localData = await getTasks();
-            if (localData) setTasks(localData);
+            const localData = await getTrashedTasks();
+            if (localData) setTrashedTasks(localData);
           }
         })
         .catch(() => {
-          setErrorMessage("Não foi possível carregar as tarefas da nuvem!");
+          setErrorMessage(
+            "Não foi possível carregar as tarefas na lixeira da nuvem!"
+          );
           setPopups((prevState) => ({
             ...prevState,
             error: true,
@@ -254,63 +221,28 @@ function HomeScreen(props) {
         })
         .finally(async () => {
           didFetch.current = true;
-          setTasksLoad(true);
+          setTrashedTasksLoad(true);
         });
     });
   }, []);
 
   useEffect(() => {
     if (didFetch.current) {
-      storeTasks(tasks);
+      storeTrashedTasks(trashedTasks);
     }
-  }, [tasks]);
-
-  useEffect(() => {
-    if (popups.taskSuggestion && didTaskSuggestionPopupJustOpen) {
-      setTaskSuggestionPopupJustOpen(false);
-    } else if (popups.taskSuggestion) {
-      animateClosing(popupAnimations["taskSuggestion"], () =>
-        setPopups((prevState) => ({
-          ...prevState,
-          taskSuggestion: false,
-        }))
-      );
-      animateSlideOut(popupAnimations["taskSuggestionRight"]);
-    }
-  }, [popups, isMenuOpen]);
-
-  useEffect(() => {
-    if (
-      didTasksLoad &&
-      tasks &&
-      Object.keys(tasks).length !== 0 &&
-      isAIConfigured
-    ) {
-      getTaskSuggestion(tasks).then((suggestion) => {
-        if (suggestion) {
-          setTaskSuggestionText(suggestion);
-          setPopups((prevState) => ({
-            ...prevState,
-            taskSuggestion: true,
-          }));
-          animateOpening(popupAnimations["taskSuggestion"]);
-          animateSlideIn(popupAnimations["taskSuggestionRight"]);
-          setTaskSuggestionPopupJustOpen(true);
-        }
-      });
-    }
-  }, [didTasksLoad, isAIConfigured]);
+  }, [trashedTasks]);
 
   return (
     <View style={styles.container} {...panResponder.panHandlers}>
       <TopBar
+        isTrashScreenActive={true}
         openMenu={openMenu}
-        sortedTasks={sortedTasks}
-        setFoundTasks={setFoundTasks}
+        sortedTasks={sortedTrashedTasks}
+        setFoundTasks={setFoundTrashedTasks}
       />
       <FilteringBar
-        tasks={tasks}
-        setSortedTasks={setSortedTasks}
+        tasks={trashedTasks}
+        setSortedTasks={setSortedTrashedTasks}
         selectedCategory={selectedCategory}
         selectedSort={selectedSort}
         pendingTasksFirst={pendingTasksFirst}
@@ -331,82 +263,60 @@ function HomeScreen(props) {
           animateOpening(popupAnimations["sortPicker"]);
         }}
       />
-      <TaskContainer
-        foundTasks={foundTasks}
-        didTasksLoad={didTasksLoad}
+      <TrashedTaskContainer
+        foundTrashedTasks={foundTrashedTasks}
+        didTrashedTasksLoad={didTrashedTasksLoad}
         emptyMessage={
-          !tasks || Object.keys(tasks).length === 0
-            ? "Nenhuma tarefa cadastrada!"
-            : foundTasks &&
-              Object.keys(foundTasks).length === 0 &&
+          !trashedTasks || Object.keys(trashedTasks).length === 0
+            ? "A lixeira está vazia!"
+            : foundTrashedTasks &&
+              Object.keys(foundTrashedTasks).length === 0 &&
               "Nenhuma tarefa encontrada!"
         }
-        openCreatePopup={() => {
+        openTrashedTaskClearPopup={() => {
           setPopups((prevState) => ({
             ...prevState,
-            taskCreation: true,
+            trashedTaskClear: true,
           }));
-          animateOpening(popupAnimations["taskCreation"]);
-        }}
-        taskViewPopup={(taskId) => {
-          setSelectedTaskId(taskId);
-          setPopups((prevState) => ({
-            ...prevState,
-            taskView: true,
-          }));
-          animateOpening(popupAnimations["taskView"]);
+          animateOpening(popupAnimations["trashedTaskClear"]);
         }}
         delete={(taskId) => {
           setSelectedTaskId(taskId);
           setPopups((prevState) => ({
             ...prevState,
-            taskRemoval: true,
+            trashedTaskRemoval: true,
           }));
-          animateOpening(popupAnimations["taskRemoval"]);
+          animateOpening(popupAnimations["trashedTaskRemoval"]);
         }}
-        checkCompleted={(taskId) => {
-          const updatedTasks = { ...tasks };
-          const updatedTask = updatedTasks[taskId];
-          if (updatedTask) {
-            updatedTask.isCompleted = !updatedTask.isCompleted;
-            updatedTask.updatedAt = Date.now();
-            updatedTasks[taskId] = updatedTask;
-            setTasks(updatedTasks);
-            modifyTask(taskId, updatedTask).catch(() => {
-              setErrorMessage(
-                "Não foi possível atualizar a tarefa na nuvem!\nA tarefa foi modificada localmente."
-              );
+        restore={(taskId) => {
+          const updatedTrashedTasks = { ...trashedTasks };
+          const restoredTask = updatedTrashedTasks[taskId];
+          delete updatedTrashedTasks[taskId];
+          storeTask(taskId, restoredTask);
+          setTrashedTasks(updatedTrashedTasks);
+          setSelectedTaskId(null);
+          setMinimalPopupMessage("Tarefa restaurada!");
+          setTimeout(
+            () => {
               setPopups((prevState) => ({
                 ...prevState,
-                error: true,
+                success: true,
               }));
-              animateOpening(popupAnimations["error"]);
-            });
-          }
-        }}
-        isTaskAnalysisButtonActive={tasks && Object.keys(tasks).length !== 0}
-        openChatbot={() => {
-          setPopups((prevState) => ({
-            ...prevState,
-            chatbot: true,
-          }));
-          animateOpening(popupAnimations["chatbot"]);
-        }}
-        openWeeklyTaskAnalysis={() => {
-          setTaskAnalysisMode("weekly");
-          setPopups((prevState) => ({
-            ...prevState,
-            taskAnalysis: true,
-          }));
-          animateOpening(popupAnimations["taskAnalysis"]);
-        }}
-        openMonthlyTaskAnalysis={() => {
-          setTaskAnalysisMode("monthly");
-          setPopups((prevState) => ({
-            ...prevState,
-            taskAnalysis: true,
-          }));
-          animateOpening(popupAnimations["taskAnalysis"]);
+              animateOpening(popupAnimations["success"]);
+              animateSlideIn(popupAnimations["successRight"]);
+            },
+            popups.trashedTaskRemoval ? 500 : 0
+          );
+          restoreTrashedTask(taskId, restoredTask).catch(() => {
+            setErrorMessage(
+              "Não foi possível restaurar a tarefa na nuvem!\nA tarefa foi restaurada localmente."
+            );
+            setPopups((prevState) => ({
+              ...prevState,
+              error: true,
+            }));
+            animateOpening(popupAnimations["error"]);
+          });
         }}
       />
       <Menu
@@ -487,214 +397,35 @@ function HomeScreen(props) {
           />
         </Animated.View>
       )}
-      {popups.chatbot && (
-        <Animated.View
-          style={[styles.fullscreenArea, { opacity: popupAnimations.chatbot }]}
-        >
-          <ChatbotPopup
-            close={() => {
-              animateClosing(popupAnimations["chatbot"], () =>
-                setPopups((prevState) => ({
-                  ...prevState,
-                  chatbot: false,
-                }))
-              );
-            }}
-            data={tasks}
-          />
-        </Animated.View>
-      )}
-      {popups.taskAnalysis && (
+      {popups.trashedTaskRemoval && (
         <Animated.View
           style={[
             styles.fullscreenArea,
-            { opacity: popupAnimations.taskAnalysis },
-          ]}
-        >
-          <TaskAnalysisPopup
-            close={() => {
-              animateClosing(popupAnimations["taskAnalysis"], () =>
-                setPopups((prevState) => ({
-                  ...prevState,
-                  taskAnalysis: false,
-                }))
-              );
-            }}
-            tasks={tasks}
-            taskAnalysisMode={taskAnalysisMode}
-          />
-        </Animated.View>
-      )}
-      {popups.taskView && (
-        <Animated.View
-          style={[styles.fullscreenArea, { opacity: popupAnimations.taskView }]}
-        >
-          <TaskViewPopup
-            close={() => {
-              animateClosing(popupAnimations["taskView"], () =>
-                setPopups((prevState) => ({
-                  ...prevState,
-                  taskView: false,
-                }))
-              );
-            }}
-            openDiscardPopup={() => {
-              setPopups((prevState) => ({
-                ...prevState,
-                taskDiscard: true,
-              }));
-              animateOpening(popupAnimations["taskDiscard"]);
-            }}
-            openLoadingPopup={() => {
-              setPopups((prevState) => ({
-                ...prevState,
-                loading: true,
-              }));
-              animateOpening(popupAnimations["loading"]);
-              animateSlideIn(popupAnimations["loadingRight"]);
-            }}
-            closeLoadingPopup={() => {
-              animateClosing(popupAnimations["loading"], () =>
-                setPopups((prevState) => ({
-                  ...prevState,
-                  loading: false,
-                }))
-              );
-              animateSlideOut(popupAnimations["loadingRight"]);
-            }}
-            openSuccessPopup={() => {
-              setMinimalPopupMessage("Tarefa atualizada!");
-              setPopups((prevState) => ({
-                ...prevState,
-                success: true,
-              }));
-              animateOpening(popupAnimations["success"]);
-              animateSlideIn(popupAnimations["successRight"]);
-            }}
-            openNoTextPopup={() => {
-              setPopups((prevState) => ({
-                ...prevState,
-                noText: true,
-              }));
-              animateOpening(popupAnimations["noText"]);
-              animateSlideIn(popupAnimations["noTextRight"]);
-            }}
-            setErrorMessage={setErrorMessage}
-            openErrorPopup={() => {
-              setPopups((prevState) => ({
-                ...prevState,
-                error: true,
-              }));
-              animateOpening(popupAnimations["error"]);
-            }}
-            tasks={tasks}
-            selectedTaskId={selectedTaskId}
-            selectedTask={tasks[selectedTaskId]}
-            setTasks={setTasks}
-          />
-        </Animated.View>
-      )}
-      {popups.taskCreation && (
-        <Animated.View
-          style={[
-            styles.fullscreenArea,
-            { opacity: popupAnimations.taskCreation },
-          ]}
-        >
-          <TaskCreationPopup
-            close={() => {
-              animateClosing(popupAnimations["taskCreation"], () =>
-                setPopups((prevState) => ({
-                  ...prevState,
-                  taskCreation: false,
-                }))
-              );
-            }}
-            openDiscardPopup={() => {
-              setPopups((prevState) => ({
-                ...prevState,
-                taskDiscard: true,
-              }));
-              animateOpening(popupAnimations["taskDiscard"]);
-            }}
-            openLoadingPopup={() => {
-              setPopups((prevState) => ({
-                ...prevState,
-                loading: true,
-              }));
-              animateOpening(popupAnimations["loading"]);
-              animateSlideIn(popupAnimations["loadingRight"]);
-            }}
-            closeLoadingPopup={() => {
-              animateClosing(popupAnimations["loading"], () =>
-                setPopups((prevState) => ({
-                  ...prevState,
-                  loading: false,
-                }))
-              );
-              animateSlideOut(popupAnimations["loadingRight"]);
-            }}
-            openSuccessPopup={() => {
-              setMinimalPopupMessage("Tarefa adicionada!");
-              setPopups((prevState) => ({
-                ...prevState,
-                success: true,
-              }));
-              animateOpening(popupAnimations["success"]);
-              animateSlideIn(popupAnimations["successRight"]);
-            }}
-            openNoTextPopup={() => {
-              setPopups((prevState) => ({
-                ...prevState,
-                noText: true,
-              }));
-              animateOpening(popupAnimations["noText"]);
-              animateSlideIn(popupAnimations["noTextRight"]);
-            }}
-            setErrorMessage={setErrorMessage}
-            openErrorPopup={() => {
-              setPopups((prevState) => ({
-                ...prevState,
-                error: true,
-              }));
-              animateOpening(popupAnimations["error"]);
-            }}
-            isAnyTaskCreated={tasks != null}
-            setTasks={setTasks}
-            taskSuggestion={
-              didUserAcceptTaskSuggestion ? taskSuggestionText : null
-            }
-          />
-        </Animated.View>
-      )}
-      {popups.taskRemoval && (
-        <Animated.View
-          style={[
-            styles.fullscreenArea,
-            { opacity: popupAnimations.taskRemoval },
+            { opacity: popupAnimations.trashedTaskRemoval },
           ]}
         >
           <MessagePopup
             close={() => {
-              animateClosing(popupAnimations["taskRemoval"], () =>
+              animateClosing(popupAnimations["trashedTaskRemoval"], () =>
                 setPopups((prevState) => ({
                   ...prevState,
-                  taskRemoval: false,
+                  trashedTaskRemoval: false,
                 }))
               );
             }}
             iconName={"trash"}
-            title={"Deletar tarefa"}
-            description={"Isso apagará a tarefa selecionada. Tem certeza?"}
+            title={"Deletar tarefa permanentemente"}
+            description={
+              "Isso apagará completamente a tarefa selecionada. Tem certeza?"
+            }
             actionName={"Deletar"}
             action={() => {
-              const updatedTasks = { ...tasks };
-              const deletedTask = updatedTasks[selectedTaskId];
-              delete updatedTasks[selectedTaskId];
-              storeTrashedTask(selectedTaskId, deletedTask);
-              setTasks(updatedTasks);
+              const updatedTrashedTasks = { ...trashedTasks };
+              const deletedTask = updatedTrashedTasks[selectedTaskId];
+              delete updatedTrashedTasks[selectedTaskId];
+              setTrashedTasks(updatedTrashedTasks);
               setSelectedTaskId(null);
-              setMinimalPopupMessage("Tarefa removida!");
+              setMinimalPopupMessage("Tarefa apagada!");
               setTimeout(
                 () => {
                   setPopups((prevState) => ({
@@ -704,11 +435,11 @@ function HomeScreen(props) {
                   animateOpening(popupAnimations["success"]);
                   animateSlideIn(popupAnimations["successRight"]);
                 },
-                popups.taskRemoval ? 500 : 0
+                popups.trashedTaskRemoval ? 500 : 0
               );
-              moveTaskToTrash(selectedTaskId, deletedTask).catch(() => {
+              permanentlyDeleteTask(selectedTaskId, deletedTask).catch(() => {
                 setErrorMessage(
-                  "Não foi possível apagar a tarefa na nuvem!\nA tarefa foi apagada localmente."
+                  "Não foi possível deletar a tarefa na nuvem!\nA tarefa foi deletada localmente."
                 );
                 setPopups((prevState) => ({
                   ...prevState,
@@ -720,43 +451,76 @@ function HomeScreen(props) {
           />
         </Animated.View>
       )}
-      {popups.taskDiscard && (
+      {popups.trashedTaskClear && (
         <Animated.View
           style={[
             styles.fullscreenArea,
-            { opacity: popupAnimations.taskDiscard },
+            { opacity: popupAnimations.trashedTaskClear },
           ]}
         >
           <MessagePopup
             close={() => {
-              animateClosing(popupAnimations["taskDiscard"], () =>
+              animateClosing(popupAnimations["trashedTaskClear"], () =>
                 setPopups((prevState) => ({
                   ...prevState,
-                  taskDiscard: false,
+                  trashedTaskClear: false,
                 }))
               );
             }}
-            iconName={"close"}
-            title={"Descartar tarefa"}
-            description={"Todo o conteúdo inserido será perdido. Tem certeza?"}
-            actionName={"Sim"}
+            iconName={"fire"}
+            title={"Esvaziar lixeira"}
+            description={
+              "Isso apagará permanentemente as tarefas da lixeira. Tem certeza?"
+            }
+            actionName={"Esvaziar"}
             action={() => {
-              if (popups.taskView) {
-                animateClosing(popupAnimations["taskView"], () =>
+              setPopups((prevState) => ({
+                ...prevState,
+                loading: true,
+              }));
+              animateOpening(popupAnimations["loading"]);
+              animateSlideIn(popupAnimations["loadingRight"]);
+              eraseTrashedTasks()
+                .then(() => {
+                  animateClosing(popupAnimations["loading"], () =>
+                    setPopups((prevState) => ({
+                      ...prevState,
+                      loading: false,
+                    }))
+                  );
+                  animateSlideOut(popupAnimations["loadingRight"]);
+                  setTrashedTasks(null);
+                  setSortedTrashedTasks(null);
+                  setFoundTrashedTasks(null);
+                  setSelectedTaskId(null);
+                  setMinimalPopupMessage("Lixeira esvaziada!");
                   setPopups((prevState) => ({
                     ...prevState,
-                    taskView: false,
-                  }))
-                );
-              } else if (popups.taskCreation) {
-                setUserAcceptTaskSuggestion(false);
-                animateClosing(popupAnimations["taskCreation"], () =>
+                    success: true,
+                  }));
+                  animateOpening(popupAnimations["success"]);
+                  animateSlideIn(popupAnimations["successRight"]);
+                  purgeTrashedTasks().catch(() => {
+                    setErrorMessage(
+                      "Não foi possível esvaziar a lixeira na nuvem!\nPor favor, contate o desenvolvedor."
+                    );
+                    setPopups((prevState) => ({
+                      ...prevState,
+                      error: true,
+                    }));
+                    animateOpening(popupAnimations["error"]);
+                  });
+                })
+                .catch(() => {
+                  setErrorMessage(
+                    "Não foi possível esvaziar a lixeira no dispositivo!\nPor favor, contate o desenvolvedor."
+                  );
                   setPopups((prevState) => ({
                     ...prevState,
-                    taskCreation: false,
-                  }))
-                );
-              }
+                    error: true,
+                  }));
+                  animateOpening(popupAnimations["error"]);
+                });
             }}
           />
         </Animated.View>
@@ -799,9 +563,6 @@ function HomeScreen(props) {
                     }))
                   );
                   animateSlideOut(popupAnimations["loadingRight"]);
-                  setTasks(null);
-                  setSortedTasks(null);
-                  setFoundTasks(null);
                   setSelectedTaskId(null);
                   setMinimalPopupMessage("Tarefas apagadas!");
                   setPopups((prevState) => ({
@@ -834,30 +595,6 @@ function HomeScreen(props) {
             }}
           />
         </Animated.View>
-      )}
-      {popups.taskSuggestion && (
-        <TaskSuggestionPopup
-          opacityAnimation={popupAnimations.taskSuggestion}
-          rightAnimation={popupAnimations.taskSuggestionRight}
-          close={() => {
-            animateClosing(popupAnimations["taskSuggestion"], () =>
-              setPopups((prevState) => ({
-                ...prevState,
-                taskSuggestion: false,
-              }))
-            );
-            animateSlideOut(popupAnimations["taskSuggestionRight"]);
-          }}
-          action={() => {
-            setUserAcceptTaskSuggestion(true);
-            setPopups((prevState) => ({
-              ...prevState,
-              taskCreation: true,
-            }));
-            animateOpening(popupAnimations["taskCreation"]);
-          }}
-          suggestion={taskSuggestionText}
-        />
       )}
       {popups.exit && (
         <Animated.View
@@ -905,23 +642,6 @@ function HomeScreen(props) {
             animateSlideOut(popupAnimations["successRight"]);
           }}
           message={minimalPopupMessage}
-        />
-      )}
-      {popups.noText && (
-        <MinimalPopup
-          opacityAnimation={popupAnimations.noText}
-          rightAnimation={popupAnimations.noTextRight}
-          color="#bc0000"
-          close={() => {
-            animateClosing(popupAnimations["noText"], () =>
-              setPopups((prevState) => ({
-                ...prevState,
-                noText: false,
-              }))
-            );
-            animateSlideOut(popupAnimations["noTextRight"]);
-          }}
-          message={"Por favor, insira algum texto!"}
         />
       )}
       {popups.error && (
@@ -996,6 +716,7 @@ function HomeScreen(props) {
             action={() => {
               logout()
                 .then(() => {
+                  props.setTrashScreenActive(false);
                   setAuthConfirmMessage("Deslogado com sucesso!");
                   setAuthConfirmPopups((prevState) => ({
                     ...prevState,
@@ -1018,40 +739,6 @@ function HomeScreen(props) {
           />
         </Animated.View>
       )}
-      {authConfirmPopups.signIn && (
-        <MinimalPopup
-          opacityAnimation={authConfirmPopupAnimations.signIn}
-          rightAnimation={authConfirmPopupAnimations.signInRight}
-          color={styles.minimalPopupSuccess.backgroundColor}
-          close={() => {
-            animateClosing(authConfirmPopupAnimations["signIn"], () => {
-              setAuthConfirmPopups((prevState) => ({
-                ...prevState,
-                signIn: false,
-              }));
-            });
-            animateSlideOut(authConfirmPopupAnimations["signInRight"]);
-          }}
-          message={authConfirmMessage}
-        />
-      )}
-      {authConfirmPopups.signUp && (
-        <MinimalPopup
-          opacityAnimation={authConfirmPopupAnimations.signUp}
-          rightAnimation={authConfirmPopupAnimations.signUpRight}
-          color={styles.minimalPopupSuccess.backgroundColor}
-          close={() => {
-            animateClosing(authConfirmPopupAnimations["signUp"], () => {
-              setAuthConfirmPopups((prevState) => ({
-                ...prevState,
-                signUp: false,
-              }));
-            });
-            animateSlideOut(authConfirmPopupAnimations["signUpRight"]);
-          }}
-          message={authConfirmMessage}
-        />
-      )}
       <StatusBar
         style={styles.statusBar.style}
         backgroundColor={styles.statusBar.backgroundColor}
@@ -1061,4 +748,4 @@ function HomeScreen(props) {
   );
 }
 
-export default HomeScreen;
+export default TrashScreen;

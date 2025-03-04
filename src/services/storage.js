@@ -1,28 +1,51 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   addTask,
-  deleteTask,
-  getDeletedTask,
+  moveTaskToTrash,
+  getTrashedTask,
   getTask,
   modifyTask,
+  getPermanentlyDeletedTask,
+  permanentlyDeleteTask,
+  modifyTrashedTask,
+  restorePermanentlyDeletedTask,
+  addTrashedTask,
+  moveTaskDirectlyToPermanentlyDeletedTasks,
+  restoreTrashedTask,
+  fullRestoreTask,
+  addPermanentlyDeletedTask,
 } from "./firebase/firestore";
 import NetInfo from "@react-native-community/netinfo";
 
 const TASKS_STORAGE_KEY = "@gentask:tasks";
 const OFFLINE_TASKS_STORAGE_KEY = "@gentask:offlineTasks";
-const DELETED_OFFLINE_TASKS_STORAGE_KEY = "@gentask:deletedOfflineTasks";
+
+const TRASHED_TASKS_STORAGE_KEY = "@gentask:trashedTasks";
+const OFFLINE_TRASHED_TASKS_STORAGE_KEY = "@gentask:offlineTrashedTasks";
+
+const OFFLINE_PERMANENTLY_DELETED_TASKS_STORAGE_KEY =
+  "@gentask:offlinePermanentlyDeletedTasks";
+
 const THEME_STORAGE_KEY = "@gentask:darkMode";
 const FIRST_USE_STORAGE_KEY = "@gentask:firstUse";
 
 export async function syncOfflineTasks() {
   try {
-    const [offlineTasksRaw, deletedTasksRaw] = await Promise.all([
+    const [
+      offlineTasksRaw,
+      offlineTrashedTasksRaw,
+      permanentlyDeletedTasksRaw,
+    ] = await Promise.all([
       AsyncStorage.getItem(OFFLINE_TASKS_STORAGE_KEY),
-      AsyncStorage.getItem(DELETED_OFFLINE_TASKS_STORAGE_KEY),
+      AsyncStorage.getItem(OFFLINE_TRASHED_TASKS_STORAGE_KEY),
+      AsyncStorage.getItem(OFFLINE_PERMANENTLY_DELETED_TASKS_STORAGE_KEY),
     ]);
     const offlineTasks = offlineTasksRaw ? JSON.parse(offlineTasksRaw) : {};
-    const deletedOfflineTasks = deletedTasksRaw
-      ? JSON.parse(deletedTasksRaw)
+    const offlineTrashedTasks = offlineTrashedTasksRaw
+      ? JSON.parse(offlineTrashedTasksRaw)
+      : {};
+    const offlinePermanentlyDeletedTasks = permanentlyDeletedTasksRaw
+      ? JSON.parse(permanentlyDeletedTasksRaw)
       : {};
 
     for (const [id, task] of Object.entries(offlineTasks)) {
@@ -30,16 +53,28 @@ export async function syncOfflineTasks() {
         const firestoreTask = await getTask(id);
 
         if (!firestoreTask) {
-          const firestoreDeletedTask = await getDeletedTask(id);
+          const firestoreTrashedTask = await getTrashedTask(id);
 
-          if (!firestoreDeletedTask) {
-            await addTask(id, task, true);
+          if (!firestoreTrashedTask) {
+            const firestorePermanentlyDeletedTask =
+              await getPermanentlyDeletedTask(id);
+
+            if (!firestorePermanentlyDeletedTask) {
+              await addTask(id, task, true);
+            } else {
+              const firestoreDate = firestorePermanentlyDeletedTask.updatedAt;
+              const localDate = task.updatedAt;
+
+              if (localDate > firestoreDate) {
+                await fullRestoreTask(id, task, true);
+              }
+            }
           } else {
-            const firestoreDate = firestoreDeletedTask.updatedAt;
+            const firestoreDate = firestoreTrashedTask.updatedAt;
             const localDate = task.updatedAt;
 
             if (localDate > firestoreDate) {
-              await addTask(id, task, true);
+              await restoreTrashedTask(id, task, true);
             }
           }
         } else {
@@ -61,26 +96,92 @@ export async function syncOfflineTasks() {
       }
     }
 
-    for (const [id, task] of Object.entries(deletedOfflineTasks)) {
+    for (const [id, task] of Object.entries(offlineTrashedTasks)) {
       try {
         const firestoreTask = await getTask(id);
 
-        if (firestoreTask) {
+        if (!firestoreTask) {
+          const firestoreTrashedTask = await getTrashedTask(id);
+
+          if (!firestoreTrashedTask) {
+            const firestorePermanentlyDeletedTask =
+              await getPermanentlyDeletedTask(id);
+
+            if (!firestorePermanentlyDeletedTask) {
+              await addTrashedTask(id, task, true);
+            } else {
+              const firestoreDate = firestorePermanentlyDeletedTask.updatedAt;
+              const localDate = task.updatedAt;
+
+              if (localDate > firestoreDate) {
+                await restorePermanentlyDeletedTask(id, task, true);
+              }
+            }
+          } else {
+            const firestoreDate = firestoreTrashedTask.updatedAt;
+            const localDate = task.updatedAt;
+
+            if (localDate > firestoreDate) {
+              await modifyTrashedTask(id, task, true);
+            }
+          }
+        } else {
           const firestoreDate = firestoreTask.updatedAt;
           const localDate = task.updatedAt;
 
           if (localDate > firestoreDate) {
-            await deleteTask(id, task, true);
+            await moveTaskToTrash(id, task, true);
           }
         }
 
-        delete deletedOfflineTasks[id];
+        delete offlineTrashedTasks[id];
         await AsyncStorage.setItem(
-          DELETED_OFFLINE_TASKS_STORAGE_KEY,
-          JSON.stringify(deletedOfflineTasks)
+          OFFLINE_TRASHED_TASKS_STORAGE_KEY,
+          JSON.stringify(offlineTrashedTasks)
         );
       } catch (error) {
-        console.error(`Error syncing deleted task ${id}: ${error}`);
+        console.error(`Error syncing trashed task ${id}: ${error}`);
+      }
+    }
+
+    for (const [id, task] of Object.entries(offlinePermanentlyDeletedTasks)) {
+      try {
+        const firestoreTask = await getTask(id);
+
+        if (!firestoreTask) {
+          const firestoreTrashedTask = await getTrashedTask(id);
+
+          if (!firestoreTrashedTask) {
+            const firestorePermanentlyDeletedTask =
+              await getPermanentlyDeletedTask(id);
+
+            if (!firestorePermanentlyDeletedTask) {
+              addPermanentlyDeletedTask(id, task);
+            }
+          } else {
+            const firestoreDate = firestoreTrashedTask.updatedAt;
+            const localDate = task.updatedAt;
+
+            if (localDate > firestoreDate) {
+              await permanentlyDeleteTask(id, task, true);
+            }
+          }
+        } else {
+          const firestoreDate = firestoreTask.updatedAt;
+          const localDate = task.updatedAt;
+
+          if (localDate > firestoreDate) {
+            await moveTaskDirectlyToPermanentlyDeletedTasks(id, task, true);
+          }
+        }
+
+        delete offlinePermanentlyDeletedTasks[id];
+        await AsyncStorage.setItem(
+          OFFLINE_PERMANENTLY_DELETED_TASKS_STORAGE_KEY,
+          JSON.stringify(offlinePermanentlyDeletedTasks)
+        );
+      } catch (error) {
+        console.error(`Error syncing permanently deleted task ${id}: ${error}`);
       }
     }
   } catch (error) {
@@ -90,6 +191,7 @@ export async function syncOfflineTasks() {
 
 export async function storeOfflineTask(id, task) {
   try {
+    task.updatedAt = Date.now();
     const offlineTasks = await AsyncStorage.getItem(OFFLINE_TASKS_STORAGE_KEY);
     const offlineTasksObject = offlineTasks ? JSON.parse(offlineTasks) : {};
     offlineTasksObject[id] = task;
@@ -102,22 +204,43 @@ export async function storeOfflineTask(id, task) {
   }
 }
 
-export async function storeDeletedOfflineTask(id, task) {
+export async function storeOfflineTrashedTask(id, task) {
+  try {
+    task.updatedAt = Date.now();
+    const offlineTrashedTasks = await AsyncStorage.getItem(
+      OFFLINE_TRASHED_TASKS_STORAGE_KEY
+    );
+    const offlineTrashedTasksObject = offlineTrashedTasks
+      ? JSON.parse(offlineTrashedTasks)
+      : {};
+    offlineTrashedTasksObject[id] = task;
+    await AsyncStorage.setItem(
+      OFFLINE_TRASHED_TASKS_STORAGE_KEY,
+      JSON.stringify(offlineTrashedTasksObject)
+    );
+  } catch (error) {
+    console.error(`Error storing offline trashed task ${id}: ${error}`);
+  }
+}
+
+export async function storeOfflinePermanentlyDeletedTask(id, task) {
   try {
     task.updatedAt = Date.now();
     const deletedOfflineTasks = await AsyncStorage.getItem(
-      DELETED_OFFLINE_TASKS_STORAGE_KEY
+      OFFLINE_PERMANENTLY_DELETED_TASKS_STORAGE_KEY
     );
     const deletedOfflineTasksObject = deletedOfflineTasks
       ? JSON.parse(deletedOfflineTasks)
       : {};
     deletedOfflineTasksObject[id] = task;
     await AsyncStorage.setItem(
-      DELETED_OFFLINE_TASKS_STORAGE_KEY,
+      OFFLINE_PERMANENTLY_DELETED_TASKS_STORAGE_KEY,
       JSON.stringify(deletedOfflineTasksObject)
     );
   } catch (error) {
-    console.error(`Error storing offline deleted task ${id}: ${error}`);
+    console.error(
+      `Error storing offline permanently deleted task ${id}: ${error}`
+    );
   }
 }
 
@@ -126,7 +249,18 @@ export async function storeTasks(tasks) {
     const jsonValue = JSON.stringify(tasks);
     await AsyncStorage.setItem(TASKS_STORAGE_KEY, jsonValue);
   } catch (error) {
-    console.error(`Error saving data: ${error}`);
+    console.error(`Error saving tasks: ${error}`);
+  }
+}
+
+export async function storeTask(id, task) {
+  try {
+    const jsonValue = await AsyncStorage.getItem(TASKS_STORAGE_KEY);
+    let tasks = jsonValue ? JSON.parse(jsonValue) : {};
+    tasks[id] = task;
+    await AsyncStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks));
+  } catch (error) {
+    console.error(`Error saving task: ${error}`);
   }
 }
 
@@ -139,22 +273,23 @@ export async function getTasks() {
       return null;
     }
   } catch (error) {
-    console.error(`Error retrieving data ${error}`);
+    console.error(`Error retrieving tasks: ${error}`);
   }
 }
 
 export async function eraseTasks() {
-  const netState = await NetInfo.fetch();
-  const tasks = await getTasks();
-
   try {
+    const netState = await NetInfo.fetch();
+    const tasks = await getTasks();
+
     if (!netState.isConnected && tasks && Object.keys(tasks).length > 0) {
       for (const [id, task] of Object.entries(tasks)) {
         try {
-          await storeDeletedOfflineTask(id, task);
+          await storeOfflineTrashedTask(id, task);
+          await storeTrashedTask(id, task);
         } catch (error) {
           console.error(
-            `Error preparing to store offline deleted task ${id}: ${error}`
+            `Error preparing to store offline trashed task ${id}: ${error}`
           );
         }
       }
@@ -162,7 +297,70 @@ export async function eraseTasks() {
 
     await AsyncStorage.removeItem(TASKS_STORAGE_KEY);
   } catch (error) {
-    console.error(`Error erasing data ${error}`);
+    console.error(`Error erasing tasks: ${error}`);
+  }
+}
+
+export async function storeTrashedTasks(tasks) {
+  try {
+    const jsonValue = JSON.stringify(tasks);
+    await AsyncStorage.setItem(TRASHED_TASKS_STORAGE_KEY, jsonValue);
+  } catch (error) {
+    console.error(`Error saving trashed tasks: ${error}`);
+  }
+}
+
+export async function storeTrashedTask(id, task) {
+  try {
+    const jsonValue = await AsyncStorage.getItem(TRASHED_TASKS_STORAGE_KEY);
+    let trashedTasks = jsonValue ? JSON.parse(jsonValue) : {};
+    trashedTasks[id] = task;
+    await AsyncStorage.setItem(
+      TRASHED_TASKS_STORAGE_KEY,
+      JSON.stringify(trashedTasks)
+    );
+  } catch (error) {
+    console.error(`Error saving trashed task: ${error}`);
+  }
+}
+
+export async function getTrashedTasks() {
+  try {
+    const jsonValue = await AsyncStorage.getItem(TRASHED_TASKS_STORAGE_KEY);
+    if (jsonValue !== null) {
+      return JSON.parse(jsonValue);
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error(`Error retrieving trashed tasks ${error}`);
+  }
+}
+
+export async function eraseTrashedTasks() {
+  try {
+    const netState = await NetInfo.fetch();
+    const trashedTasks = await getTrashedTasks();
+
+    if (
+      !netState.isConnected &&
+      trashedTasks &&
+      Object.keys(trashedTasks).length > 0
+    ) {
+      for (const [id, task] of Object.entries(trashedTasks)) {
+        try {
+          await storeOfflinePermanentlyDeletedTask(id, task);
+        } catch (error) {
+          console.error(
+            `Error preparing to store offline permanently deleted task ${id}: ${error}`
+          );
+        }
+      }
+    }
+
+    await AsyncStorage.removeItem(TRASHED_TASKS_STORAGE_KEY);
+  } catch (error) {
+    console.error(`Error erasing trashed tasks: ${error}`);
   }
 }
 

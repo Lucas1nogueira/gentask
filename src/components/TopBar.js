@@ -89,6 +89,9 @@ function TopBar(props) {
               <Entypo name="menu" size={24} color={styles.icon.color} />
             </TouchableOpacity>
             <Text style={styles.header}>Gentask</Text>
+            {props.isTrashScreenActive && (
+              <Text style={styles.text}> / Lixeira</Text>
+            )}
           </View>
           <TouchableOpacity onPress={() => setSearchbarActive(true)}>
             <Entypo

@@ -31,6 +31,22 @@ function Menu(props) {
       </View>
       <View style={styles.menuOptions}>
         <MenuOption
+          iconName="home"
+          text="Tela inicial"
+          action={() => {
+            props.close();
+            props.setTrashScreenActive(false);
+          }}
+        />
+        <MenuOption
+          iconName="trash-2"
+          text="Lixeira"
+          action={() => {
+            props.close();
+            props.setTrashScreenActive(true);
+          }}
+        />
+        <MenuOption
           iconName="settings"
           text="Ajustes"
           action={props.openSettingsPopup}

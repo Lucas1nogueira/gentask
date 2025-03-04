@@ -173,8 +173,9 @@ function TaskContainer(props) {
             />
           )}
           <TouchableOpacity
-            style={{ marginLeft: 17 }}
+            style={{ marginLeft: 17, opacity: !showTasks && 0.5 }}
             onPress={() => props.openCreatePopup()}
+            disabled={!showTasks}
           >
             <LinearGradient
               colors={styles.taskAnalysisButtonGradient.colors}

@@ -8,6 +8,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./services/firebase/firebaseConfig";
 import AuthScreen from "./screens/AuthScreen";
 import HomeScreen from "./screens/HomeScreen";
+import TrashScreen from "./screens/TrashScreen";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -23,6 +24,8 @@ function AppPreConfig() {
 
   const [user, setUser] = useState(null);
   const [didAuthLoad, setAuthLoad] = useState(false);
+
+  const [isTrashScreenActive, setTrashScreenActive] = useState(false);
 
   useEffect(() => {
     if (styles) {
@@ -64,7 +67,15 @@ function AppPreConfig() {
 
   return (
     <AuthConfirmMessagesProvider>
-      {!user ? <AuthScreen /> : <HomeScreen />}
+      {!user ? (
+        <AuthScreen />
+      ) : !isTrashScreenActive ? (
+        <HomeScreen setTrashScreenActive={setTrashScreenActive} />
+      ) : (
+        isTrashScreenActive && (
+          <TrashScreen setTrashScreenActive={setTrashScreenActive} />
+        )
+      )}
     </AuthConfirmMessagesProvider>
   );
 }
