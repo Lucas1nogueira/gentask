@@ -1,14 +1,13 @@
 import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Dimensions,
   FlatList,
   Platform,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, Octicons } from "@expo/vector-icons";
 import { ThemeContext } from "../contexts/ThemeContext";
 import TrashedTask from "./TrashedTask";
 
@@ -104,7 +103,10 @@ function TrashedTaskContainer(props) {
                 alignItems: "center",
               }}
             >
-              <Text style={styles.text}>{props.emptyMessage}</Text>
+              <Octicons name="trash" size={22} color={styles.text.color} />
+              <Text style={[styles.text, { paddingLeft: 5 }]}>
+                {props.emptyMessage}
+              </Text>
             </View>
           )}
         </View>
@@ -119,12 +121,20 @@ function TrashedTaskContainer(props) {
           <TouchableOpacity
             style={[
               styles.emptyTrashButton,
-              (!showTrashedTasks || trashedTasks.length === 0) && {
-                opacity: 0.5,
-              },
+              !props.foundTrashedTasks ||
+              !showTrashedTasks ||
+              trashedTasks.length === 0
+                ? {
+                    opacity: 0.5,
+                  }
+                : { opacity: 1 },
             ]}
             onPress={() => props.openTrashedTaskClearPopup()}
-            disabled={!showTrashedTasks || trashedTasks.length === 0}
+            disabled={
+              !props.foundTrashedTasks ||
+              !showTrashedTasks ||
+              trashedTasks.length === 0
+            }
           >
             <MaterialCommunityIcons name="trash-can" size={22} color="white" />
             <Text style={[styles.header, { color: "white", paddingLeft: 2 }]}>

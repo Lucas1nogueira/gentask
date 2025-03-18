@@ -194,6 +194,9 @@ export async function storeOfflineTask(id, task) {
     task.updatedAt = Date.now();
     const offlineTasks = await AsyncStorage.getItem(OFFLINE_TASKS_STORAGE_KEY);
     const offlineTasksObject = offlineTasks ? JSON.parse(offlineTasks) : {};
+    if (offlineTasksObject === null) {
+      offlineTasksObject = {};
+    }
     offlineTasksObject[id] = task;
     await AsyncStorage.setItem(
       OFFLINE_TASKS_STORAGE_KEY,
@@ -213,6 +216,9 @@ export async function storeOfflineTrashedTask(id, task) {
     const offlineTrashedTasksObject = offlineTrashedTasks
       ? JSON.parse(offlineTrashedTasks)
       : {};
+    if (offlineTrashedTasksObject === null) {
+      offlineTrashedTasksObject = {};
+    }
     offlineTrashedTasksObject[id] = task;
     await AsyncStorage.setItem(
       OFFLINE_TRASHED_TASKS_STORAGE_KEY,
@@ -232,6 +238,9 @@ export async function storeOfflinePermanentlyDeletedTask(id, task) {
     const deletedOfflineTasksObject = deletedOfflineTasks
       ? JSON.parse(deletedOfflineTasks)
       : {};
+    if (deletedOfflineTasksObject === null) {
+      deletedOfflineTasksObject = {};
+    }
     deletedOfflineTasksObject[id] = task;
     await AsyncStorage.setItem(
       OFFLINE_PERMANENTLY_DELETED_TASKS_STORAGE_KEY,
@@ -257,6 +266,9 @@ export async function storeTask(id, task) {
   try {
     const jsonValue = await AsyncStorage.getItem(TASKS_STORAGE_KEY);
     let tasks = jsonValue ? JSON.parse(jsonValue) : {};
+    if (tasks === null) {
+      tasks = {};
+    }
     tasks[id] = task;
     await AsyncStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks));
   } catch (error) {
@@ -314,6 +326,9 @@ export async function storeTrashedTask(id, task) {
   try {
     const jsonValue = await AsyncStorage.getItem(TRASHED_TASKS_STORAGE_KEY);
     let trashedTasks = jsonValue ? JSON.parse(jsonValue) : {};
+    if (trashedTasks === null) {
+      trashedTasks = {};
+    }
     trashedTasks[id] = task;
     await AsyncStorage.setItem(
       TRASHED_TASKS_STORAGE_KEY,

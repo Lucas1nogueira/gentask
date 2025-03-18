@@ -55,7 +55,6 @@ EXPO_PUBLIC_FIREBASE_PROJECT_ID=seu_project_id
 EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=seu_storage_bucket
 EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=seu_sender_id
 EXPO_PUBLIC_FIREBASE_APP_ID=seu_app_id
-EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=seu_measurement_id
 ```
 
 ## 🚀 Executando o projeto

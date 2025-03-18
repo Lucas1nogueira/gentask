@@ -88,7 +88,7 @@ function ChatbotPopup(props) {
         ...prev,
         {
           id: Date.now().toString(),
-          text: botResponse,
+          text: botResponse.trim(),
           sender: "bot",
           timestamp: new Date(),
         },
@@ -98,9 +98,7 @@ function ChatbotPopup(props) {
         ...prev,
         {
           id: Date.now().toString(),
-          text: error.message.includes("exceed")
-            ? "Limite de contexto excedido. Nova conversa iniciada."
-            : "Erro ao processar resposta.",
+          text: "Erro ao processar resposta. Por favor, tente novamente mais tarde.",
           sender: "bot",
           timestamp: new Date(),
           isError: true,

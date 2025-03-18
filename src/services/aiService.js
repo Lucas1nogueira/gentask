@@ -114,9 +114,9 @@ async function categorizeTask(text, categoryName, isUrgent, dueDate) {
       })()
     : Promise.resolve(dueDate);
 
-  const insightsPromise = query(insightsPromptTemplate, text, 50, 0.7).catch(
-    () => null
-  );
+  const insightsPromise = query(insightsPromptTemplate, text, 50, 0.7)
+    .then((result) => (result ? result.trim() : null))
+    .catch(() => null);
 
   const [taskCategoryName, isTaskUrgent, taskDueDate, taskInsights] =
     await Promise.all([
@@ -139,7 +139,7 @@ async function categorizeTask(text, categoryName, isUrgent, dueDate) {
   return {
     categoryName: categoryObject?.name || "Outros",
     categoryColor: categoryObject?.color || "gray",
-    dueDate: processedDueDate,
+    dueDate: processedDueDate !== null ? processedDueDate : dueDate,
     isUrgent: isTaskUrgent,
     insights: taskInsights,
   };
@@ -216,7 +216,7 @@ async function getTaskAnalysis(tasks, mode) {
       0.7
     );
     return {
-      result: analysisResult,
+      result: analysisResult.trim(),
       categories: taskCategories,
     };
   } catch (error) {
@@ -239,7 +239,7 @@ async function getTaskSuggestion(tasks) {
     );
 
     if (typeof taskSuggestion === "string") {
-      return taskSuggestion.replace(/["]/g, "");
+      return taskSuggestion.replace(/["]/g, "").trim();
     } else {
       return null;
     }

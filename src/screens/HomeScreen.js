@@ -883,7 +883,6 @@ function HomeScreen(props) {
       {popups.loading && (
         <MinimalPopup
           loading={true}
-          customTop={40}
           opacityAnimation={popupAnimations.loading}
           rightAnimation={popupAnimations.loadingRight}
           message={"Salvando tarefa..."}
@@ -891,7 +890,6 @@ function HomeScreen(props) {
       )}
       {popups.success && (
         <MinimalPopup
-          customTop={40}
           opacityAnimation={popupAnimations.success}
           rightAnimation={popupAnimations.successRight}
           color={styles.minimalPopupSuccess.backgroundColor}

@@ -544,7 +544,7 @@ const lightStyles = StyleSheet.create({
   },
   minimalPopup: {
     position: "absolute",
-    top: 70,
+    top: 40,
     right: 40,
     width: "auto",
     height: 50,

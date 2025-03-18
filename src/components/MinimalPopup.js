@@ -18,7 +18,6 @@ function MinimalPopup(props) {
     <Animated.View
       style={[
         styles.minimalPopup,
-        props.customTop && { top: props.customTop },
         props.color && { backgroundColor: props.color },
         {
           opacity: props.opacityAnimation,

@@ -26,7 +26,7 @@ function Menu(props) {
         />
         <View>
           <Text style={styles.header}>Gentask</Text>
-          <Text style={styles.text}>Task Manager + AI</Text>
+          <Text style={styles.text}>Gestor de tarefas + AI</Text>
         </View>
       </View>
       <View style={styles.menuOptions}>
