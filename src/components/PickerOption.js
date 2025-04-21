@@ -1,6 +1,6 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useContext } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { ThemeContext } from "../contexts/ThemeContext";
 
 function PickerOption(props) {

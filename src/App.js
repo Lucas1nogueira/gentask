@@ -1,14 +1,14 @@
-import { useContext, useEffect, useState } from "react";
 import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
 import * as NavigationBar from "expo-navigation-bar";
-import { ThemeContext, ThemeProvider } from "./contexts/ThemeContext";
-import { AuthConfirmMessagesProvider } from "./contexts/AuthConfirmMessagesContext";
+import * as SplashScreen from "expo-splash-screen";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "./services/firebase/firebaseConfig";
+import { useContext, useEffect, useState } from "react";
+import { AuthConfirmMessagesProvider } from "./contexts/AuthConfirmMessagesContext";
+import { ThemeContext, ThemeProvider } from "./contexts/ThemeContext";
 import AuthScreen from "./screens/AuthScreen";
 import HomeScreen from "./screens/HomeScreen";
 import TrashScreen from "./screens/TrashScreen";
+import { auth } from "./services/firebase/firebaseConfig";
 
 SplashScreen.preventAutoHideAsync();
 

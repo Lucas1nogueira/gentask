@@ -1,6 +1,6 @@
+import { AntDesign, FontAwesome } from "@expo/vector-icons/";
 import { useContext, useEffect, useState } from "react";
 import { BackHandler, Text, TouchableOpacity, View } from "react-native";
-import { AntDesign, FontAwesome } from "@expo/vector-icons/";
 import { ThemeContext } from "../contexts/ThemeContext";
 import PickerRoundOption from "./PickerRoundOption";
 

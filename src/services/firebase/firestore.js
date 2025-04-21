@@ -1,20 +1,20 @@
-import { db } from "./firebaseConfig";
+import NetInfo from "@react-native-community/netinfo";
 import {
   collection,
-  getDocs,
-  updateDoc,
   doc,
-  setDoc,
   getDoc,
+  getDocs,
+  setDoc,
+  updateDoc,
   writeBatch,
 } from "firebase/firestore";
-import NetInfo from "@react-native-community/netinfo";
-import { getCurrentUser } from "./auth";
 import {
-  storeOfflineTrashedTask,
-  storeOfflineTask,
   storeOfflinePermanentlyDeletedTask,
+  storeOfflineTask,
+  storeOfflineTrashedTask,
 } from "../storage";
+import { getCurrentUser } from "./auth";
+import { db } from "./firebaseConfig";
 
 async function handleOfflineData(id, task, wasTrashed) {
   const netState = await NetInfo.fetch();

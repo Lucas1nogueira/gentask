@@ -1,3 +1,4 @@
+import { Entypo, MaterialIcons } from "@expo/vector-icons/";
 import { useContext, useRef, useState } from "react";
 import {
   Animated,
@@ -6,9 +7,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Entypo, MaterialIcons } from "@expo/vector-icons/";
-import { animateCollapsing, animateExpanding } from "../utils/animationUtils";
 import { ThemeContext } from "../contexts/ThemeContext";
+import { animateCollapsing, animateExpanding } from "../utils/animationUtils";
 
 function TaskInsights(props) {
   const { styles } = useContext(ThemeContext);

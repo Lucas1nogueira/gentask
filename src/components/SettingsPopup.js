@@ -1,14 +1,14 @@
+import { Ionicons, MaterialIcons } from "@expo/vector-icons/";
+import * as MailComposer from "expo-mail-composer";
 import { useContext, useEffect } from "react";
 import {
-  Text,
-  View,
-  TouchableOpacity,
-  BackHandler,
   Alert,
+  BackHandler,
   Pressable,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import * as MailComposer from "expo-mail-composer";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons/";
 import { ThemeContext } from "../contexts/ThemeContext";
 
 function SettingsPopup(props) {

@@ -1,3 +1,7 @@
+import { Entypo, Feather, MaterialIcons } from "@expo/vector-icons/";
+import MaskedView from "@react-native-masked-view/masked-view";
+import { LinearGradient } from "expo-linear-gradient";
+import { StatusBar } from "expo-status-bar";
 import { useContext, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -11,14 +15,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { StatusBar } from "expo-status-bar";
-import { LinearGradient } from "expo-linear-gradient";
-import MaskedView from "@react-native-masked-view/masked-view";
-import { Entypo, Feather, MaterialIcons } from "@expo/vector-icons/";
 import MessagePopup from "../components/MessagePopup";
 import MinimalPopup from "../components/MinimalPopup";
-import { ThemeContext } from "../contexts/ThemeContext";
 import { AuthConfirmMessagesContext } from "../contexts/AuthConfirmMessagesContext";
+import { ThemeContext } from "../contexts/ThemeContext";
 import { signIn, signUp } from "../services/firebase/auth";
 import { getFirstUse, handleFirstUse } from "../services/storage";
 import {

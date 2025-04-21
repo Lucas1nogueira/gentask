@@ -1,3 +1,4 @@
+import { MaterialIcons, Octicons } from "@expo/vector-icons";
 import { useContext, useEffect, useRef } from "react";
 import {
   Platform,
@@ -6,7 +7,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { AntDesign, MaterialIcons, Octicons } from "@expo/vector-icons";
 import { ThemeContext } from "../contexts/ThemeContext";
 
 const SCROLL_INITIAL_POSITION = 72;

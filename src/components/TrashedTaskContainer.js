@@ -1,3 +1,4 @@
+import { MaterialCommunityIcons, Octicons } from "@expo/vector-icons";
 import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -7,7 +8,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { MaterialCommunityIcons, Octicons } from "@expo/vector-icons";
 import { ThemeContext } from "../contexts/ThemeContext";
 import TrashedTask from "./TrashedTask";
 

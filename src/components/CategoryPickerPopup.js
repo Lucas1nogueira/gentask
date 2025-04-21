@@ -1,8 +1,8 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useContext, useEffect } from "react";
 import { BackHandler, FlatList, Text, View } from "react-native";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import categories from "../data/categories";
 import { ThemeContext } from "../contexts/ThemeContext";
+import categories from "../data/categories";
 import PickerOption from "./PickerOption";
 
 function CategoryPickerPopup(props) {

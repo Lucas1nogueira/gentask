@@ -1,13 +1,38 @@
-import { useRef, useState, useEffect, useContext } from "react";
+import NetInfo from "@react-native-community/netinfo";
+import { StatusBar } from "expo-status-bar";
+import { useContext, useEffect, useRef, useState } from "react";
 import {
-  View,
   Animated,
   BackHandler,
   PanResponder,
   TouchableWithoutFeedback,
+  View,
 } from "react-native";
-import { StatusBar } from "expo-status-bar";
-import NetInfo from "@react-native-community/netinfo";
+import CategoryPickerPopup from "../components/CategoryPickerPopup";
+import ChatbotPopup from "../components/ChatbotPopup";
+import FilteringBar from "../components/FilteringBar";
+import Menu from "../components/Menu";
+import MessagePopup from "../components/MessagePopup";
+import MinimalPopup from "../components/MinimalPopup";
+import ProfileAnalysisPopup from "../components/ProfileAnalysisPopup";
+import SettingsPopup from "../components/SettingsPopup";
+import SortPickerPopup from "../components/SortPickerPopup";
+import TaskAnalysisPopup from "../components/TaskAnalysisPopup";
+import TaskContainer from "../components/TaskContainer";
+import TaskCreationPopup from "../components/TaskCreationPopup";
+import TaskSuggestionPopup from "../components/TaskSuggestionPopup";
+import TaskViewPopup from "../components/TaskViewPopup";
+import TopBar from "../components/TopBar";
+import { AuthConfirmMessagesContext } from "../contexts/AuthConfirmMessagesContext";
+import { ThemeContext } from "../contexts/ThemeContext";
+import { configure, getTaskSuggestion } from "../services/aiService";
+import { logout } from "../services/firebase/auth";
+import {
+  fetchTasks,
+  modifyTask,
+  moveTaskToTrash,
+  purgeTasks,
+} from "../services/firebase/firestore";
 import {
   eraseTasks,
   getTasks,
@@ -15,37 +40,13 @@ import {
   storeTrashedTask,
   syncOfflineTasks,
 } from "../services/storage";
-import { logout } from "../services/firebase/auth";
+import "../styles/global.css";
 import {
-  moveTaskToTrash,
-  fetchTasks,
-  modifyTask,
-  purgeTasks,
-} from "../services/firebase/firestore";
-import { configure, getTaskSuggestion } from "../services/aiService";
-import { ThemeContext } from "../contexts/ThemeContext";
-import { AuthConfirmMessagesContext } from "../contexts/AuthConfirmMessagesContext";
-import Menu from "../components/Menu";
-import TopBar from "../components/TopBar";
-import FilteringBar from "../components/FilteringBar";
-import TaskContainer from "../components/TaskContainer";
-import CategoryPickerPopup from "../components/CategoryPickerPopup";
-import SortPickerPopup from "../components/SortPickerPopup";
-import TaskViewPopup from "../components/TaskViewPopup";
-import TaskCreationPopup from "../components/TaskCreationPopup";
-import TaskAnalysisPopup from "../components/TaskAnalysisPopup";
-import TaskSuggestionPopup from "../components/TaskSuggestionPopup";
-import ChatbotPopup from "../components/ChatbotPopup";
-import MessagePopup from "../components/MessagePopup";
-import MinimalPopup from "../components/MinimalPopup";
-import SettingsPopup from "../components/SettingsPopup";
-import {
-  animateOpening,
   animateClosing,
+  animateOpening,
   animateSlideIn,
   animateSlideOut,
 } from "../utils/animationUtils";
-import "../styles/global.css";
 
 const MENU_DRAWER_WIDTH = 280;
 
@@ -94,6 +95,7 @@ function HomeScreen(props) {
     categoryPicker: false,
     sortPicker: false,
     chatbot: false,
+    profileAnalysis: false,
     taskAnalysis: false,
     taskView: false,
     taskCreation: false,
@@ -114,6 +116,7 @@ function HomeScreen(props) {
     categoryPicker: new Animated.Value(0),
     sortPicker: new Animated.Value(0),
     chatbot: new Animated.Value(0),
+    profileAnalysis: new Animated.Value(0),
     taskAnalysis: new Animated.Value(0),
     taskView: new Animated.Value(0),
     taskCreation: new Animated.Value(0),
@@ -392,6 +395,13 @@ function HomeScreen(props) {
           }));
           animateOpening(popupAnimations["chatbot"]);
         }}
+        openProfileAnalysis={() => {
+          setPopups((prevState) => ({
+            ...prevState,
+            profileAnalysis: true,
+          }));
+          animateOpening(popupAnimations["profileAnalysis"]);
+        }}
         openWeeklyTaskAnalysis={() => {
           setTaskAnalysisMode("weekly");
           setPopups((prevState) => ({
@@ -501,6 +511,26 @@ function HomeScreen(props) {
               );
             }}
             data={tasks}
+          />
+        </Animated.View>
+      )}
+      {popups.profileAnalysis && (
+        <Animated.View
+          style={[
+            styles.fullscreenArea,
+            { opacity: popupAnimations.profileAnalysis },
+          ]}
+        >
+          <ProfileAnalysisPopup
+            close={() => {
+              animateClosing(popupAnimations["profileAnalysis"], () =>
+                setPopups((prevState) => ({
+                  ...prevState,
+                  profileAnalysis: false,
+                }))
+              );
+            }}
+            tasks={tasks}
           />
         </Animated.View>
       )}

@@ -1,12 +1,12 @@
+import { Entypo, MaterialIcons, Octicons } from "@expo/vector-icons/";
 import { useContext, useEffect, useRef, useState } from "react";
 import { Animated, Text, TouchableOpacity, View } from "react-native";
-import { Entypo, MaterialIcons, Octicons } from "@expo/vector-icons/";
+import { ThemeContext } from "../contexts/ThemeContext";
 import {
   animateCollapsing,
   animateExpanding,
   animateToggleSwitch,
 } from "../utils/animationUtils";
-import { ThemeContext } from "../contexts/ThemeContext";
 
 function TaskAdvancedOptions(props) {
   const { styles } = useContext(ThemeContext);

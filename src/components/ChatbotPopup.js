@@ -1,3 +1,4 @@
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -10,7 +11,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { ThemeContext } from "../contexts/ThemeContext";
 import { query } from "../services/aiService";
 import ChatRoundedArrow from "./ChatRoundedArrow";

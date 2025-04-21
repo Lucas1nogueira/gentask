@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import { getTheme, saveTheme } from "../services/storage";
-import lightStyles from "../styles/lightStyles";
 import darkStyles from "../styles/darkStyles";
+import lightStyles from "../styles/lightStyles";
 
 export const ThemeContext = createContext();
 

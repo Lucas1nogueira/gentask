@@ -1,6 +1,6 @@
+import Feather from "@expo/vector-icons/Feather";
 import { useContext } from "react";
 import { Text, TouchableOpacity } from "react-native";
-import Feather from "@expo/vector-icons/Feather";
 import { ThemeContext } from "../contexts/ThemeContext";
 
 function MenuOption(props) {

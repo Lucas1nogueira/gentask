@@ -1,3 +1,5 @@
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useContext, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -7,11 +9,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
-import Task from "./Task";
 import { ThemeContext } from "../contexts/ThemeContext";
+import Task from "./Task";
 import TaskAnalysisButton from "./TaskAnalysisButton";
-import { LinearGradient } from "expo-linear-gradient";
 
 function TaskContainer(props) {
   const { styles } = useContext(ThemeContext);
@@ -134,6 +134,18 @@ function TaskContainer(props) {
                     </Text>
                   </View>
                 </TouchableOpacity>
+                <TouchableOpacity onPress={() => props.openProfileAnalysis()}>
+                  <View style={styles.webTaskAnalysisButton}>
+                    <MaterialCommunityIcons
+                      name="account-question-outline"
+                      size={20}
+                      color={styles.icon.color}
+                    />
+                    <Text style={[styles.text, { paddingLeft: 3 }]}>
+                      Análise de perfil
+                    </Text>
+                  </View>
+                </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => props.openWeeklyTaskAnalysis()}
                 >
@@ -168,6 +180,7 @@ function TaskContainer(props) {
             <TaskAnalysisButton
               isActive={props.isTaskAnalysisButtonActive}
               openChatbot={() => props.openChatbot()}
+              openProfileAnalysis={() => props.openProfileAnalysis()}
               openWeeklyTaskAnalysis={() => props.openWeeklyTaskAnalysis()}
               openMonthlyTaskAnalysis={() => props.openMonthlyTaskAnalysis()}
             />

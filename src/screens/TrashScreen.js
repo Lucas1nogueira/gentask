@@ -1,20 +1,24 @@
-import { useRef, useState, useEffect, useContext } from "react";
+import NetInfo from "@react-native-community/netinfo";
+import { StatusBar } from "expo-status-bar";
+import { useContext, useEffect, useRef, useState } from "react";
 import {
-  View,
   Animated,
   BackHandler,
   PanResponder,
   TouchableWithoutFeedback,
+  View,
 } from "react-native";
-import { StatusBar } from "expo-status-bar";
-import NetInfo from "@react-native-community/netinfo";
-import {
-  eraseTasks,
-  eraseTrashedTasks,
-  getTrashedTasks,
-  storeTask,
-  storeTrashedTasks,
-} from "../services/storage";
+import CategoryPickerPopup from "../components/CategoryPickerPopup";
+import FilteringBar from "../components/FilteringBar";
+import Menu from "../components/Menu";
+import MessagePopup from "../components/MessagePopup";
+import MinimalPopup from "../components/MinimalPopup";
+import SettingsPopup from "../components/SettingsPopup";
+import SortPickerPopup from "../components/SortPickerPopup";
+import TopBar from "../components/TopBar";
+import TrashedTaskContainer from "../components/TrashedTaskContainer";
+import { AuthConfirmMessagesContext } from "../contexts/AuthConfirmMessagesContext";
+import { ThemeContext } from "../contexts/ThemeContext";
 import { logout } from "../services/firebase/auth";
 import {
   fetchTrashedTasks,
@@ -23,24 +27,20 @@ import {
   purgeTrashedTasks,
   restoreTrashedTask,
 } from "../services/firebase/firestore";
-import { ThemeContext } from "../contexts/ThemeContext";
-import { AuthConfirmMessagesContext } from "../contexts/AuthConfirmMessagesContext";
-import Menu from "../components/Menu";
-import TopBar from "../components/TopBar";
-import FilteringBar from "../components/FilteringBar";
-import TrashedTaskContainer from "../components/TrashedTaskContainer";
-import CategoryPickerPopup from "../components/CategoryPickerPopup";
-import SortPickerPopup from "../components/SortPickerPopup";
-import MessagePopup from "../components/MessagePopup";
-import MinimalPopup from "../components/MinimalPopup";
-import SettingsPopup from "../components/SettingsPopup";
 import {
-  animateOpening,
+  eraseTasks,
+  eraseTrashedTasks,
+  getTrashedTasks,
+  storeTask,
+  storeTrashedTasks,
+} from "../services/storage";
+import "../styles/global.css";
+import {
   animateClosing,
+  animateOpening,
   animateSlideIn,
   animateSlideOut,
 } from "../utils/animationUtils";
-import "../styles/global.css";
 
 const MENU_DRAWER_WIDTH = 280;
 

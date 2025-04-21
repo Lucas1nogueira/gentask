@@ -1,7 +1,7 @@
-import { useContext, useEffect, useState } from "react";
-import { View, Text, ActivityIndicator } from "react-native";
-import Svg, { G, Circle } from "react-native-svg";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useContext, useEffect, useState } from "react";
+import { ActivityIndicator, Text, View } from "react-native";
+import Svg, { Circle, G } from "react-native-svg";
 import { ThemeContext } from "../contexts/ThemeContext";
 
 export default function Chart(props) {

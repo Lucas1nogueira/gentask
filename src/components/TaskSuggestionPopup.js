@@ -1,6 +1,6 @@
-import { useContext } from "react";
-import { Text, Animated, View, TouchableOpacity } from "react-native";
 import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useContext } from "react";
+import { Animated, Text, TouchableOpacity, View } from "react-native";
 import { ThemeContext } from "../contexts/ThemeContext";
 
 function TaskSuggestionPopup(props) {

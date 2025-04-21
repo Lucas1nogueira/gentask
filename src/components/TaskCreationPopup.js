@@ -1,23 +1,23 @@
-import { useState, useEffect, useContext } from "react";
+import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useContext, useEffect, useState } from "react";
 import {
   Animated,
   BackHandler,
+  Platform,
   Text,
-  View,
   TextInput,
   TouchableOpacity,
-  Platform,
+  View,
 } from "react-native";
 import "react-native-get-random-values";
 import { v4 as uuidv4 } from "uuid";
-import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { addTask } from "../services/firebase/firestore";
-import { categorizeTask } from "../services/aiService";
-import { animateClosing, animateOpening } from "../utils/animationUtils";
 import { ThemeContext } from "../contexts/ThemeContext";
-import TaskAdvancedOptions from "./TaskAdvancedOptions";
+import { categorizeTask } from "../services/aiService";
+import { addTask } from "../services/firebase/firestore";
+import { animateClosing, animateOpening } from "../utils/animationUtils";
 import CategoryPickerPopup from "./CategoryPickerPopup";
 import DatePickerPopup from "./DatePickerPopup";
+import TaskAdvancedOptions from "./TaskAdvancedOptions";
 
 function TaskCreationPopup(props) {
   const { styles } = useContext(ThemeContext);

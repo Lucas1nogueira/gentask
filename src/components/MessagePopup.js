@@ -1,6 +1,6 @@
-import { useContext, useEffect } from "react";
-import { Text, View, BackHandler, TouchableOpacity } from "react-native";
 import { AntDesign, Ionicons, SimpleLineIcons } from "@expo/vector-icons";
+import { useContext, useEffect } from "react";
+import { BackHandler, Text, TouchableOpacity, View } from "react-native";
 import { ThemeContext } from "../contexts/ThemeContext";
 
 function MessagePopup(props) {

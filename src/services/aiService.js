@@ -1,5 +1,5 @@
-import { getAIConfig } from "./firebase/firestore";
 import categories from "../data/categories";
+import { getAIConfig } from "./firebase/firestore";
 
 let apiUrl;
 let apiKey;
@@ -15,7 +15,9 @@ const dueDatePromptTemplate = `Analise as seguintes tarefa e data. Se na tarefa 
 
 const insightsPromptTemplate = `Considerando a tarefa a seguir, forneça um insight útil. NÃO ultrapasse 10 palavras. A tarefa é: `;
 
-const analysisPromptTemplate = `Considerando as tarefas a seguir, forneça uma análise produtiva. Responda sem caracteres especiais, mas use emojis. Responda com POUCAS palavras. O texto é: `;
+const analysisPromptTemplate = `Considerando as tarefas a seguir, forneça uma análise com dicas. Responda sem caracteres especiais, mas use emojis. Responda com POUCAS palavras. O texto é: `;
+
+const profilePromptTemplate = `Considerando isso, forneça uma análise com dicas para melhorar. Responda sem caracteres especiais. Responda com POUCAS palavras. O texto é: `;
 
 const suggestionPromptTemplate = `Considerando as tarefas a seguir, sugira uma nova tarefa baseada em interesses encontrados. Responda com, no máximo, 10 palavras. Tarefas: `;
 
@@ -225,6 +227,57 @@ async function getTaskAnalysis(tasks, mode) {
   }
 }
 
+async function getProfileAnalysis(tasks) {
+  if (!tasks || Object.values(tasks).length === 0) {
+    return null;
+  }
+
+  let tasksInfo = {
+    done: {
+      name: "Concluídas",
+      color: "#4A90E2",
+      count: 0,
+    },
+    undone: {
+      name: "Não concluídas",
+      color: "#FF6B6B",
+      count: 0,
+    },
+  };
+
+  Object.values(tasks).forEach((task) => {
+    if (task.isCompleted) tasksInfo.done.count += 1;
+    else tasksInfo.undone.count += 1;
+  });
+
+  const doneTasks = tasksInfo.done.count;
+  const undoneTasks = tasksInfo.undone.count;
+  const totalTasks = doneTasks + undoneTasks;
+
+  const doneTasksPercentage =
+    totalTasks > 0 ? (doneTasks * 100) / totalTasks : 0;
+  const doneTasksPrompt = `Cumpri um total de ${doneTasksPercentage.toFixed(
+    1
+  )}% das minhas tarefas.`;
+
+  try {
+    const analysisResult = await query(
+      doneTasksPrompt,
+      profilePromptTemplate,
+      400,
+      0.7
+    );
+
+    return {
+      result: analysisResult.trim(),
+      categories: tasksInfo,
+    };
+  } catch (error) {
+    console.error("Error obtaining profile analysis:", error);
+    return false;
+  }
+}
+
 async function getTaskSuggestion(tasks) {
   const tasksText = Object.values(tasks)
     .map((task) => task.text)
@@ -249,4 +302,11 @@ async function getTaskSuggestion(tasks) {
   }
 }
 
-export { configure, query, categorizeTask, getTaskAnalysis, getTaskSuggestion };
+export {
+  categorizeTask,
+  configure,
+  getProfileAnalysis,
+  getTaskAnalysis,
+  getTaskSuggestion,
+  query,
+};

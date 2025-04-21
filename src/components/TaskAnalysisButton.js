@@ -1,3 +1,5 @@
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useContext, useEffect, useRef, useState } from "react";
 import {
   Animated,
@@ -6,14 +8,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { ThemeContext } from "../contexts/ThemeContext";
 import {
   animateClosingDown,
   animateOpeningUp,
   animateRotation,
 } from "../utils/animationUtils";
-import { ThemeContext } from "../contexts/ThemeContext";
 
 function TaskAnalysisButton(props) {
   const { styles } = useContext(ThemeContext);
@@ -36,7 +36,7 @@ function TaskAnalysisButton(props) {
 
   const top = topAnimation.interpolate({
     inputRange: [0, 1],
-    outputRange: [-180, -215],
+    outputRange: [-220, -280],
   });
 
   function close() {
@@ -86,6 +86,23 @@ function TaskAnalysisButton(props) {
                 />
                 <Text style={[styles.text, { paddingLeft: 3 }]}>
                   Abrir chatbot
+                </Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                props.openProfileAnalysis();
+                close();
+              }}
+            >
+              <View style={styles.taskAnalysisMenuOption}>
+                <MaterialCommunityIcons
+                  name="account-question-outline"
+                  size={20}
+                  color={styles.icon.color}
+                />
+                <Text style={[styles.text, { paddingLeft: 3 }]}>
+                  Análise de perfil
                 </Text>
               </View>
             </TouchableOpacity>

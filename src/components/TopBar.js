@@ -1,3 +1,4 @@
+import { Entypo } from "@expo/vector-icons";
 import { useContext, useEffect, useState } from "react";
 import {
   BackHandler,
@@ -7,7 +8,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Entypo } from "@expo/vector-icons";
 import { ThemeContext } from "../contexts/ThemeContext";
 
 function TopBar(props) {

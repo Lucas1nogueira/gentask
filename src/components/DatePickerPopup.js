@@ -1,6 +1,6 @@
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { useContext, useEffect, useState } from "react";
 import { BackHandler, Text, TouchableOpacity, View } from "react-native";
-import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import { ThemeContext } from "../contexts/ThemeContext";
 

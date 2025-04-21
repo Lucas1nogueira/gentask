@@ -1,21 +1,21 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  addTask,
-  moveTaskToTrash,
-  getTrashedTask,
-  getTask,
-  modifyTask,
-  getPermanentlyDeletedTask,
-  permanentlyDeleteTask,
-  modifyTrashedTask,
-  restorePermanentlyDeletedTask,
-  addTrashedTask,
-  moveTaskDirectlyToPermanentlyDeletedTasks,
-  restoreTrashedTask,
-  fullRestoreTask,
-  addPermanentlyDeletedTask,
-} from "./firebase/firestore";
 import NetInfo from "@react-native-community/netinfo";
+import {
+  addPermanentlyDeletedTask,
+  addTask,
+  addTrashedTask,
+  fullRestoreTask,
+  getPermanentlyDeletedTask,
+  getTask,
+  getTrashedTask,
+  modifyTask,
+  modifyTrashedTask,
+  moveTaskDirectlyToPermanentlyDeletedTasks,
+  moveTaskToTrash,
+  permanentlyDeleteTask,
+  restorePermanentlyDeletedTask,
+  restoreTrashedTask,
+} from "./firebase/firestore";
 
 const TASKS_STORAGE_KEY = "@gentask:tasks";
 const OFFLINE_TASKS_STORAGE_KEY = "@gentask:offlineTasks";

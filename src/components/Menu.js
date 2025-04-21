@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Animated, Dimensions, Image, Text, View } from "react-native";
+import { Animated, Image, Text, View } from "react-native";
 import { ThemeContext } from "../contexts/ThemeContext";
 import MenuOption from "./MenuOption";
 

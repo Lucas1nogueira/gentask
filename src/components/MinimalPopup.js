@@ -1,6 +1,6 @@
-import { useContext, useEffect } from "react";
-import { Text, Animated, ActivityIndicator } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
+import { useContext, useEffect } from "react";
+import { ActivityIndicator, Animated, Text } from "react-native";
 import { ThemeContext } from "../contexts/ThemeContext";
 
 function MinimalPopup(props) {

@@ -13,11 +13,11 @@ import {
   View,
 } from "react-native";
 import { ThemeContext } from "../contexts/ThemeContext";
-import { getTaskAnalysis } from "../services/aiService";
+import { getProfileAnalysis } from "../services/aiService";
 import { animateBlinking } from "../utils/animationUtils";
 import Chart from "./Chart";
 
-function TaskAnalysisPopup(props) {
+function ProfileAnalysisPopup(props) {
   const { styles } = useContext(ThemeContext);
 
   const opacityAnimation = useRef(new Animated.Value(1)).current;
@@ -48,26 +48,24 @@ function TaskAnalysisPopup(props) {
   }, [opacityAnimation]);
 
   useEffect(() => {
-    if (props.tasks && props.taskAnalysisMode) {
-      getTaskAnalysis(props.tasks, props.taskAnalysisMode).then(
-        (analysisObject) => {
-          if (analysisObject) {
-            setChartData(analysisObject.categories);
-            setAnalysisResult(analysisObject.result);
-            setAnalysisLoad(true);
-          } else if (analysisObject === null) {
-            setErrorMessage(
-              "Não foram encontradas tarefas pendentes com data prevista para o período selecionado!"
-            );
-            setAnalysisLoad(false);
-          } else if (analysisObject === false) {
-            setErrorMessage(
-              "Não foi possível conectar com o servidor no momento! Por favor, verifique sua conexão e tente novamente mais tarde."
-            );
-            setAnalysisLoad(false);
-          }
+    if (props.tasks) {
+      getProfileAnalysis(props.tasks).then((analysisObject) => {
+        if (analysisObject) {
+          setChartData(analysisObject.categories);
+          setAnalysisResult(analysisObject.result);
+          setAnalysisLoad(true);
+        } else if (analysisObject === null) {
+          setErrorMessage(
+            "Nenhuma tarefa cadastrada! Por favor, insira uma ou mais tarefas para que a análise possa ser realizada."
+          );
+          setAnalysisLoad(false);
+        } else if (analysisObject === false) {
+          setErrorMessage(
+            "Não foi possível conectar com o servidor no momento! Por favor, verifique sua conexão e tente novamente mais tarde."
+          );
+          setAnalysisLoad(false);
         }
-      );
+      });
     }
   }, []);
 
@@ -91,14 +89,12 @@ function TaskAnalysisPopup(props) {
           }}
         >
           <MaterialCommunityIcons
-            name="timeline-help"
+            name="account-question-outline"
             size={20}
             color={styles.icon.color}
           />
           <Text style={[styles.header, { paddingLeft: 5 }]}>
-            {props.taskAnalysisMode === "weekly"
-              ? "Ajuda semanal"
-              : props.taskAnalysisMode === "monthly" && "Ajuda mensal"}
+            Análise de perfil
           </Text>
         </View>
         {didAnalysisLoad === null ? (
@@ -187,4 +183,4 @@ function TaskAnalysisPopup(props) {
   );
 }
 
-export default TaskAnalysisPopup;
+export default ProfileAnalysisPopup;

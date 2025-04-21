@@ -1,6 +1,6 @@
+import { Octicons } from "@expo/vector-icons";
 import { useContext, useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import { Octicons } from "@expo/vector-icons";
 import { ThemeContext } from "../contexts/ThemeContext";
 
 function FilteringBar(props) {
