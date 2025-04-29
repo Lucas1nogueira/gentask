@@ -375,7 +375,11 @@ function AuthScreen() {
                       .catch((error) => {
                         setLoading(false);
                         setErrorMessage(
-                          `Não foi possível fazer login!\n${error.message}`
+                          `Não foi possível fazer login!\n${
+                            error.code === "auth/invalid-credential"
+                              ? "Credenciais inválidas."
+                              : "Ocorreu um erro ao processar sua solicitação."
+                          }`
                         );
                         setPopups((prevState) => ({
                           ...prevState,
@@ -415,7 +419,11 @@ function AuthScreen() {
                       .catch((error) => {
                         setLoading(false);
                         setErrorMessage(
-                          `Não foi possível fazer o cadastro!\n${error.message}`
+                          `Não foi possível fazer o cadastro!\n${
+                            error.code === "auth/email-already-in-use"
+                              ? "Este e-mail já está em uso."
+                              : "Ocorreu um erro ao processar sua solicitação."
+                          }`
                         );
                         setPopups((prevState) => ({
                           ...prevState,
