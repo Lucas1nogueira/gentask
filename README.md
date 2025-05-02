@@ -18,23 +18,22 @@ Um gerenciador de tarefas inteligente desenvolvido com React Native e Expo, pote
 - React Native
 - Expo
 - Firebase (Authentication e Firestore)
-- OpenRouter API
+- Gemini API
 
 ## 📋 Pré-requisitos
 
 - Node.js instalado
 - Expo CLI
-- Conta e projeto no Firebase
-- Conta no OpenRouter e chave API
+- Projeto no Firebase
+- Chave para API do Gemini
 - Expo Go instalado no dispositivo móvel (para desenvolvimento)
 
-Os dados para acesso da API do OpenRouter são obtidos do Firestore.
+Os dados para acesso a API do Gemini são obtidos do Firestore.
 Portanto, é necessário que você crie o caminho para eles na sua base de dados.
 Crie a coleção 'ai' e o documento 'config', inserindo neste último os seguintes dados:
 
-- apiUrl: A URL para a API do OpenRouter.
-- apiKey: Sua chave para acessar a API.
-- model: O modelo de IA que você tem acesso.
+- apiKey: Sua chave de acesso.
+- modelName: Seu modelo de escolha do Gemini (ex: "gemini-2.0-flash").
 
 ## ⚙️ Configuração
 

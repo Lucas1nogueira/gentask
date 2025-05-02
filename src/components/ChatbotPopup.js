@@ -1,4 +1,5 @@
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -12,7 +13,7 @@ import {
   View,
 } from "react-native";
 import { ThemeContext } from "../contexts/ThemeContext";
-import { query } from "../services/aiService";
+import { apiKey, modelName } from "../services/aiService";
 import ChatRoundedArrow from "./ChatRoundedArrow";
 
 function ChatbotPopup(props) {
@@ -22,44 +23,69 @@ function ChatbotPopup(props) {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [systemPrompt, setSystemPrompt] = useState("");
+  const [chat, setChat] = useState(null);
 
   const startNewChat = useCallback(() => {
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: modelName });
+
+    const initialMessage = {
+      id: (Date.now() + 1).toString(),
+      text: "Olá! Como posso te ajudar hoje?",
+      sender: "bot",
+      timestamp: new Date(),
+    };
+
     const tasks = props.data
       ? Object.values(props.data)
-          .filter((task) => !task.isCompleted)
+          .filter((task) => task.isCompleted === false)
           .map((task) => ({
             text: task.text,
-            dueDate: task.dueDate
-              ? new Date(task.dueDate).toLocaleDateString("pt-BR", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                })
-              : "N/A",
+            dueDate: task.dueDate,
           }))
       : [];
 
-    const newSystemPrompt =
+    const taskContext =
       tasks.length > 0
-        ? `You are a helpful assistant. The user's current tasks are: ${JSON.stringify(
+        ? `Essas são as tarefas do usuário: ${JSON.stringify(
             tasks
-          )}. 
-         Answer what he asks you in brazilian portuguese (limit to 50 words).`
-        : "You are a helpful assistant. Answer in brazilian portuguese (limit to 50 words).";
+          )}. Use-as para responder, sempre com POUCAS palavras.`
+        : "";
 
-    setSystemPrompt(newSystemPrompt);
-    setMessages([
-      {
-        id: Date.now().toString(),
-        text: "Olá! Como posso te ajudar hoje?",
-        sender: "bot",
-        timestamp: new Date(),
+    const initialHistory = [];
+
+    if (taskContext) {
+      initialHistory.push(
+        {
+          role: "user",
+          parts: [{ text: taskContext }],
+        },
+        {
+          role: "model",
+          parts: [
+            {
+              text: "Recebi as tarefas.",
+            },
+          ],
+        }
+      );
+    }
+
+    const newChat = model.startChat({
+      history: initialHistory,
+      generationConfig: {
+        maxOutputTokens: 200,
+        temperature: 0.7,
       },
-    ]);
+    });
+
+    setChat(newChat);
+    setMessages([initialMessage]);
   }, [props.data]);
 
   async function handleSend() {
+    if (!chat) return;
+
     if (!inputText.trim() || isLoading) return;
 
     if (inputText.trim().toLocaleLowerCase() === "sair") {
@@ -77,18 +103,20 @@ function ChatbotPopup(props) {
     setMessages((prev) => [...prev, userMessage]);
     setInputText("");
     setIsLoading(true);
+
     setTimeout(() => {
       scrollRef.current?.scrollToEnd({ animated: true });
     }, 100);
 
     try {
-      const botResponse = await query(systemPrompt, inputText, 200, 0.7);
+      const res = await chat.sendMessage(inputText);
+      const text = await res.response.text();
 
       setMessages((prev) => [
         ...prev,
         {
           id: Date.now().toString(),
-          text: botResponse.trim(),
+          text: text.trim(),
           sender: "bot",
           timestamp: new Date(),
         },
@@ -140,7 +168,6 @@ function ChatbotPopup(props) {
           backgroundColor: "rgba(0,0,0,0.3)",
         },
       ]}
-      onPress={() => props.close()}
     >
       <KeyboardAvoidingView
         style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
@@ -157,6 +184,7 @@ function ChatbotPopup(props) {
               ref={scrollRef}
               data={messages}
               keyExtractor={(item) => item.id}
+              keyboardShouldPersistTaps="handled"
               renderItem={({ item }) => (
                 <View
                   style={[

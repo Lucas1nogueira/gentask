@@ -1,9 +1,10 @@
+import { GoogleGenAI } from "@google/genai";
 import categories from "../data/categories";
 import { getAIConfig } from "./firebase/firestore";
 
-let apiUrl;
-let apiKey;
-let aiModel;
+export let apiKey;
+export let modelName;
+let genAI;
 
 const categorizingPromptTemplate = `Classifique a tarefa a seguir em exatamente UMA das categorias seguintes. Responda UNICAMENTE com o nome da categoria. As categorias são: (${categories
   .map((category) => category.name)
@@ -26,9 +27,9 @@ async function configure() {
     const aiConfig = await getAIConfig();
 
     if (aiConfig) {
-      apiUrl = aiConfig.apiUrl;
       apiKey = aiConfig.apiKey;
-      aiModel = aiConfig.model;
+      modelName = aiConfig.modelName;
+      genAI = new GoogleGenAI({ apiKey });
       return true;
     } else {
       console.log("Could not obtain AI configuration!");
@@ -40,49 +41,27 @@ async function configure() {
 }
 
 async function query(prePrompt, userInput, maxTokens, temp) {
-  if (!apiUrl || !apiKey || !aiModel) {
-    throw new Error("API URL, API key or AI model are not defined.");
+  if (!apiKey || !modelName) {
+    throw new Error("API key or AI model are not defined.");
   }
 
   const fullPrompt = `${prePrompt} ${userInput}`;
-  const TIMEOUT_DURATION = 15000;
-
-  const timeoutController = new AbortController();
-  const timeout = setTimeout(() => timeoutController.abort(), TIMEOUT_DURATION);
 
   try {
-    const response = await fetch(apiUrl, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: aiModel,
-        messages: [{ role: "user", content: fullPrompt }],
-        max_tokens: maxTokens,
-        top_k: 1,
+    const response = await genAI.models.generateContent({
+      model: modelName,
+      contents: fullPrompt,
+      config: {
+        maxOutputTokens: maxTokens,
         temperature: temp,
-      }),
-      signal: timeoutController.signal,
+      },
     });
 
-    clearTimeout(timeout);
+    const result = response.text;
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    // console.log(JSON.stringify(data, null, 2));
-
-    if (!data?.choices?.[0]?.message?.content) {
-      throw new Error("Incomplete API response: " + JSON.stringify(data));
-    }
-
-    return data.choices[0].message.content;
+    return result;
   } catch (error) {
-    throw new Error(`AI query error: ${error.message}`);
+    throw new Error(`Gemini query error: ${error.message}`);
   }
 }
 
