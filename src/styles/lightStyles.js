@@ -122,7 +122,7 @@ const lightStyles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     alignSelf: "center",
-    paddingHorizontal: 17,
+    paddingHorizontal: 15,
   },
   categorySelectionButton: {
     height: 40,
@@ -130,7 +130,15 @@ const lightStyles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 15,
     backgroundColor: "#dbdbdb",
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
+  },
+  selectedCategoryOption: {
+    height: 40,
+    borderLeftWidth: 2,
+    borderColor: "#eaeaea",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingLeft: 10,
   },
   topBar: {
     minWidth: "100%",

@@ -144,12 +144,12 @@ function FilteringBar(props) {
 
   return (
     <View style={styles.filteringBar}>
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Text style={[styles.text, { paddingRight: 10 }]}>Categoria:</Text>
-        <TouchableOpacity
-          style={styles.categorySelectionButton}
-          onPress={() => props.openCategoryPickerPopup()}
-        >
+      <TouchableOpacity
+        style={styles.categorySelectionButton}
+        onPress={() => props.openCategoryPickerPopup()}
+      >
+        <Text style={[styles.text, { paddingRight: 10 }]}>Categoria</Text>
+        <View style={styles.selectedCategoryOption}>
           <Octicons
             name="dot-fill"
             size={22}
@@ -158,8 +158,8 @@ function FilteringBar(props) {
           <Text style={[styles.text, { paddingLeft: 5 }]}>
             {props.selectedCategory.name}
           </Text>
-        </TouchableOpacity>
-      </View>
+        </View>
+      </TouchableOpacity>
       <TouchableOpacity onPress={() => props.openSortPickerPopup()}>
         <Octicons name="sort-desc" size={22} color={styles.icon.color} />
       </TouchableOpacity>

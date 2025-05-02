@@ -26,9 +26,12 @@ function Menu(props) {
         />
         <View>
           <Text style={styles.header}>Gentask</Text>
-          <Text style={[styles.text, { fontSize: 10 }]}>
-            © Lucas Bastos 2025 • GPLv3
-          </Text>
+          <View style={{ flexDirection: "row" }}>
+            <Text style={[styles.header, { fontSize: 10 }]}>
+              © Lucas Bastos 2025{" "}
+            </Text>
+            <Text style={[styles.text, { fontSize: 10 }]}>• GPLv3</Text>
+          </View>
         </View>
       </View>
       <View style={styles.menuOptions}>
