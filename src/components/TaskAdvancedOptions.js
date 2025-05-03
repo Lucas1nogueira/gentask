@@ -76,9 +76,7 @@ function TaskAdvancedOptions(props) {
                 alignItems: "center",
               }}
             >
-              <Text style={[styles.text, { paddingRight: 10 }]}>
-                Categoria:
-              </Text>
+              <Text style={[styles.text, { paddingRight: 10 }]}>Categoria</Text>
               <TouchableOpacity
                 style={styles.categorySelectionButton}
                 onPress={() => props.openCategoryPickerPopup()}
@@ -101,7 +99,7 @@ function TaskAdvancedOptions(props) {
                 alignItems: "center",
               }}
             >
-              <Text style={[styles.text, { paddingRight: 10 }]}>Urgência:</Text>
+              <Text style={[styles.text, { paddingRight: 10 }]}>Urgente?</Text>
               <View
                 style={{
                   width: 150,
@@ -178,9 +176,7 @@ function TaskAdvancedOptions(props) {
                 alignItems: "center",
               }}
             >
-              <Text style={[styles.text, { paddingRight: 10 }]}>
-                Selecione uma data:
-              </Text>
+              <Text style={[styles.text, { paddingRight: 10 }]}>Data</Text>
               <TouchableOpacity
                 style={styles.categorySelectionButton}
                 onPress={() => props.openDatePickerPopup()}

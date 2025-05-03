@@ -87,8 +87,6 @@ const darkStyles = StyleSheet.create({
     height: screenHeight,
     left: 0,
     top: 0,
-    borderRightWidth: 1,
-    borderRightColor: "#555",
     backgroundColor: "#000",
     padding: 30,
     shadowColor: "#000",
@@ -129,8 +127,8 @@ const darkStyles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 15,
-    backgroundColor: "#191919",
-    paddingHorizontal: 12,
+    backgroundColor: "#222",
+    paddingHorizontal: 10,
   },
   selectedCategoryOption: {
     height: 40,
@@ -143,7 +141,7 @@ const darkStyles = StyleSheet.create({
   topBar: {
     minWidth: "100%",
     width: "100%",
-    height: 60,
+    height: 65,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -151,7 +149,7 @@ const darkStyles = StyleSheet.create({
   },
   searchbar: {
     width: "100%",
-    height: 50,
+    height: 45,
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#191919",
@@ -466,7 +464,7 @@ const darkStyles = StyleSheet.create({
     justifyContent: "space-around",
     alignItems: "center",
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 15,
     borderColor: "#333",
     backgroundColor: "#1e1e1e",
     paddingHorizontal: 10,
@@ -585,7 +583,7 @@ const darkStyles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#777",
+    borderColor: "#333",
     borderRadius: 15,
     backgroundColor: "rgba(0,0,0,0.3)",
     paddingHorizontal: 10,
@@ -677,9 +675,6 @@ const darkStyles = StyleSheet.create({
   taskControlScroll: {
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "white",
-    borderRadius: 15,
     overflow: "hidden",
   },
   urgentTask: {
@@ -692,7 +687,7 @@ const darkStyles = StyleSheet.create({
     backgroundColor: "#274c4b",
   },
   taskAnalysisButtonGradient: {
-    colors: ["#2a7eaa", "#2aaa6c"],
+    colors: ["#1a4a66", "#1a6640"],
   },
   switch: {
     backgroundColor: "#333",

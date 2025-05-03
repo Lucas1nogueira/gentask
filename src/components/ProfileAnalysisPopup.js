@@ -3,7 +3,7 @@ import {
   MaterialCommunityIcons,
   MaterialIcons,
 } from "@expo/vector-icons/";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef } from "react";
 import {
   Animated,
   BackHandler,
@@ -13,7 +13,7 @@ import {
   View,
 } from "react-native";
 import { ThemeContext } from "../contexts/ThemeContext";
-import { getProfileAnalysis } from "../services/aiService";
+import { useProfileAnalysis } from "../hooks/useProfileAnalysis";
 import { animateBlinking } from "../utils/animationUtils";
 import Chart from "./Chart";
 
@@ -22,10 +22,8 @@ function ProfileAnalysisPopup(props) {
 
   const opacityAnimation = useRef(new Animated.Value(1)).current;
 
-  const [chartData, setChartData] = useState(null);
-  const [didAnalysisLoad, setAnalysisLoad] = useState(null);
-  const [analysisResult, setAnalysisResult] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const { didAnalysisLoad, chartData, analysisResult, errorMessage } =
+    useProfileAnalysis(props.tasks);
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
@@ -46,28 +44,6 @@ function ProfileAnalysisPopup(props) {
 
     return () => animation.stop();
   }, [opacityAnimation]);
-
-  useEffect(() => {
-    if (props.tasks) {
-      getProfileAnalysis(props.tasks).then((analysisObject) => {
-        if (analysisObject) {
-          setChartData(analysisObject.categories);
-          setAnalysisResult(analysisObject.result);
-          setAnalysisLoad(true);
-        } else if (analysisObject === null) {
-          setErrorMessage(
-            "Nenhuma tarefa cadastrada! Por favor, insira uma ou mais tarefas para que a análise possa ser realizada."
-          );
-          setAnalysisLoad(false);
-        } else if (analysisObject === false) {
-          setErrorMessage(
-            "Não foi possível conectar com o servidor no momento! Por favor, verifique sua conexão e tente novamente mais tarde."
-          );
-          setAnalysisLoad(false);
-        }
-      });
-    }
-  }, []);
 
   return (
     <View

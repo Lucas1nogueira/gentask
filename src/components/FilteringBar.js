@@ -145,7 +145,13 @@ function FilteringBar(props) {
   return (
     <View style={styles.filteringBar}>
       <TouchableOpacity
-        style={styles.categorySelectionButton}
+        style={[
+          styles.categorySelectionButton,
+          {
+            backgroundColor: styles.taskContainer.backgroundColor,
+            paddingHorizontal: 13,
+          },
+        ]}
         onPress={() => props.openCategoryPickerPopup()}
       >
         <Text style={[styles.text, { paddingRight: 10 }]}>Categoria</Text>

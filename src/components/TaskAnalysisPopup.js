@@ -3,7 +3,7 @@ import {
   MaterialCommunityIcons,
   MaterialIcons,
 } from "@expo/vector-icons/";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef } from "react";
 import {
   Animated,
   BackHandler,
@@ -13,7 +13,7 @@ import {
   View,
 } from "react-native";
 import { ThemeContext } from "../contexts/ThemeContext";
-import { getTaskAnalysis } from "../services/aiService";
+import { useTaskAnalysis } from "../hooks/useTaskAnalysis";
 import { animateBlinking } from "../utils/animationUtils";
 import Chart from "./Chart";
 
@@ -22,10 +22,8 @@ function TaskAnalysisPopup(props) {
 
   const opacityAnimation = useRef(new Animated.Value(1)).current;
 
-  const [chartData, setChartData] = useState(null);
-  const [didAnalysisLoad, setAnalysisLoad] = useState(null);
-  const [analysisResult, setAnalysisResult] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const { didAnalysisLoad, chartData, analysisResult, errorMessage } =
+    useTaskAnalysis(props.tasks, props.taskAnalysisMode);
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
@@ -46,30 +44,6 @@ function TaskAnalysisPopup(props) {
 
     return () => animation.stop();
   }, [opacityAnimation]);
-
-  useEffect(() => {
-    if (props.tasks && props.taskAnalysisMode) {
-      getTaskAnalysis(props.tasks, props.taskAnalysisMode).then(
-        (analysisObject) => {
-          if (analysisObject) {
-            setChartData(analysisObject.categories);
-            setAnalysisResult(analysisObject.result);
-            setAnalysisLoad(true);
-          } else if (analysisObject === null) {
-            setErrorMessage(
-              "Não foram encontradas tarefas pendentes com data prevista para o período selecionado!"
-            );
-            setAnalysisLoad(false);
-          } else if (analysisObject === false) {
-            setErrorMessage(
-              "Não foi possível conectar com o servidor no momento! Por favor, verifique sua conexão e tente novamente mais tarde."
-            );
-            setAnalysisLoad(false);
-          }
-        }
-      );
-    }
-  }, []);
 
   return (
     <View
