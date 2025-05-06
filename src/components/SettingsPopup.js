@@ -126,8 +126,8 @@ function SettingsPopup(props) {
           <TouchableOpacity
             style={styles.settingsButton}
             onPress={() => {
-              props.openLogoutPopup();
               props.close();
+              props.openLogoutPopup();
             }}
           >
             <MaterialIcons name="logout" size={24} color={styles.icon.color} />
