@@ -49,7 +49,7 @@ function ChatbotPopup(props) {
       tasks.length > 0
         ? `Essas são as tarefas do usuário: ${JSON.stringify(
             tasks
-          )}. Use-as para responder, sempre com POUCAS palavras.`
+          )}. Use-as para responder, sempre com POUCAS palavras. Ignore termos temporais.`
         : "";
 
     const initialHistory = [];

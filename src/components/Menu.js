@@ -54,7 +54,7 @@ function Menu(props) {
         <MenuOption
           iconName="settings"
           text="Ajustes"
-          action={props.openSettingsPopup}
+          action={() => props.openSettingsPopup()}
         />
       </View>
     </Animated.View>

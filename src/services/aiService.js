@@ -16,7 +16,7 @@ const dueDatePromptTemplate = `Analise as seguintes tarefa e data. Se na tarefa 
 
 const insightsPromptTemplate = `Considerando a tarefa a seguir, forneça um insight útil. NÃO ultrapasse 10 palavras. A tarefa é: `;
 
-const analysisPromptTemplate = `Considerando as tarefas a seguir, forneça uma análise com dicas. Use emojis, a resposta deve ser de tamanho médio, e não conter negrito ou itálico. Ignore termos temporais. O texto é: `;
+const analysisPromptTemplate = `Considerando as tarefas a seguir, forneça uma análise com dicas. Use emojis, a resposta deve ser de tamanho médio, e não conter negrito, itálico ou asteriscos. IGNORE termos temporais. O texto é: `;
 
 const profilePromptTemplate = `Considerando isso, forneça uma análise com dicas para melhorar. Responda sem caracteres especiais. Responda brevemente. O texto é: `;
 
@@ -267,7 +267,7 @@ async function getTaskSuggestion(tasks) {
       suggestionPromptTemplate,
       tasksText,
       50,
-      0.7
+      0.9
     );
 
     if (typeof taskSuggestion === "string") {
