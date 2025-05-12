@@ -14,13 +14,13 @@ const isUrgentPromptTemplate = `Considerando o texto a seguir como uma tarefa, p
 
 const dueDatePromptTemplate = `Analise as seguintes tarefa e data. Se na tarefa for encontrado algum termo temporal, como "amanhã", "semana que vem", "próximo mês" ou qualquer outro, tente calcular a data de conclusão a partir do termo temporal, por exemplo: "amanhã" = +1 dia, "semana que vem" = +7 dias, "daqui a X dias" = +X dias, e assim por diante. Responda UNICAMENTE com a data de conclusão (formato DD/MM/AAAA) ou apenas "no" se nenhum termo temporal for encontrado. Nenhum comentário adicional!`;
 
-const insightsPromptTemplate = `Considerando a tarefa a seguir, forneça um insight útil. NÃO ultrapasse 10 palavras. A tarefa é: `;
+const insightsPromptTemplate = `Considerando a tarefa a seguir, forneça um insight útil e breve, sem formatação. A tarefa é: `;
 
-const analysisPromptTemplate = `Considerando as tarefas a seguir, forneça uma análise com dicas. Use emojis, a resposta deve ser de tamanho médio, e não conter negrito, itálico ou asteriscos. IGNORE termos temporais. O texto é: `;
+const analysisPromptTemplate = `Considerando as tarefas a seguir, forneça uma análise com dicas. Use emojis, a resposta deve ser de tamanho médio, e não conter negrito ou itálico. IGNORE termos temporais. O texto é: `;
 
-const profilePromptTemplate = `Considerando isso, forneça uma análise com dicas para melhorar. Responda sem caracteres especiais. Responda brevemente. O texto é: `;
+const profilePromptTemplate = `Considerando isso, forneça uma análise com dicas para melhorar. Responda brevemente, sem negrito ou itálico. O texto é: `;
 
-const suggestionPromptTemplate = `Considerando as tarefas a seguir, sugira apenas uma nova tarefa criativa baseada em interesses encontrados. Responda com poucas palavras. Tarefas: `;
+const suggestionPromptTemplate = `Considerando as tarefas a seguir, sugira apenas uma nova tarefa baseada em interesses encontrados. Responda com poucas palavras, sem formatação. Tarefas: `;
 
 async function configure() {
   try {

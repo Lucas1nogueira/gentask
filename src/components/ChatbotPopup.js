@@ -49,7 +49,7 @@ function ChatbotPopup(props) {
       tasks.length > 0
         ? `Essas são as tarefas do usuário: ${JSON.stringify(
             tasks
-          )}. Use-as para responder, sempre com POUCAS palavras. Ignore termos temporais.`
+          )}. Use-as para responder. Resposta em tamanho curto, sem negrito ou itálico, e ignore termos temporais.`
         : "";
 
     const initialHistory = [];
@@ -74,7 +74,7 @@ function ChatbotPopup(props) {
     const newChat = model.startChat({
       history: initialHistory,
       generationConfig: {
-        maxOutputTokens: 200,
+        maxOutputTokens: 300,
         temperature: 0.7,
       },
     });
