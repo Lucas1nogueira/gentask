@@ -40,11 +40,12 @@ const darkStyles = StyleSheet.create({
   authInput: {
     width: "100%",
     height: 50,
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 15,
     borderWidth: 0.5,
     borderRadius: 10,
     borderColor: "#555",
-    color: "white",
     backgroundColor: "#111",
     paddingHorizontal: 10,
   },

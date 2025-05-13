@@ -40,11 +40,12 @@ const lightStyles = StyleSheet.create({
   authInput: {
     width: "100%",
     height: 50,
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 15,
     borderWidth: 0.5,
     borderRadius: 10,
     borderColor: "#999",
-    color: "#000",
     backgroundColor: "#CCC",
     paddingHorizontal: 10,
   },

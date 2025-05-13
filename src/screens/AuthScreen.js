@@ -1,4 +1,4 @@
-import { Entypo, Feather, MaterialIcons } from "@expo/vector-icons/";
+import { Entypo, Feather, Ionicons, MaterialIcons } from "@expo/vector-icons/";
 import MaskedView from "@react-native-masked-view/masked-view";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
@@ -53,6 +53,8 @@ function AuthScreen() {
   const [email, onChangeEmail] = useState("");
   const [password, onChangePassword] = useState("");
   const [confirmPassword, onChangeConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [warningMessage, setWarningMessage] = useState("");
@@ -274,7 +276,10 @@ function AuthScreen() {
               <Text style={[styles.text, { paddingLeft: 5 }]}>E-mail</Text>
             </View>
             <TextInput
-              style={styles.authInput}
+              style={[
+                styles.authInput,
+                { color: styles.text.color, paddingHorizontal: 14 },
+              ]}
               value={email}
               onChangeText={(input) => onChangeEmail(input)}
               keyboardType="email-address"
@@ -296,14 +301,31 @@ function AuthScreen() {
               />
               <Text style={[styles.text, { paddingLeft: 5 }]}>Senha</Text>
             </View>
-            <TextInput
-              style={styles.authInput}
-              value={password}
-              onChangeText={(input) => onChangePassword(input)}
-              secureTextEntry
-              placeholder="Digite aqui..."
-              placeholderTextColor={styles.authInputPlaceholder.color}
-            />
+            <View style={styles.authInput}>
+              <TextInput
+                style={{
+                  width: 249,
+                  marginRight: 5,
+                  color: styles.text.color,
+                }}
+                value={password}
+                onChangeText={(input) => onChangePassword(input)}
+                secureTextEntry={!showPassword}
+                placeholder="Digite aqui..."
+                placeholderTextColor={styles.authInputPlaceholder.color}
+              />
+              {password.length > 0 && (
+                <TouchableOpacity
+                  onPress={() => setShowPassword(!showPassword)}
+                >
+                  <Ionicons
+                    name={showPassword ? "eye-off-outline" : "eye-outline"}
+                    size={22}
+                    color={styles.icon.color}
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
           {authMode === "signUp" && (
             <Animated.View
@@ -329,14 +351,33 @@ function AuthScreen() {
                   Confirmar senha
                 </Text>
               </View>
-              <TextInput
-                style={styles.authInput}
-                value={confirmPassword}
-                onChangeText={(input) => onChangeConfirmPassword(input)}
-                secureTextEntry
-                placeholder="Digite aqui..."
-                placeholderTextColor={styles.authInputPlaceholder.color}
-              />
+              <View style={styles.authInput}>
+                <TextInput
+                  style={{
+                    width: 249,
+                    marginRight: 5,
+                    color: styles.text.color,
+                  }}
+                  value={confirmPassword}
+                  onChangeText={(input) => onChangeConfirmPassword(input)}
+                  secureTextEntry={!showConfirmPassword}
+                  placeholder="Digite aqui..."
+                  placeholderTextColor={styles.authInputPlaceholder.color}
+                />
+                {confirmPassword.length > 0 && (
+                  <TouchableOpacity
+                    onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    <Ionicons
+                      name={
+                        showConfirmPassword ? "eye-off-outline" : "eye-outline"
+                      }
+                      size={22}
+                      color={styles.icon.color}
+                    />
+                  </TouchableOpacity>
+                )}
+              </View>
             </Animated.View>
           )}
           <View
